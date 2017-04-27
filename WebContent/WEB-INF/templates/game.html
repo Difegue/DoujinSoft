@@ -1,0 +1,72 @@
+{% extends "./base.html" %}
+
+{% block background %}./img/bg_gam.png{% endblock %}
+{% block color %}green{% endblock %}
+{% block type %}Games{% endblock %}
+{% block desc %}Browse the games created by the DIY Community! <br/><br/>You can download .mio files directly or make a selection to import into a save later.{% endblock %}
+
+
+{% block content %}
+	
+	{% for game in games %}
+	
+	<div class="col s12 m6 l4">
+
+          <div class="card {{ game.colorCart }} darken-2">
+            <div class="game-header {{ game.colorLogo }} accent-4">
+                <div class="chip game-title" style="font-family: warioware; font-size:24px; margin-left:10px; margin-top:10px; background-color: rgb(53, 53, 53); color: white; display:inline-block">
+                  {{ game.name }}
+                </div>
+                <div class="game-metadata black-text" style="float: right; text-align: right; margin-right:5px;font-size:12px; display:inline-block; margin-top:5px">
+                  Released on {{ game.timestamp }}<br/>
+                  MIO-ID: G-{{ game.mioID }}
+                </div>
+              </div>
+
+            <div class="card-content black-text">
+
+                  <div class="game-data" style="display:inline-block; float:right; width:100%;">
+
+                    <div style="width:125px; float:left">
+
+                      <div class="game-author white-text" style="background-image: url('./img/icons/game/publisher.png'); line-height:17px; font-size:15px; width: 125px; height: 50px; text-align:center; padding:7px; margin-right:10px; display:inline-block; vertical-align: top;">
+                      {{ game.brand }} <br/>Software
+                      </div>
+
+                      <div class="game-maker black white-text" style="width:125px; text-align:center; margin-top:10px; border: 3px solid black; border-radius:10px; font-size:12px ">
+                        Made By
+                        <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px">
+                          {{ game.creator }}
+                          </div>
+                      </div>
+
+                  </div>
+
+                    <img style="display:inline-block; float:right; max-width:180px; width:100%; border: 3px solid black" src="{{ game.preview }}"/>
+
+                  </div>
+
+              <span class="card-title white-text" style="margin-bottom:-10px; font-size: 22px; "><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
+            </div>
+            <div class="card-action">
+              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="#" style="width:48%" >
+                <object data="./img/download.svg" type="image/svg+xml" style="height:85%; margin-top:2px">
+                  <img src="yourfallback.jpg" />
+                </object>
+              </a>
+              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" href="#">
+                <i class="material-icons">shopping_cart</i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+        
+    {% else %}
+    
+	No games in the database ! <br/>
+	This might be a mistake.
+        
+	{% endfor %}
+	
+{% endblock %}

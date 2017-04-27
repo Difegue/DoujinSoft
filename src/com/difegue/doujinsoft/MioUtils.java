@@ -11,6 +11,10 @@ import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;
 
@@ -22,6 +26,10 @@ import com.xperia64.diyedit.editors.MangaEdit;
 
 public class MioUtils {
 	
+	//Constants for timestamp printing
+	private static final DateTime date = new DateTime(2000, 1, 1, 0, 0, 0, 0);
+	private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy");
+	
 	// Basic enum to distinguish mio files quickly. 
 	//Game = 64KB, Manga = 14KB, Record = 8KB.
 	public class Types {
@@ -30,7 +38,16 @@ public class MioUtils {
 		   public static final int RECORD = 8192;
 		}
 	
-
+	/*
+	 * Returns a readable date from DIY's weird timestamp ints.
+	 */
+	public static String getTimeString(int timestamp)
+	{
+		
+		DateTime dateMio = date.plusDays(timestamp);
+    	return  dateMio.toString(formatter);
+	}
+	
 	/*
 	 * Returns color strings matching the bytes used in .mio files.
 	 * The strings match the colors used by MaterializeCSS.
@@ -53,8 +70,8 @@ public class MioUtils {
 		case 3: return "orange";
 		case 4: return "indigo";
 		case 5: return "red";
-		case 6: return "white";
-		case 7: return "black";
+		case 6: return "grey lighten-3";
+		case 7: return "grey darken-4";
 		default: return "purple";
 		}
 	}
