@@ -30,6 +30,10 @@ body {
     font-family: Karla;
 }
 
+label.active {
+	margin-top:8px;
+}
+
 .pagination-wrapper {
 	
 	height: 50px; 
