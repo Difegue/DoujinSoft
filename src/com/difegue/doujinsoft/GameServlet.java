@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.difegue.doujinsoft.MioUtils.Types;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
@@ -76,14 +78,102 @@ public class GameServlet extends HttpServlet {
     	
     }
     
+    
+    //Generates the regular landing page for games.
+    private String doStandardPage(ServletContext application) throws PebbleException, SQLException, IOException {
+    	
+    	ArrayList<Game> games = new ArrayList<Game>();
+    	Map<String, Object> context = new HashMap<>();
+		Connection connection = null;
+		
+    	PebbleEngine engine = new PebbleEngine.Builder().build();
+		PebbleTemplate compiledTemplate;
+
+		//Getting base template
+		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/game.html"));
+		String dataDir = application.getInitParameter("dataDirectory");
+
+	    // create a database connection
+	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+	    Statement statement = connection.createStatement();
+	    statement.setQueryTimeout(30);  // set timeout to 30 sec.
+	    
+	    ResultSet result = statement.executeQuery("select * from Games LIMIT 9");
+	    
+	    while(result.next()) 
+	    	games.add(new Game(result));
+		
+		context.put("games", games);
+		
+		//Output to client
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+		
+		return output;
+    	
+    }
+    
+    //Generates a smaller HTML for searches/pages.
+    private String doSearch(ServletContext application, HttpServletRequest request ) throws SQLException, PebbleException, IOException {
+    	
+    	ArrayList<Game> games = new ArrayList<Game>();
+    	Map<String, Object> context = new HashMap<>();
+		Connection connection = null;
+		
+    	PebbleEngine engine = new PebbleEngine.Builder().build();
+		PebbleTemplate compiledTemplate;
+
+		//We only use the part of the template containing the game cards here
+		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/gameDetail.html"));	
+		String dataDir = application.getInitParameter("dataDirectory");
+		
+	    // create a database connection
+	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+	    Statement statement = connection.createStatement();
+	    statement.setQueryTimeout(30);  // set timeout to 30 sec.
+    	
+	    String query = "SELECT * FROM Games WHERE name LIKE ? AND creator LIKE ? LIMIT 9 OFFSET ?";
+		
+		PreparedStatement ret = connection.prepareStatement(query);
+		
+		int page = 1;
+		String name = "%";
+		String creator = "%";
+		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
+			page = Integer.parseInt(request.getParameter("page"));
+		
+		if (request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty())
+			name = "%"+request.getParameter("name")+"%";
+		
+		if (request.getParameterMap().containsKey("creator"))
+			creator = "%"+request.getParameter("creator")+"%";
+		
+		ret.setString(1, name);
+		ret.setString(2, creator);
+		ret.setInt(3, page*9-9);
+    	
+		ResultSet result = ret.executeQuery();
+	    
+	    while(result.next()) 
+	    	games.add(new Game(result));
+		
+		context.put("games", games);
+		
+		//Output to client
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+		
+		return output;
+    }
+    
+    
     /**
      * @see HttpServlet#HttpServlet()
      */
     public GameServlet() {
-        super();
-        
-        
-        
+        super(); 
     }
 
 	/**
@@ -91,49 +181,21 @@ public class GameServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		ServletLog = Logger.getLogger("GameServlet");
-    	ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
-    	int page = 1;
-    	
-    	if (request.getParameterMap().containsKey("page"))
-    		page = Integer.parseInt(request.getParameter("page"));
-    	
 		response.setContentType("text/html; charset=UTF-8");
 		ServletContext application = getServletConfig().getServletContext();	
-		String dataDir = application.getInitParameter("dataDirectory");
 		
-		
-		PebbleEngine engine = new PebbleEngine.Builder().build();
-		PebbleTemplate compiledTemplate;
+		String output = "";
 		try {
-			//Getting base template
-			compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/game.html"));
-			Map<String, Object> context = new HashMap<>();
 			
-			//Fill 'er up
-			ArrayList<Game> games = new ArrayList<Game>();
-			Connection connection = null;
-			
-		    // create a database connection
-		    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-		    Statement statement = connection.createStatement();
-		    statement.setQueryTimeout(30);  // set timeout to 30 sec.
-		    
-		    //todo: limits on this select w. a parameter of get 
-		    ResultSet result = statement.executeQuery("select * from Games LIMIT 9 OFFSET "+(page*9-9));
-		    
-		    while(result.next()) {
-		    	games.add(new Game(result));
-		    }
-			
-			context.put("games", games);
-			
-			//Output to client
-			Writer writer = new StringWriter();
-			compiledTemplate.evaluate(writer, context);
-			String output = writer.toString();
+			Map<String, String[]> paramMap = request.getParameterMap();
+				
+			if (paramMap.isEmpty())
+	    		output = doStandardPage(application);
+			else
+				output = doSearch(application, request);
+				
 			response.getWriter().append(output);
-			
+				
 		} catch (PebbleException e ) {
 			ServletLog.log(Level.SEVERE, e.getPebbleMessage());
 		}

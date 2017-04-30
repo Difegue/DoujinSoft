@@ -1,0 +1,59 @@
+{% for game in games %}
+	
+	<div class="col s12 m6 l4">
+
+          <div class="card {{ game.colorCart }} darken-2">
+            <div class="game-header {{ game.colorLogo }} accent-4">
+                <div class="chip game-title">
+                  {{ game.name }}
+                </div>
+                <div class="game-metadata black-text">
+                  Released on {{ game.timestamp }}<br/>
+                  MIO-ID: G-{{ game.mioID }}
+                </div>
+              </div>
+
+            <div class="card-content black-text">
+
+                  <div class="game-data">
+
+                    <div style="width:125px; float:left">
+
+                      <div class="game-brand white-text">
+                      {{ game.brand }} <br/>Software
+                      </div>
+
+                      <div class="game-creator black white-text">
+                        Made By
+                        <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" onclick="searchForUser('{{ game.creator }}')">
+                          {{ game.creator }}
+                          </div>
+                      </div>
+
+                  </div>
+
+                    <img class ="game-preview" src="{{ game.preview }}"/>
+
+                  </div>
+
+              <span class="game-text card-title white-text" style=""><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
+            </div>
+            <div class="card-action">
+              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="#" style="width:48%" >
+                <i class="material-icons">file_download</i>
+              </a>
+              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" href="#">
+                <i class="material-icons">shopping_cart</i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+        
+   {% else %}
+   
+No more games. <br/>
+Sad.
+       
+{% endfor %}
+	

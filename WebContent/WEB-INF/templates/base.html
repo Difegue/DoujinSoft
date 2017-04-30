@@ -8,7 +8,7 @@
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/css?family=Karla|Material+Icons" rel="stylesheet"> 
-  <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   
   <style>
@@ -17,6 +17,12 @@
     	
 	}
   </style>
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+  <script src="js/jquery.twbsPagination.min.js"></script>
+  <script src="js/init.js"></script>
 
 </head>
 <body>
@@ -57,7 +63,6 @@
       <div class="row center">
         <h5 class="header col s12 light white-text">{% block desc %}Generic description here{% endblock %}</h5>
       </div>
-      <br><br>
 
     </div>
   </div>
@@ -67,15 +72,20 @@
     <div class="section">
 
       <!--   Content Section   -->
-      <div class="row">
+      <div class="row" id="content">
 		{% block content %}
-    		No games.... ;_;
+		
     	{% endblock %}   
 	  </div>
-    <br><br>
-
-    <div class="section"></div>
+    
+      <div class="row center">
+	  	{% block footdata %}
+	    	
+	    {% endblock %}
+	  </div>
+	  
     </div>
+   
   </div>
 
   <footer class="page-footer orange">
@@ -109,17 +119,13 @@
     </div>
     <div class="footer-copyright">
       <div class="container">
-      Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      	Powered by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
       </div>
     </div>
   </footer>
 
 
-  <!--  Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
-  <script src="js/jquery.twbsPagination.min.js"></script>
-  <script src="js/init.js"></script>
+  
 
   </body>
 </html>

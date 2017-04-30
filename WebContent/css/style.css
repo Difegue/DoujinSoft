@@ -30,6 +30,14 @@ body {
     font-family: Karla;
 }
 
+.pagination-wrapper {
+	
+	height: 50px; 
+	max-width: 600px; 
+	width: 70%;
+	
+}
+
 .game-header {
 
     overflow:hidden;
@@ -99,7 +107,7 @@ body {
     margin-bottom:-10px !important; 
     font-size: 22px !important; 
     display: inline-flex !important;
-    height: 50px;
+    height: 80px;
     text-overflow: ellipsis;
 }
 
