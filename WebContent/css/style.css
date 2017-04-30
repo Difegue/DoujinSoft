@@ -10,7 +10,7 @@
   padding: 0 15px;
 }
 .icon-block .material-icons {
-	font-size: inherit;
+    font-size: inherit;
 }
 
 @font-face {
@@ -22,9 +22,119 @@
 }
 
 body {
+    background-image: url('../img/bg_gam.png');
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.6) 100%), url('../img/bg_gam.png');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
     font-family: Karla;
+}
+
+.game-header {
+
+    overflow:hidden;
+    width:100%;
+}
+
+.game-title {
+    font-family: warioware;
+    font-size: 24px !important;
+    margin-left: 10px;
+    margin-top: 10px;
+    background-color: #353535 !important;
+    color: #FFF !important;
+    display: inline-block;
+    min-width: 50%;
+    text-align: center;
+}
+
+.game-metadata {
+    float: right;
+    text-align: right;
+    margin-right: 5px;
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.game-data {
+    display: inline-block;
+    float: right;
+    width: 100%; 
+}
+
+.game-brand {
+    background-image: url('../img/icons/game/publisher.png'); 
+    line-height:17px; 
+    font-size:15px; 
+    width: 125px; 
+    height: 50px; 
+    text-align:center; 
+    padding:7px; 
+    margin-right:10px; 
+    display:inline-block; 
+    vertical-align: top;
+}
+
+.game-creator {
+    width:125px; 
+    text-align:center; 
+    margin-top:10px; 
+    border: 3px solid black; 
+    border-radius:10px; 
+    font-size:12px; 
+}
+
+.game-preview {
+
+    display:inline-block; 
+    float:right; 
+    max-width:180px; 
+    width:100%; 
+    border: 3px solid black;
+}
+
+.game-text {
+
+    margin-bottom:-10px !important; 
+    font-size: 22px !important; 
+    display: inline-flex !important;
+    height: 50px;
+    text-overflow: ellipsis;
+}
+
+@media screen and (max-width:1600px) and (min-width:992px), screen and (max-width:880px) and (min-width:600px), screen and (max-width: 400px ){
+
+    .game-preview {
+        width:50%; 
+    }
+
+
+    .game-metadata {
+        font-size: 12px;
+        text-align: center;
+        display: block;
+        float: none;
+    }
+
+    .game-title {
+        min-width: 200%;
+        margin-left: 10px;
+        text-align: left;
+    }
+}
+
+@media screen and (max-width:1360px) and (min-width:992px), screen and (max-width:750px) and (min-width:600px), screen and (max-width: 400px ){
+
+    .game-preview {
+        margin-top: 10px;
+        width:100%; 
+        float:none;
+    }
+    
+    .game-data {
+    text-align: center;
+    }
+
+
 }

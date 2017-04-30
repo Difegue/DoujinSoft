@@ -14,10 +14,10 @@
 
           <div class="card {{ game.colorCart }} darken-2">
             <div class="game-header {{ game.colorLogo }} accent-4">
-                <div class="chip game-title" style="font-family: warioware; font-size:24px; margin-left:10px; margin-top:10px; background-color: rgb(53, 53, 53); color: white; display:inline-block">
+                <div class="chip game-title">
                   {{ game.name }}
                 </div>
-                <div class="game-metadata black-text" style="float: right; text-align: right; margin-right:5px;font-size:12px; display:inline-block; margin-top:5px">
+                <div class="game-metadata black-text">
                   Released on {{ game.timestamp }}<br/>
                   MIO-ID: G-{{ game.mioID }}
                 </div>
@@ -25,15 +25,15 @@
 
             <div class="card-content black-text">
 
-                  <div class="game-data" style="display:inline-block; float:right; width:100%;">
+                  <div class="game-data">
 
                     <div style="width:125px; float:left">
 
-                      <div class="game-author white-text" style="background-image: url('./img/icons/game/publisher.png'); line-height:17px; font-size:15px; width: 125px; height: 50px; text-align:center; padding:7px; margin-right:10px; display:inline-block; vertical-align: top;">
+                      <div class="game-brand white-text">
                       {{ game.brand }} <br/>Software
                       </div>
 
-                      <div class="game-maker black white-text" style="width:125px; text-align:center; margin-top:10px; border: 3px solid black; border-radius:10px; font-size:12px ">
+                      <div class="game-creator black white-text">
                         Made By
                         <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px">
                           {{ game.creator }}
@@ -42,11 +42,11 @@
 
                   </div>
 
-                    <img style="display:inline-block; float:right; max-width:180px; width:100%; border: 3px solid black" src="{{ game.preview }}"/>
+                    <img class ="game-preview" src="{{ game.preview }}"/>
 
                   </div>
 
-              <span class="card-title white-text" style="margin-bottom:-10px; font-size: 22px; "><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
+              <span class="game-text card-title white-text" style=""><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
             </div>
             <div class="card-action">
               <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="#" style="width:48%" >
