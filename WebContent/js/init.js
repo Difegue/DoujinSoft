@@ -63,3 +63,40 @@ function searchForUser(creator)
 	loadItems(1);
 	
 }
+
+function drawManga(page1, page2, page3, page4)
+{
+	  ctx = $('#canvas_manga')[0].getContext('2d');
+	  img1 = new Image();
+	  img2 = new Image();
+	  img3 = new Image();
+	  img4 = new Image();
+	
+	  img1.src = page1;
+	  img2.src = page2;
+	  img3.src = page3;
+	  img4.src = page4;
+	  
+	  img1.addEventListener('load', function() {
+		  ctx.drawImage(img1, 1, 1);
+		}, false);
+	  
+	  img2.addEventListener('load', function() {
+		  ctx.drawImage(img2, 1, 129);
+		}, false);
+	  
+	  img3.addEventListener('load', function() {
+		  ctx.drawImage(img3, 1, 257);
+		}, false);
+	  
+	  img4.addEventListener('load', function() {
+		  ctx.drawImage(img4, 1, 385);
+		}, false);
+	 
+	 
+	  
+
+	  
+	  $('.materialboxed').click();
+
+}

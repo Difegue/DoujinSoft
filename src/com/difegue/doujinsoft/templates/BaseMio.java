@@ -32,7 +32,7 @@ public class BaseMio {
 		}
 		else {
 			mioDesc1 = desc;
-			mioDesc2 = "_";
+			mioDesc2 = "";
 		}
 		
 		colorCart = result.getString("color");

@@ -135,6 +135,10 @@ label.active {
     text-overflow: ellipsis;
 }
 
+.materialboxed:not(.active) {
+  display:none;
+}
+
 @media screen and (max-width:1600px) and (min-width:992px), screen and (max-width:880px) and (min-width:600px), screen and (max-width: 400px ){
 
     .game-preview {

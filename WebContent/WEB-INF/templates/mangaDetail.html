@@ -32,16 +32,8 @@
 
                   </div>
 
-					<div id='gallery'>
-					  <a href="{{ item.pages[0] }}">
-						<img class ="game-preview" src="{{ item.pages[0] }}"/> 
-					  </a>
-					  <a href="{{ item.pages[1] }}"> </a>
-					  <a href="{{ item.pages[2] }}"> </a>
-					  <a href="{{ item.pages[3] }}"> </a>
-					</div>
-					
-					<script>$('#gallery a').materialbox();</script>
+					<img class="game-preview z-depth-1" style="cursor: zoom-in" src="{{ item.pages[0] }}" onclick="drawManga('{{ item.pages[0] }}','{{ item.pages[1] }}','{{ item.pages[2] }}','{{ item.pages[3] }}')" />
+
                   </div>
 
               <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
@@ -65,4 +57,6 @@ Sad.
        
 {% endfor %}
 	
+<canvas class="materialboxed" style="position:absolute; top:-600" id="canvas_manga" width="193" height="513" style="background-color:black;"></canvas>
+
 <span id="total_items" style="display:none">{{ totalitems }}</span>
