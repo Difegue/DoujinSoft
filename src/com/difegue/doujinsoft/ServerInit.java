@@ -26,10 +26,11 @@ import com.xperia64.diyedit.metadata.Metadata;
  */
 public class ServerInit implements javax.servlet.ServletContextListener {
 
+
+//Database structure, straightforward stuff
 private void databaseDefinition(Statement statement) throws SQLException
 {
 	
-	 //Database structure, straightforward stuff
     statement.executeUpdate("CREATE TABLE IF NOT EXISTS Games "
       + "(id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, isAdult INTEGER, "
       + "previewPic TEXT, PRIMARY KEY(`id`) )");
@@ -44,7 +45,7 @@ private void databaseDefinition(Statement statement) throws SQLException
 	
 }
 
-/*
+/* 
  * Standard parsing for every .mio file - Returns the first values of the final SQL Statement.
  */
 private PreparedStatement parseMioBase(Metadata mio, String ID, Connection co, int type) throws SQLException {

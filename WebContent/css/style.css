@@ -34,6 +34,13 @@ label.active {
 	margin-top:8px;
 }
 
+.pagination li.active {
+    background-color: #EE6E73;
+    font-size: 1.2rem;
+    padding: 0px 10px;
+    line-height: 30px;
+}
+
 .pagination-wrapper {
 	
 	height: 50px; 

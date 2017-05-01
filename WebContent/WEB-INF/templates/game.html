@@ -27,7 +27,7 @@ You can download .mio files directly or make a selection to import into a save l
           </div>
       </div>
     <br/>  <br/>   
-  	<a class="waves-effect waves-light btn" style="width:160px" onclick="resetPagination()">
+  	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadGames(1)">
   		<i class="material-icons left">search</i>Search
   	</a>
   	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
@@ -38,7 +38,7 @@ You can download .mio files directly or make a selection to import into a save l
 </div>
 <br/>
 <div id="pagination-top" class="pagination-wrapper chip">
-  <ul class="pagination-sm"></ul>
+  <ul class="pagination"></ul>
 </div>
 
 {% endblock %}
@@ -53,7 +53,7 @@ You can download .mio files directly or make a selection to import into a save l
 {% block footdata %}
 
 <div id="pagination-bottom" class="pagination-wrapper chip">
-  <ul class="pagination-sm"></ul>
+  <ul class="pagination"></ul>
 </div>
 
 {% endblock %}

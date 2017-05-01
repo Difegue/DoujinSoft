@@ -4,14 +4,19 @@
     $('.button-collapse').sideNav();
 
     
-    $('.pagination-sm').twbsPagination({
-        totalPages: 35,
-        visiblePages: 7,
-        first: '<i class="material-icons">first_page</i>',
-        prev: '<i class="material-icons">chevron_left</i>',
-        next:'<i class="material-icons">chevron_right</i>',
-        last: '<i class="material-icons">last_page</i>',
-        onPageClick: function (event, page) {
+    $('.pagination').pagination({
+        items: $("#total_games").html(),
+        itemsOnPage: 9,
+        currentPage: 1,
+        displayedPages: 3,
+        ellipsePageSet: false,
+        cssStyle: '',
+        prevText: '<i class="material-icons">chevron_left</i>',
+        nextText: '<i class="material-icons">chevron_right</i>',
+        onInit: function () {
+            // fire first page loading
+        },
+        onPageClick: function (page, evt) {
         	loadGames(page);
         }
     });
@@ -24,12 +29,13 @@ function loadGames(pageNumber)
 {
 	
 	//showSpinner();
+	
 	$.get( "games", { page: pageNumber, name: $("#game_name").val(), creator: $("#maker_name").val() } )
-		.done(function( data ) {
-			
+		.done(function( data ) {		
 			$("#content").html(data);
 			
-			//return data;
+			$('.pagination').pagination('updateItems', $("#total_games").html());
+			$('.pagination').pagination('drawPage', pageNumber);
 		})
 		.fail(function() {
 			alert("error wow");
@@ -38,30 +44,14 @@ function loadGames(pageNumber)
 
 }
 
-function resetPagination()
-{
-	
-	$('.pagination-sm').twbsPagination('destroy');
-	$('.pagination-sm').twbsPagination({
-        totalPages: 35, //todo: use a number given by the server while treating gameDetail pages
-        visiblePages: 7,
-        first: '<i class="material-icons">first_page</i>',
-        prev: '<i class="material-icons">chevron_left</i>',
-        next:'<i class="material-icons">chevron_right</i>',
-        last: '<i class="material-icons">last_page</i>',
-        onPageClick: function (event, page) {
-        	loadGames(page);
-        }
-    });
 
-}
 
 function clearSearch()
 {
 	$("#game_name").val("");
 	$("#maker_name").val("");
 	Materialize.updateTextFields();
-	resetPagination();
+	loadGames(1);
 }
 
 function searchForUser(creator)
@@ -69,6 +59,6 @@ function searchForUser(creator)
 	$("#game_name").val("");
 	$("#maker_name").val(creator);
 	Materialize.updateTextFields();
-	resetPagination();
+	loadGames(1);
 	
 }

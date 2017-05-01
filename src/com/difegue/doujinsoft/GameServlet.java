@@ -103,7 +103,11 @@ public class GameServlet extends HttpServlet {
 	    while(result.next()) 
 	    	games.add(new Game(result));
 		
+	    result = statement.executeQuery("select COUNT(id) from Games");
+	    
 		context.put("games", games);
+		context.put("totalgames", result.getInt(1));
+		
 		
 		//Output to client
 		Writer writer = new StringWriter();
@@ -130,12 +134,12 @@ public class GameServlet extends HttpServlet {
 		
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-	    Statement statement = connection.createStatement();
-	    statement.setQueryTimeout(30);  // set timeout to 30 sec.
     	
 	    String query = "SELECT * FROM Games WHERE name LIKE ? AND creator LIKE ? LIMIT 9 OFFSET ?";
+	    String queryCount = "SELECT COUNT(id) FROM Games WHERE name LIKE ? AND creator LIKE ?";
 		
 		PreparedStatement ret = connection.prepareStatement(query);
+		
 		
 		int page = 1;
 		String name = "%";
@@ -152,13 +156,21 @@ public class GameServlet extends HttpServlet {
 		ret.setString(1, name);
 		ret.setString(2, creator);
 		ret.setInt(3, page*9-9);
+		
     	
 		ResultSet result = ret.executeQuery();
 	    
 	    while(result.next()) 
 	    	games.add(new Game(result));
+
+	    PreparedStatement ret2 = connection.prepareStatement(queryCount);
+	    
+	    ret2.setString(1, name);
+		ret2.setString(2, creator);
+	    result = ret2.executeQuery();
 		
 		context.put("games", games);
+		context.put("totalgames", result.getInt(1));
 		
 		//Output to client
 		Writer writer = new StringWriter();
