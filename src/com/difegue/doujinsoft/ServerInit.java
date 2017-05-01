@@ -113,7 +113,6 @@ public void contextInitialized(ServletContextEvent arg0) {
 	try {
 		Class.forName("org.sqlite.JDBC");
 	} catch (ClassNotFoundException e1) {
-		// TODO Auto-generated catch block
 		e1.printStackTrace();
 	}
 	System.out.println("DoujinSoft Database builder started");	

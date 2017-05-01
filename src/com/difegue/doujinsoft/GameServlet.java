@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.difegue.doujinsoft.MioUtils.Types;
+import com.difegue.doujinsoft.templates.Game;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
@@ -38,46 +38,59 @@ public class GameServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private Logger ServletLog;
     
-    /*
-     * Class used for binding with the template.
-     */
-    public class Game { 	
-    	
-		public Game(ResultSet result) throws SQLException{
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		response.setContentType("text/html; charset=UTF-8");
+		ServletContext application = getServletConfig().getServletContext();			
+		String output = "";
 		
-			//Compute timestamp 
-	    	timestamp = MioUtils.getTimeString(result.getInt("timeStamp"));
+		try {
+			
+	    	output = doStandardPage(application);
+			response.getWriter().append(output);
+				
+		} catch (SQLException | PebbleException e) {
+			ServletLog.log(Level.SEVERE, e.getMessage());
+		}
+
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-	    	String desc = result.getString("description");
-	    	colorLogo = result.getString("colorLogo");
-	    	
-	    	//Special case to make black logos readable on the user interface
-	    	if (colorLogo.equals("grey darken-4"))
-	    		colorLogo = "grey";
-	    	
-	    	name = result.getString("name");
-	    	mioID = result.getString("id");
-			brand = result.getString("brand");
-			creator = result.getString("creator");
-			if (desc.length() > 18) {
-				mioDesc1 = desc.substring(0,18);
-				mioDesc2 = desc.substring(18);
-			}
-			else {
-				mioDesc1 = desc;
-				mioDesc2 = "_";
-			}
-			preview = result.getString("previewPic");
-			colorCart = result.getString("color");
-			logo = result.getInt("logo");
+		response.setContentType("text/html; charset=UTF-8");
+		ServletContext application = getServletConfig().getServletContext();	
+		String output = "Who are you running from?";
 		
+		try {
+			
+			if (!request.getParameterMap().isEmpty())
+				output = doSearch(application, request);
+
+			response.getWriter().append(output);
+			
+		} catch (SQLException | PebbleException e) {
+			ServletLog.log(Level.SEVERE, e.getMessage());
 		}
 		
-		public String name, timestamp, mioID, brand, creator, mioDesc1, mioDesc2, preview, colorLogo, colorCart;
-    	public int logo;
-    	
-    }
+	}
+
     
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public GameServlet() {
+        super(); 
+        ServletLog = Logger.getLogger("GameServlet");
+        ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));     
+    }
+   
     
     //Generates the regular landing page for games.
     private String doStandardPage(ServletContext application) throws PebbleException, SQLException, IOException {
@@ -106,7 +119,7 @@ public class GameServlet extends HttpServlet {
 	    result = statement.executeQuery("select COUNT(id) from Games");
 	    
 		context.put("games", games);
-		context.put("totalgames", result.getInt(1));
+		context.put("totalitems", result.getInt(1));
 		
 		
 		//Output to client
@@ -170,7 +183,7 @@ public class GameServlet extends HttpServlet {
 	    result = ret2.executeQuery();
 		
 		context.put("games", games);
-		context.put("totalgames", result.getInt(1));
+		context.put("totalitems", result.getInt(1));
 		
 		//Output to client
 		Writer writer = new StringWriter();
@@ -179,50 +192,5 @@ public class GameServlet extends HttpServlet {
 		
 		return output;
     }
-    
-    
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public GameServlet() {
-        super(); 
-    }
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		response.setContentType("text/html; charset=UTF-8");
-		ServletContext application = getServletConfig().getServletContext();	
-		
-		String output = "";
-		try {
-			
-			Map<String, String[]> paramMap = request.getParameterMap();
-				
-			if (paramMap.isEmpty())
-	    		output = doStandardPage(application);
-			else
-				output = doSearch(application, request);
-				
-			response.getWriter().append(output);
-				
-		} catch (PebbleException e ) {
-			ServletLog.log(Level.SEVERE, e.getPebbleMessage());
-		}
-		  catch(SQLException e){
-			ServletLog.log(Level.SEVERE, e.getSQLState());
-		}
-
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
 
 }

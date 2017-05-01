@@ -42,7 +42,7 @@
               <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=game&id={{ game.mioID }}" style="width:48%" >
                 <i class="material-icons">file_download</i>
               </a>
-              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addGameToCart('{{ game.mioID }}')">
+              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('game','{{ game.mioID }}')">
                 <i class="material-icons">shopping_cart</i>
               </a>
             </div>
@@ -57,4 +57,4 @@ Sad.
        
 {% endfor %}
 	
-<span id="total_games" style="display:none">{{ totalgames }}</span>
+<span id="total_items" style="display:none">{{ totalitems }}</span>

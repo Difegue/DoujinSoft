@@ -1,13 +1,13 @@
 {% extends "./base.html" %}
 
-{% block gamepage %}active{% endblock %}
-{% block background %}./img/bg_gam.png{% endblock %}
-{% block color %}green{% endblock %}
-{% block type %}Games{% endblock %}
+{% block comicpage %}active{% endblock %}
+{% block background %}./img/bg_com.png{% endblock %}
+{% block color %}blue{% endblock %}
+{% block type %}Comics{% endblock %}
 {% block desc %}
-Browse the games created by the DIY Community! 
+Browse some classic Nintendo-powered 4komas, from before Miiverse was a thing.
 <br/><br/>
-You can download .mio files directly or make a selection to import into a save later.
+Thanks to our cutting-edge technology, you can read those comics straight from your browser.
 <br/><br/>
 
 <div id="game-search">
@@ -22,9 +22,9 @@ You can download .mio files directly or make a selection to import into a save l
 
 	<div style="height: 50px; width: 300px" class="chip">
         <div class="input-field" style="margin-top:-5px; margin-left: -10px;">
-            <i style="margin-top: 15px;" class="material-icons prefix">videogame_asset</i>
+            <i style="margin-top: 15px;" class="material-icons prefix">local_library</i>
             <input id="game_name" type="text">
-            <label class="" for="item_name">Game Name</label>
+            <label class="" for="item_name">Comic Name</label>
           </div>
       </div>
     <br/>  <br/>   
@@ -47,7 +47,7 @@ You can download .mio files directly or make a selection to import into a save l
 
 {% block content %}
 
-	{% include "./gameDetail.html" %}
+	{% include "./mangaDetail.html" %}
 	
 {% endblock %}
 

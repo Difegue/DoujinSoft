@@ -38,17 +38,17 @@
       DoujinSoft Store
       </a>
       <ul class="right hide-on-med-and-down">
-        <li><a href="./games">Games</a></li>
-        <li><a href="./records">Records</a></li>
-        <li><a href="./comics">Comics</a></li>
-        <li><a href="./cart">Cart</a></li>
+        <li class="{% block gamepage %}{% endblock %}"><a href="./games">Games</a></li>
+        <li class="{% block recordpage %}{% endblock %}"><a href="./records">Records</a></li>
+        <li class="{% block comicpage %}{% endblock %}"><a href="./comics">Comics</a></li>
+        <li class="{% block cartpage %}{% endblock %}"><a href="./cart">Cart</a></li>
       </ul>
 
       <ul id="nav-mobile" class="side-nav white">
-        <li><a href="./games">Games</a></li>
-        <li><a href="./records">Records</a></li>
-        <li><a href="./comics">Comics</a></li>
-        <li><a href="./cart">Cart</a></li>
+ 		<li class="{% block gamepage %}{% endblock %}"><a href="./games">Games</a></li>
+        <li class="{% block recordpage %}{% endblock %}"><a href="./records">Records</a></li>
+        <li class="{% block comicpage %}{% endblock %}"><a href="./comics">Comics</a></li>
+        <li class="{% block cartpage %}{% endblock %}"><a href="./cart">Cart</a></li>
       </ul>
       <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
     </div>

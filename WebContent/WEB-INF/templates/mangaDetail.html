@@ -1,0 +1,68 @@
+{% for item in mangas %}
+	
+	<div class="col s12 m6 l4">
+
+          <div class="card {{ item.colorCart }} darken-2">
+            <div class="game-header {{ item.colorLogo }} accent-4">
+                <div class="chip game-title">
+                  {{ item.name }}
+                </div>
+                <div class="game-metadata black-text">
+                  Released on {{ item.timestamp }}<br/>
+                  MIO-ID: M-{{ item.mioID }}
+                </div>
+              </div>
+
+            <div class="card-content black-text">
+
+                  <div class="game-data">
+
+                    <div style="width:125px; float:left">
+
+                      <div class="manga-brand white-text">
+                      {{ item.brand }} <br/>Publishing
+                      </div>
+
+                      <div class="game-creator black white-text">
+                        Made By
+                        <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" onclick="searchForUser('{{ item.creator }}')">
+                          {{ item.creator }}
+                          </div>
+                      </div>
+
+                  </div>
+
+					<div id='gallery'>
+					  <a href="{{ item.pages[0] }}">
+						<img class ="game-preview" src="{{ item.pages[0] }}"/> 
+					  </a>
+					  <a href="{{ item.pages[1] }}"> </a>
+					  <a href="{{ item.pages[2] }}"> </a>
+					  <a href="{{ item.pages[3] }}"> </a>
+					</div>
+					
+					<script>$('#gallery a').materialbox();</script>
+                  </div>
+
+              <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
+            </div>
+            <div class="card-action">
+              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=manga&id={{ item.mioID }}" style="width:48%" >
+                <i class="material-icons">file_download</i>
+              </a>
+              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addMangaToCart('{{ item.mioID }}')">
+                <i class="material-icons">shopping_cart</i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+        
+   {% else %}
+   
+No more comics. <br/>
+Sad.
+       
+{% endfor %}
+	
+<span id="total_items" style="display:none">{{ totalitems }}</span>

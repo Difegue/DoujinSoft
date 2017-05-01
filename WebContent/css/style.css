@@ -95,6 +95,19 @@ label.active {
     vertical-align: top;
 }
 
+.manga-brand {
+    background-image: url('../img/icons/comic/publisher.png'); 
+    line-height:17px; 
+    font-size:15px; 
+    width: 125px; 
+    height: 50px; 
+    text-align:center; 
+    padding:7px; 
+    margin-right:10px; 
+    display:inline-block; 
+    vertical-align: top;
+}
+
 .game-creator {
     width:125px; 
     text-align:center; 
