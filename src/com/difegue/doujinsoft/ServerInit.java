@@ -67,7 +67,9 @@ private PreparedStatement parseMioBase(Metadata mio, String ID, Connection co, i
 	ret.setString(4, mio.getBrand());
 	ret.setString(5, mio.getDescription());
 	ret.setInt(6, mio.getTimestamp());
-	ret.setInt(10, 0);
+	
+	if (type == Types.GAME || type == Types.MANGA)
+		ret.setInt(10, 0);
 	
 	return ret;
 }

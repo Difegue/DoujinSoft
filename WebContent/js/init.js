@@ -92,11 +92,7 @@ function drawManga(page1, page2, page3, page4)
 	  img4.addEventListener('load', function() {
 		  ctx.drawImage(img4, 1, 385);
 		}, false);
-	 
-	 
-	  
-
-	  
+	   
 	  $('.materialboxed').click();
 
 }
