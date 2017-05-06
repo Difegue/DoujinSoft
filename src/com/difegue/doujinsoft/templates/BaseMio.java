@@ -35,6 +35,9 @@ public class BaseMio {
 			mioDesc2 = "";
 		}
 		
+		if (mioDesc1.equals(""))
+			mioDesc1 = "No Description.";
+		
 		colorCart = result.getString("color");
 		logo = result.getInt("logo");
 	

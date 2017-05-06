@@ -37,6 +37,7 @@ function loadItems(pageNumber)
 			
 			$('.pagination').pagination('updateItems', $("#total_items").html());
 			$('.pagination').pagination('drawPage', pageNumber);
+			$('.tooltipped').tooltip({delay: 50});
 		})
 		.fail(function() {
 			alert("error wow");
@@ -94,5 +95,12 @@ function drawManga(page1, page2, page3, page4)
 		}, false);
 	   
 	  $('.materialboxed').click();
+
+}
+
+function playMidi(id)
+{
+	MIDIjs.stop();
+	MIDIjs.play('midi?id='+id);
 
 }

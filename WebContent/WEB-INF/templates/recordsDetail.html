@@ -9,7 +9,7 @@
                 </div>
                 <div class="game-metadata black-text">
                   Released on {{ item.timestamp }}<br/>
-                  MIO-ID: M-{{ item.mioID }}
+                  MIO-ID: R-{{ item.mioID }}
                 </div>
               </div>
 
@@ -19,8 +19,8 @@
 
                     <div style="width:125px; float:left">
 
-                      <div class="manga-brand white-text">
-                      {{ item.brand }} <br/>Publishing
+                      <div class="brand record-brand white-text">
+                      {{ item.brand }} <br/>Music
                       </div>
 
                       <div class="game-creator black white-text">
@@ -31,6 +31,10 @@
                       </div>
 
                   </div>
+                  
+					<a class="btn manga-preview z-depth-1 tooltipped waves-effect {{ item.colorLogo }}" data-tooltip="Play this" onclick="playMidi('{{ item.mioID }}')" >
+					 	<img src="./img/icons/comic/comic_{{ item.logo }}.png" /> 
+					</a>
 
                   </div>
 

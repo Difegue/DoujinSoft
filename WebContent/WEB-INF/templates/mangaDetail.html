@@ -19,7 +19,7 @@
 
                     <div style="width:125px; float:left">
 
-                      <div class="manga-brand white-text">
+                      <div class="brand manga-brand white-text">
                       {{ item.brand }} <br/>Publishing
                       </div>
 
@@ -32,7 +32,9 @@
 
                   </div>
 
-					<img class="game-preview z-depth-1" style="cursor: zoom-in" src="{{ item.pages[0] }}" onclick="drawManga('{{ item.pages[0] }}','{{ item.pages[1] }}','{{ item.pages[2] }}','{{ item.pages[3] }}')" />
+					<a class="btn manga-preview z-depth-1 tooltipped waves-effect {{ item.colorLogo }}" data-tooltip="Read this" onclick="drawManga('{{ item.pages[0] }}','{{ item.pages[1] }}','{{ item.pages[2] }}','{{ item.pages[3] }}')" >
+					 	<img src="./img/icons/comic/comic_{{ item.logo }}.png" /> 
+					</a>
 
                   </div>
 

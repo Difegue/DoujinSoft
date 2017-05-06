@@ -21,13 +21,17 @@
     font-style: normal;
 }
 
+html {
+	font-family: Karla, Calibri, Trebuchet, sans-serif;
+}
+
 body {
     background-image: url('../img/bg_gam.png');
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.6) 100%), url('../img/bg_gam.png');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
-    font-family: Karla;
+    
 }
 
 label.active {
@@ -82,9 +86,8 @@ label.active {
     width: 100%; 
 }
 
-.game-brand {
-    background-image: url('../img/icons/game/publisher.png'); 
-    line-height:17px; 
+.brand {
+	line-height:17px; 
     font-size:15px; 
     width: 125px; 
     height: 50px; 
@@ -95,17 +98,16 @@ label.active {
     vertical-align: top;
 }
 
+.game-brand {
+    background-image: url('../img/icons/game/publisher.png'); 
+}
+
 .manga-brand {
     background-image: url('../img/icons/comic/publisher.png'); 
-    line-height:17px; 
-    font-size:15px; 
-    width: 125px; 
-    height: 50px; 
-    text-align:center; 
-    padding:7px; 
-    margin-right:10px; 
-    display:inline-block; 
-    vertical-align: top;
+}
+
+.record-brand {
+	background-image: url('../img/icons/music/publisher.png'); 
 }
 
 .game-creator {
@@ -126,6 +128,25 @@ label.active {
     border: 3px solid black;
 }
 
+.manga-preview {
+
+    display:inline-block; 
+    float:right; 
+    max-width:180px; 
+    width:100%; 
+    cursor: zoom-in; 
+    text-align: center; 
+    height:100px; 
+    border: none;
+}
+
+.manga-preview > img {
+	background-color: #353535; 
+	height: 75%; 
+	margin: 10%; 
+	border-radius: 5px;
+}
+
 .game-text {
 
     margin-bottom:-10px !important; 
@@ -139,12 +160,15 @@ label.active {
   display:none;
 }
 
-@media screen and (max-width:1600px) and (min-width:992px), screen and (max-width:880px) and (min-width:600px), screen and (max-width: 400px ){
+@media screen and (max-width:1700px) and (min-width:992px), screen and (max-width:920px) and (min-width:600px), screen and (max-width: 420px ){
 
     .game-preview {
         width:50%; 
     }
 
+	.manga-preview {
+		width:50%;
+	}
 
     .game-metadata {
         font-size: 12px;
@@ -163,6 +187,12 @@ label.active {
 @media screen and (max-width:1360px) and (min-width:992px), screen and (max-width:750px) and (min-width:600px), screen and (max-width: 400px ){
 
     .game-preview {
+        margin-top: 10px;
+        width:100%; 
+        float:none;
+    }
+    
+     .manga-preview {
         margin-top: 10px;
         width:100%; 
         float:none;
