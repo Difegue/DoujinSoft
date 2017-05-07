@@ -3,6 +3,7 @@
 	 
     $('.button-collapse').sideNav();
 
+    idPlaying = "";
     
     $('.pagination').pagination({
         items: $("#total_items").html(),
@@ -38,6 +39,7 @@ function loadItems(pageNumber)
 			$('.pagination').pagination('updateItems', $("#total_items").html());
 			$('.pagination').pagination('drawPage', pageNumber);
 			$('.tooltipped').tooltip({delay: 50});
+			$("#"+idPlaying+"-record").addClass("playing");
 		})
 		.fail(function() {
 			alert("error wow");
@@ -98,9 +100,29 @@ function drawManga(page1, page2, page3, page4)
 
 }
 
+
 function playMidi(id)
 {
+	
+	$("#toast-container .toast").remove();
+	$(".playing").removeClass();
 	MIDIjs.stop();
-	MIDIjs.play('midi?id='+id);
-
+	
+	if (id != idPlaying) {
+	
+		//Set the function as message callback
+		MIDIjs.message_callback = function(mes){
+			if (!mes.includes("Loading instruments"))
+				Materialize.toast(mes, 4000, 'rounded grey lighten-4 black-text');
+		};
+		
+		idPlaying=id;
+		
+		$("#"+id+"-record").addClass("playing");
+		MIDIjs.play('midi?id='+id);
+	}
+	else {
+		idPlaying = "";
+		Materialize.toast("Playback Stopped.", 4000, 'rounded grey lighten-4 black-text');
+	}
 }

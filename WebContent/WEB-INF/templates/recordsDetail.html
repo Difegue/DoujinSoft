@@ -32,9 +32,12 @@
 
                   </div>
                   
-					<a class="btn manga-preview z-depth-1 tooltipped waves-effect {{ item.colorLogo }}" data-tooltip="Play this" onclick="playMidi('{{ item.mioID }}')" >
-					 	<img src="./img/icons/comic/comic_{{ item.logo }}.png" /> 
-					</a>
+                  	<div class="record-preview tooltipped" data-tooltip="Play/Stop" onclick="playMidi('{{ item.mioID }}')">
+                  		<div id="{{ item.mioID }}-record" style="height:104px; width:104px; position: relative; margin-left: auto; margin-right: auto">
+	                  		<img src="./img/icons/music/disc.png" /> 
+						 	<img style="border-radius: 100px; left: 26%; top: 25%; height: 50%; padding: 7px;position: absolute;" class="{{ item.colorLogo }} darken-2" src="./img/icons/music/record_{{ item.logo }}.png" /> 
+						</div>
+					</div>
 
                   </div>
 

@@ -6,6 +6,10 @@
  * Made By MaterializeCSS.com
  */
 
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 .icon-block {
   padding: 0 15px;
 }
@@ -129,12 +133,19 @@ label.active {
 }
 
 .manga-preview {
+	cursor: zoom-in; 
+}
+
+.record-preview {
+	cursor: pointer;
+}
+
+.manga-preview, .record-preview {
 
     display:inline-block; 
     float:right; 
     max-width:180px; 
     width:100%; 
-    cursor: zoom-in; 
     text-align: center; 
     height:100px; 
     border: none;
@@ -145,6 +156,16 @@ label.active {
 	height: 75%; 
 	margin: 10%; 
 	border-radius: 5px;
+}
+
+.record-preview > img {
+	height: 100%; 
+}
+
+.playing {
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 4s linear infinite;
 }
 
 .game-text {
@@ -162,13 +183,10 @@ label.active {
 
 @media screen and (max-width:1700px) and (min-width:992px), screen and (max-width:920px) and (min-width:600px), screen and (max-width: 420px ){
 
-    .game-preview {
+    .game-preview, .manga-preview, .record-preview {
         width:50%; 
     }
 
-	.manga-preview {
-		width:50%;
-	}
 
     .game-metadata {
         font-size: 12px;
@@ -186,13 +204,7 @@ label.active {
 
 @media screen and (max-width:1360px) and (min-width:992px), screen and (max-width:750px) and (min-width:600px), screen and (max-width: 400px ){
 
-    .game-preview {
-        margin-top: 10px;
-        width:100%; 
-        float:none;
-    }
-    
-     .manga-preview {
+    .game-preview, .manga-preview, .record-preview {
         margin-top: 10px;
         width:100%; 
         float:none;

@@ -113,7 +113,7 @@ public class CartServlet extends HttpServlet {
     	
     }
     
-    //Generates a smaller HTML for searches/pages.
+    
     private String doSearch(ServletContext application, HttpServletRequest request ) throws SQLException, PebbleException, IOException {
     	
     	ArrayList<Record> items = new ArrayList<Record>();
