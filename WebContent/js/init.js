@@ -26,8 +26,7 @@
 })(jQuery); // end of jQuery name space
 
 
-function loadItems(pageNumber)
-{
+function loadItems(pageNumber) {
 	
 	//showSpinner();
 	
@@ -50,16 +49,16 @@ function loadItems(pageNumber)
 
 
 
-function clearSearch()
-{
+function clearSearch() {
+	
 	$("#item_name").val("");
 	$("#maker_name").val("");
 	Materialize.updateTextFields();
 	loadItems(1);
 }
 
-function searchForUser(creator)
-{
+function searchForUser(creator) {
+	
 	$("#item_name").val("");
 	$("#maker_name").val(creator);
 	Materialize.updateTextFields();
@@ -67,8 +66,8 @@ function searchForUser(creator)
 	
 }
 
-function drawManga(page1, page2, page3, page4)
-{
+function drawManga(page1, page2, page3, page4) {
+	
 	  ctx = $('#canvas_manga')[0].getContext('2d');
 	  img1 = new Image();
 	  img2 = new Image();
@@ -101,12 +100,10 @@ function drawManga(page1, page2, page3, page4)
 }
 
 
-function playMidi(id)
-{
+function playMidi(id) {
 	
 	$("#toast-container .toast").remove();
-	$(".playing").removeClass();
-	MIDIjs.stop();
+	$(".playing").removeClass("playing");
 	
 	if (id != idPlaying) {
 	
@@ -122,7 +119,30 @@ function playMidi(id)
 		MIDIjs.play('midi?id='+id);
 	}
 	else {
+		MIDIjs.stop();
 		idPlaying = "";
 		Materialize.toast("Playback Stopped.", 4000, 'rounded grey lighten-4 black-text');
 	}
+}
+
+function addToCart(type, id) {
+
+	if (localStorage.getItem(type) === null) {
+		var items = [id];
+		localStorage.setItem(type, JSON.stringify(items));
+		Materialize.toast("Item added to cart successfully.", 4000, 'rounded grey lighten-4 black-text');
+	}
+	else {
+		var items = JSON.parse(localStorage.getItem(type));
+		if (items.indexOf(id) === -1) {
+			items.push(id);
+			localStorage.setItem(type, JSON.stringify(items));
+			Materialize.toast("Item added to cart successfully.", 4000, 'rounded grey lighten-4 black-text');
+			}
+		else
+			Materialize.toast("Item already in cart.", 4000, 'rounded grey lighten-4 black-text');
+		
+	}
+	
+	
 }
