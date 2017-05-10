@@ -59,7 +59,7 @@ function loadItems(pageNumber) {
 			$("#"+idPlaying+"-record").addClass("playing");
 		})
 		.fail(function() {
-			alert("error wow");
+			alert("Couldn't load items from DoujinSoft.");
 			return 0;
 		});
 
@@ -97,6 +97,7 @@ function drawManga(page1, page2, page3, page4) {
 	  img3.src = page3;
 	  img4.src = page4;
 	  
+	  //Draw base64 images on canvas with a 1px black border
 	  img1.addEventListener('load', function() {
 		  ctx.drawImage(img1, 1, 1);
 		}, false);
@@ -173,9 +174,28 @@ function addToCart(type, id) {
 	
 }
 
-function deleteFromCart(type, id) {
+function deleteFromCart(item) {
 	
+	id = item.attr('id');
+	type = item.attr('type');
 	
+	console.log("deleting "+type+" with id "+id);
 	
+	//Open matching localStorage array, remove item and reinsert
+	var items = JSON.parse(localStorage.getItem(type));
+	itemPosition = null;
+	
+	for (i=0; i< items.length; i++) 
+		if (items[i].id === id)
+			itemPosition = i;
+	
+	items.splice(itemPosition,1);
+	
+	if (items.length > 0)
+		localStorage.setItem(type, JSON.stringify(items));
+	else
+		localStorage.removeItem(type);
+	
+	item.remove();
 	
 }

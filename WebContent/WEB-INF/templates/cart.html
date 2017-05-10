@@ -43,10 +43,10 @@ if (games === null && manga === null && record === null)
 if (games != null)
 for (i=0; i< games.length; i++)
 	$("#cart-main").append([
-		  '<li class="collection-item avatar cart-item" id="'+games[i].id+'" >',
+		  '<li class="collection-item avatar cart-item" id="'+games[i].id+'" type="game" >',
 		  '		<i class="material-icons green-text cart-icon">videogame_asset</i>',
 		  '		<span class="title">'+escapeHtml(games[i].name.trim())+'</span>',
-		  '		<a class="secondary-content cart-del" onclick="">',
+		  '		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
 		  '			<i class="material-icons">delete</i>',
 		  '		</a>',
 		  '</li>'
@@ -55,10 +55,10 @@ for (i=0; i< games.length; i++)
 if (manga != null)
 for (i=0; i< manga.length; i++)
 	$("#cart-main").append([
-		  '<li class="collection-item avatar cart-item" id="'+manga[i].id+'" >',
+		  '<li class="collection-item avatar cart-item" id="'+manga[i].id+'" type="manga">',
 		  '		<i class="material-icons blue-text cart-icon">local_library</i>',
 		  '		<span class="title">'+escapeHtml(manga[i].name.trim())+'</span>',
-		  '		<a class="secondary-content cart-del" onclick="">',
+		  '		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
 		  '			<i class="material-icons">delete</i>',
 		  '		</a>',
 		  '</li>'
@@ -67,10 +67,10 @@ for (i=0; i< manga.length; i++)
 if (record != null)
 for (i=0; i< record.length; i++)
 	$("#cart-main").append([
-		  '<li class="collection-item avatar cart-item" id="'+record[i].id+'" >',
+		  '<li class="collection-item avatar cart-item" id="'+record[i].id+'" type="record">',
 		  '		<i class="material-icons pink-text cart-icon">album</i>',
 		  '		<span class="title">'+escapeHtml(record[i].name.trim())+'</span>',
-		  '		<a class="secondary-content cart-del" onclick="">',
+		  '		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
 		  '			<i class="material-icons">delete</i>',
 		  '		</a>',
 		  '</li>'
