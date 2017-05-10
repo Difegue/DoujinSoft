@@ -11,26 +11,72 @@ Import content into your copies of DIY!
 You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
 <br/><br/>
 
-<ul class="collection with-header black-text" style="text-align:left">
-        <li class="collection-header"><h4>First Names</h4></li>
-        <li class="collection-item"><div>Alvin<a href="#!" class="secondary-content"><i class="material-icons">send</i></a></div></li>
-        <li class="collection-item"><div>Alvin<a href="#!" class="secondary-content"><i class="material-icons">send</i></a></div></li>
-        <li class="collection-item"><div>Alvin<a href="#!" class="secondary-content"><i class="material-icons">send</i></a></div></li>
-        <li class="collection-item"><div>Alvin<a href="#!" class="secondary-content"><i class="material-icons">send</i></a></div></li>
-      </ul>
-
-<a class="waves-effect waves-light btn-floating btn-large red btn-wii tooltipped" data-tooltip="Import Wii Save" onclick="loadItems(1)">
-  		</a>
-<a class="waves-effect waves-light btn-floating btn-large red btn-nds tooltipped" data-tooltip="Import NDS Save" onclick="loadItems(1)">
-</a>
-
-
 {% endblock %}
 
 
 
-{% block footdata %}
+{% block content %}
 
+<div id="cart-content">
+	<h5 class="white-text">Your Cart:</h5> 
+	<ul class="collection black-text" style="text-align:left" id="cart-main">
+	
+	</ul>
+	
+	<a class="waves-effect waves-light btn-floating btn-large red btn-wii tooltipped" data-tooltip="Import Wii Save" onclick="loadItems(1)">
+	  		</a>
+	<a class="waves-effect waves-light btn-floating btn-large red btn-nds tooltipped" data-tooltip="Import NDS Save" onclick="loadItems(1)">
+	</a>
+</div>
+
+<script>
+
+//Populate cart with localStorage
+
+var games = JSON.parse(localStorage.getItem("game"));
+var manga = JSON.parse(localStorage.getItem("manga"));
+var record = JSON.parse(localStorage.getItem("record"));
+
+if (games === null && manga === null && record === null) 
+	$("#cart-content").html('<h5 class="white-text center">...But your cart seems to be empty right now. <br/> <br/>  ┐(￣ー￣)┌  </h5> ');
+
+if (games != null)
+for (i=0; i< games.length; i++)
+	$("#cart-main").append([
+		  '<li class="collection-item avatar cart-item" id="'+games[i].id+'" >',
+		  '		<i class="material-icons green-text cart-icon">videogame_asset</i>',
+		  '		<span class="title">'+escapeHtml(games[i].name.trim())+'</span>',
+		  '		<a class="secondary-content cart-del" onclick="">',
+		  '			<i class="material-icons">delete</i>',
+		  '		</a>',
+		  '</li>'
+		].join("\n"));
+
+if (manga != null)
+for (i=0; i< manga.length; i++)
+	$("#cart-main").append([
+		  '<li class="collection-item avatar cart-item" id="'+manga[i].id+'" >',
+		  '		<i class="material-icons blue-text cart-icon">local_library</i>',
+		  '		<span class="title">'+escapeHtml(manga[i].name.trim())+'</span>',
+		  '		<a class="secondary-content cart-del" onclick="">',
+		  '			<i class="material-icons">delete</i>',
+		  '		</a>',
+		  '</li>'
+		].join("\n"));
+		
+if (record != null)
+for (i=0; i< record.length; i++)
+	$("#cart-main").append([
+		  '<li class="collection-item avatar cart-item" id="'+record[i].id+'" >',
+		  '		<i class="material-icons pink-text cart-icon">album</i>',
+		  '		<span class="title">'+escapeHtml(record[i].name.trim())+'</span>',
+		  '		<a class="secondary-content cart-del" onclick="">',
+		  '			<i class="material-icons">delete</i>',
+		  '		</a>',
+		  '</li>'
+		].join("\n"));
+
+</script>
 
 
 {% endblock %}

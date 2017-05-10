@@ -22,9 +22,27 @@
         }
     });
     
+    
   }); // end of document ready
 })(jQuery); // end of jQuery name space
 
+function escapeHtml (string) {
+	
+  entityMap = {
+  		  '&': '&amp;',
+  		  '<': '&lt;',
+  		  '>': '&gt;',
+  		  '"': '&quot;',
+  		  "'": '&#39;',
+  		  '/': '&#x2F;',
+  		  '`': '&#x60;',
+  		  '=': '&#x3D;'
+  		};
+
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
 
 function loadItems(pageNumber) {
 	
@@ -127,15 +145,24 @@ function playMidi(id) {
 
 function addToCart(type, id) {
 
+	var name = $("#"+id+"-name").html();
+	var item = {id:id, name:name}; 
+	
 	if (localStorage.getItem(type) === null) {
-		var items = [id];
+		var items = [item];
 		localStorage.setItem(type, JSON.stringify(items));
 		Materialize.toast("Item added to cart successfully.", 4000, 'rounded grey lighten-4 black-text');
 	}
 	else {
 		var items = JSON.parse(localStorage.getItem(type));
-		if (items.indexOf(id) === -1) {
-			items.push(id);
+		var itemExists = false;
+		
+		for (i=0; i< items.length; i++)
+			if (items[i].id === id)
+				itemExists = true;
+		
+		if (!itemExists) {
+			items.push(item);
 			localStorage.setItem(type, JSON.stringify(items));
 			Materialize.toast("Item added to cart successfully.", 4000, 'rounded grey lighten-4 black-text');
 			}
@@ -143,6 +170,12 @@ function addToCart(type, id) {
 			Materialize.toast("Item already in cart.", 4000, 'rounded grey lighten-4 black-text');
 		
 	}
+	
+}
+
+function deleteFromCart(type, id) {
+	
+	
 	
 	
 }

@@ -35,7 +35,7 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
-    
+    height: 100%;
 }
 
 label.active {
@@ -100,6 +100,7 @@ label.active {
     margin-right:10px; 
     display:inline-block; 
     vertical-align: top;
+    background-repeat: no-repeat;
 }
 
 .game-brand {
@@ -189,8 +190,6 @@ label.active {
 	background-repeat: no-repeat; 
 	background-size: 100%; 
 	background-position: center;
-	width: 72px !important; 
-	height: 72px !important;
 }
 
 .btn-nds {
@@ -198,8 +197,20 @@ label.active {
 	background-repeat: no-repeat; 
 	background-size: 90%; 
 	background-position: center;
-	width: 72px !important; 
-	height: 72px !important;
+}
+
+.cart-item {
+	min-height: 40px !important; 
+}
+
+.cart-icon {
+	left: 20px; 
+	position: absolute;
+}
+
+.cart-del {
+	top: 9px !important;
+	cursor: pointer;
 }
 
 .materialboxed:not(.active) {
