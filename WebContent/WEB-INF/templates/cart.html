@@ -9,7 +9,7 @@
 Import content into your copies of DIY!
 <br/><br/>
 You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
-<br/><br/>
+<br/> <br/>
 
 {% endblock %}
 
@@ -23,10 +23,20 @@ You can upload a Wii/NDS save here, and we'll import the games/comics/records yo
 	
 	</ul>
 	
-	<a class="waves-effect waves-light btn-floating btn-large red btn-wii tooltipped" data-tooltip="Import Wii Save" onclick="loadItems(1)">
-	  		</a>
-	<a class="waves-effect waves-light btn-floating btn-large red btn-nds tooltipped" data-tooltip="Import NDS Save" onclick="loadItems(1)">
-	</a>
+	
+	  <form action="#">
+	    <div class="file-field input-field">
+	      <div class="btn">
+	        <span>Upload Save </span>
+	        <input type="file" name="save">
+	      </div>
+	      <div class="file-path-wrapper white-text">
+	        <input class="file-path validate white-text" type="text">
+	        Wii data.bin and NDS 32MB save files are supported.
+	      </div>
+	    </div>
+	  </form>
+        
 </div>
 
 <script>
