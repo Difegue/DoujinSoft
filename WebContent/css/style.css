@@ -38,6 +38,10 @@ body {
     height: 100%;
 }
 
+#sidenav-overlay {
+	z-index: 995 !important;
+}
+
 label.active {
 	margin-top:8px;
 }

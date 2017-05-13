@@ -199,3 +199,30 @@ function deleteFromCart(item) {
 	item.remove();
 	
 }
+
+function checkoutSave() {
+	
+	if ($("#filename").val() !== "") {
+		//Fill form with localStorage if available
+		
+		if (localStorage.getItem("game") !== null)
+			$("#cartg").val(localStorage.getItem("game"));
+		
+		if (localStorage.getItem("manga") !== null)
+			$("#cartm").val(localStorage.getItem("manga"));
+		
+		if (localStorage.getItem("record") !== null)
+			$("#cartr").val(localStorage.getItem("record"));
+		
+		
+		$("#checkout-form").submit();
+		
+		//Empty localStorage and submit the form.
+		localStorage.clear();
+		$("#checkout-confirm").html('<div class="progress"><div class="indeterminate amber"></div></div>Thanks for using DoujinSoft! Your save file will automatically download once done.');
+		
+	}
+	else
+		alert("Please upload a savefile before checking out your content.")
+	
+}

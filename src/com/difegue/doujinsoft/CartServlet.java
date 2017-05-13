@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.apache.tomcat.jni.Time;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -73,42 +71,52 @@ public class CartServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		boolean result = false;
 		
 		//post contains a gameSave
 		if (!request.getParameterMap().isEmpty()) 
-			injectMios(request, response);
-		else
+			result = injectMios(request, response);
+		
+		if (!result)
 		{
 			response.setContentType("text/html; charset=UTF-8");
-			String output = "Who are you running from ?";
+			String output = "Invalid file.";
 			response.getWriter().append(output);
 		}
 		
 	}
 
     
-    private void injectMios(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private boolean injectMios(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
     	ServletContext application = getServletConfig().getServletContext();	
 		String dataDir = application.getInitParameter("dataDirectory");
-		
-    	// gets MIME type of the file
-		String mimeType = "application/octet-stream";
-		// Set response
-		response.setContentType(mimeType);
-		
+
 		//Get byte[] save from request parameters
 	    Part filePart = request.getPart("save"); 
 	    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
 	    InputStream fileContent = filePart.getInputStream();
 	    
+	    
+	    JsonArray games = new JsonArray();
+	    JsonArray manga = new JsonArray();
+	    JsonArray records = new JsonArray();
+	    
 	    //Get the cart data and deserialize it.
-	    JsonArray games = new JsonParser().parse(request.getParameter("games")).getAsJsonArray();
-	    JsonArray manga = new JsonParser().parse(request.getParameter("manga")).getAsJsonArray();
-	    JsonArray records = new JsonParser().parse(request.getParameter("records")).getAsJsonArray();
+	    JsonElement a = new JsonParser().parse(request.getParameter("games"));
+	    if (a.isJsonArray())
+	    	games = a.getAsJsonArray();
+	    
+	    a = new JsonParser().parse(request.getParameter("manga"));
+	    if (a.isJsonArray())
+	    	manga = a.getAsJsonArray();
+	    
+	    a = new JsonParser().parse(request.getParameter("records"));
+	    if (a.isJsonArray())
+	    	records = a.getAsJsonArray();
 		
 	    //Drop the file in a temp file
-	    File targetFile = File.createTempFile(fileName+Time.now(), "bin");
+	    File targetFile = File.createTempFile(fileName+System.currentTimeMillis(), "bin");
 
 	    Files.copy(
 	      fileContent, 
@@ -125,6 +133,11 @@ public class CartServlet extends HttpServlet {
         	String mioPath = dataDir+"/mio/game/"+id+".mio";
         	
         	int emptySlot = getEmptySlot(sHand, 0);
+        	
+        	//Abort in case of bad file, no need to waste time.
+        	if (emptySlot == -2)
+        		return false;
+        	
         	if (emptySlot != -1)
         		sHand.setMio(mioPath, emptySlot);
         	
@@ -154,10 +167,14 @@ public class CartServlet extends HttpServlet {
         
 		sHand.saveChanges();
 		
-		
+	  	// gets MIME type of the file
+		String mimeType = "application/octet-stream";
+		// Set response
+		response.setContentType(mimeType);
+			
     	// forces download
 		String headerKey = "Content-Disposition";
-		String headerValue = String.format("attachment; filename=\"%s\"", targetFile.getName());
+		String headerValue = String.format("attachment; filename=\"%s\"", "DoujinSoft-imported.bin");
 		response.setHeader(headerKey, headerValue);
 		
 		// obtains response's output stream
@@ -174,6 +191,8 @@ public class CartServlet extends HttpServlet {
 		inStream.close();
 		outStream.close();
     	targetFile.delete();
+    	
+    	return true;
 	}
 
     /*
