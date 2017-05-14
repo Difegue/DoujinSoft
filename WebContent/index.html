@@ -13,7 +13,7 @@
   
   <style>
 	body {
-    	background-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.6) 100%), url('{% block background %}./img/bg_gam.png{% endblock %}');
+    	background-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.6) 100%), url('./img/bg_contact.png');
     	
 	}
   </style>
@@ -31,7 +31,7 @@
 
 
 <div class = "navbar-fixed">
-  <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">
+  <nav class="brown darken-3" role="navigation">
     <div class="nav-wrapper container">
     
       <object data="./img/logo.svg" type="image/svg+xml" style="height:35px; margin-top:15px; margin-right: 10px">
@@ -40,17 +40,17 @@
       DoujinSoft Store
       </a>
       <ul class="right hide-on-med-and-down">
-        <li class="{% block gamepage %}{% endblock %}"><a href="./games">Games</a></li>
-        <li class="{% block recordpage %}{% endblock %}"><a href="./records">Records</a></li>
-        <li class="{% block comicpage %}{% endblock %}"><a href="./comics">Comics</a></li>
-        <li class="{% block cartpage %}{% endblock %}"><a href="./cart">Cart</a></li>
+        <li class=""><a href="./games">Games</a></li>
+        <li class=""><a href="./records">Records</a></li>
+        <li class=""><a href="./comics">Comics</a></li>
+        <li class=""><a href="./cart">Cart</a></li>
       </ul>
 
-      <ul id="nav-mobile" class="side-nav {% block color %}indigo{% endblock %} darken-1">
- 		<li class="{% block gamepage %}{% endblock %}"><a class=" white-text" href="./games">Games</a></li>
-        <li class="{% block recordpage %}{% endblock %}"><a class=" white-text" href="./records">Records</a></li>
-        <li class="{% block comicpage %}{% endblock %}"><a class=" white-text" href="./comics">Comics</a></li>
-        <li class="{% block cartpage %}{% endblock %}"><a class=" white-text" href="./cart">Cart</a></li>
+      <ul id="nav-mobile" class="side-nav brown darken-1">
+ 		<li class=""><a class=" white-text" href="./games">Games</a></li>
+        <li class=""><a class=" white-text" href="./records">Records</a></li>
+        <li class=""><a class=" white-text" href="./comics">Comics</a></li>
+        <li class=""><a class=" white-text" href="./cart">Cart</a></li>
       </ul>
       <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
     </div>
@@ -60,9 +60,14 @@
   <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br><br>
-      <h1 class="header center {% block color %}green{% endblock %}-text" style="font-family: warioware">{% block type %}Generic title here{% endblock %}</h1>
+      <h1 class="header center brown-text" style="font-family: warioware"></h1>
       <div class="row center">
-        <h5 class="header col s12 light white-text">{% block desc %}Generic description here{% endblock %}</h5>
+        <h5 class="header col s12 light white-text">Import content into your copies of DIY!
+<br/><br/>
+You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
+<br/> <br/>
+
+</h5>
       </div>
 
     </div>
@@ -74,22 +79,30 @@
 
       <!--   Content Section   -->
       <div class="row" id="content">
-		{% block content %}
 		
-    	{% endblock %}   
+<div id="cart-content">
+ 
+        
+</div>
+
+<script>
+
+
+</script>
+
+
+   
 	  </div>
     
       <div class="row center">
-	  	{% block footdata %}
-	    	
-	    {% endblock %}
-	  </div>
+	  		    	
+	    	  </div>
 	  
     </div>
    
   </div>
 
-  <footer class="page-footer {% block color %}indigo{% endblock %}">
+  <footer class="page-footer brown">
     <div class="container">
       <div class="row">
         <div class="col l9 s12">

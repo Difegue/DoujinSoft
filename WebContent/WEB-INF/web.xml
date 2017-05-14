@@ -12,8 +12,11 @@
   <listener>
     <listener-class>com.difegue.doujinsoft.ServerInit</listener-class>
   </listener>
+  
+  <!-- Change this directory to the one you want to store DoujinSoft data to. -->
   <context-param>
     <param-name>dataDirectory</param-name>
     <param-value>C:\Users\Vincent\Desktop\DoujinSoftDataFolder</param-value>
   </context-param>
+  
 </web-app>

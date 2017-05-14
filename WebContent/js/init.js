@@ -198,6 +198,13 @@ function deleteFromCart(item) {
 	
 	item.remove();
 	
+	games = JSON.parse(localStorage.getItem("game"));
+	manga = JSON.parse(localStorage.getItem("manga"));
+	record = JSON.parse(localStorage.getItem("record"));
+	
+	if (games === null && manga === null && record === null) 
+		$("#cart-content").html('<h5 class="white-text center">...But your cart seems to be empty right now.</h5> <br/> <br/>  <span class="white-text" style="font-size:10vw">¯\\_(ツ)_/¯</span>   ');
+
 }
 
 function checkoutSave() {
