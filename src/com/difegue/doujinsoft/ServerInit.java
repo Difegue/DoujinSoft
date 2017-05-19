@@ -93,6 +93,11 @@ private String computeMioID(File f, Metadata mio, int type) {
 		case (Types.MANGA): baseDir = f.getParent()+"/manga/"; break;
 		case (Types.RECORD): baseDir = f.getParent()+"/record/"; break;
 	}
+	
+	//Create directories if they don't exist
+	if (!new File (baseDir).exists())
+  	  new File(baseDir).mkdirs();
+	
 	SQLog.log(Level.INFO, "Moving file to "+baseDir+ID+".mio");
 	f2 = new File(baseDir+ID+".mio");
 	
@@ -139,6 +144,10 @@ public void contextInitialized(ServletContextEvent arg0) {
 
       databaseDefinition(statement);
       
+      //Create the mio directory if it doesn't exist - although that means we probably won't find any games to parse...
+      if (!new File (dataDir+"/mio/").exists())
+    	  new File(dataDir+"/mio/").mkdirs();
+    
       //Let's jam some .mios in this
       File[] files = new File(dataDir+"/mio/").listFiles();
       

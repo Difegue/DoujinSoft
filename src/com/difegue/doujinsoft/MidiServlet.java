@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.xperia64.diyedit.ExportMidi;
+import com.difegue.doujinsoft.ExportMidi;
 import com.xperia64.diyedit.FileByteOperations;
 
 /**
@@ -46,6 +46,9 @@ public class MidiServlet extends HttpServlet {
 			
 			String id = request.getParameter("id");
 			String filePath = dataDir+"/mio/record/"+id+".mio";
+			
+			if (!new File (dataDir+"/midi/").exists())
+		    	  new File(dataDir+"/midi/").mkdirs();
 			
 			String midiPath = dataDir+"/midi/"+id+".midi";
 			

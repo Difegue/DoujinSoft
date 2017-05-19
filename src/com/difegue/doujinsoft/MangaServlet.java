@@ -148,7 +148,7 @@ public class MangaServlet extends HttpServlet {
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
     	
-	    String query = "SELECT * FROM Manga WHERE name LIKE ? AND creator LIKE ? LIMIT 9 OFFSET ?";
+	    String query = "SELECT * FROM Manga WHERE name LIKE ? AND creator LIKE ? ORDER BY id ASC LIMIT 9 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) FROM Manga WHERE name LIKE ? AND creator LIKE ?";
 		
 		PreparedStatement ret = connection.prepareStatement(query);
