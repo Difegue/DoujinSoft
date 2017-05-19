@@ -1,0 +1,192 @@
+package com.difegue.doujinsoft.utils;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
+import com.difegue.doujinsoft.templates.Game;
+import com.difegue.doujinsoft.templates.Manga;
+import com.difegue.doujinsoft.templates.Record;
+import com.difegue.doujinsoft.utils.MioUtils.Types;
+import com.mitchellbosecke.pebble.PebbleEngine;
+import com.mitchellbosecke.pebble.error.PebbleException;
+import com.mitchellbosecke.pebble.template.PebbleTemplate;
+
+/*
+ * This class contains generic get/search methods used across all three major servlets
+ * (Games, Comics and Records)
+ */
+public class ServletUtils {
+
+	
+	public static String doStandardPageGeneric(int type, ServletContext application) 
+			throws PebbleException, SQLException, IOException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    	
+		//Generics
+		ArrayList items = new ArrayList();
+		Constructor classConstructor = null;
+		
+    	Map<String, Object> context = new HashMap<>();
+		Connection connection = null;
+		String tableName = "";
+		String contextTable = "";
+		
+    	PebbleEngine engine = new PebbleEngine.Builder().build();
+		PebbleTemplate compiledTemplate = null;
+		ResultSet result = null;
+		
+		
+		String dataDir = application.getInitParameter("dataDirectory");
+
+	    // create a database connection
+	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+	    Statement statement = connection.createStatement();
+	    statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+	  //Getting base template and other type dependant data
+  		switch (type) {
+  		case Types.GAME:
+  				compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/game.html"));
+  				tableName = "Games";
+  				contextTable = "games";
+  				classConstructor = Game.class.getConstructor(ResultSet.class);
+  			break;
+  		case Types.MANGA:
+  				compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/manga.html"));
+				tableName = "Manga";
+				contextTable = "mangas";			
+				classConstructor = Manga.class.getConstructor(ResultSet.class);
+  			break;
+  			
+  		case Types.RECORD:
+  				compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/records.html"));
+				tableName = "Records";
+				contextTable = "records";
+				classConstructor = Record.class.getConstructor(ResultSet.class);
+  			break;
+  		}
+  		
+  		result = statement.executeQuery("select * from "+tableName+" ORDER BY name ASC LIMIT 9");
+  		
+  		while(result.next()) 
+	    	items.add(classConstructor.newInstance(result));
+  		
+	    result = statement.executeQuery("select COUNT(id) from "+tableName);
+	    
+		context.put(contextTable, items);
+		context.put("totalitems", result.getInt(1));
+		
+		
+		//Output to client
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+		
+		return output;
+    	
+	}
+	
+	public static String doSearchGeneric(int type, ServletContext application, HttpServletRequest request ) 
+			throws SQLException, PebbleException, IOException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    	
+    	ArrayList items = new ArrayList();
+    	Map<String, Object> context = new HashMap<>();
+		Connection connection = null;
+		String tableName = "";
+		String contextTable = "";
+		Constructor classConstructor = null;
+		
+		
+    	PebbleEngine engine = new PebbleEngine.Builder().build();
+		PebbleTemplate compiledTemplate = null;
+		
+		//We only use the part of the template containing the item cards here
+		switch (type) {
+  		case Types.GAME:
+  				compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/gameDetail.html"));
+  				tableName = "Games";
+  				contextTable = "games";
+  				classConstructor = Game.class.getConstructor(ResultSet.class);
+  			break;
+  		case Types.MANGA:
+  				compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/mangaDetail.html"));
+				tableName = "Manga";
+				contextTable = "mangas";			
+				classConstructor = Manga.class.getConstructor(ResultSet.class);
+  			break;
+  			
+  		case Types.RECORD:
+  				compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/recordsDetail.html"));
+				tableName = "Records";
+				contextTable = "records";
+				classConstructor = Record.class.getConstructor(ResultSet.class);
+  			break;
+  		}
+
+		
+		String dataDir = application.getInitParameter("dataDirectory");
+		
+	    // create a database connection
+	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+    	
+	    String query = "SELECT * FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? ORDER BY name ASC LIMIT 9 OFFSET ?";
+	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ?";
+		
+		PreparedStatement ret = connection.prepareStatement(query);
+		
+		
+		int page = 1;
+		//Those filters go in the LIKE parts of the query
+		String name = "%";
+		String creator = "%";
+		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
+			page = Integer.parseInt(request.getParameter("page"));
+		
+		if (request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty())
+			name = "%"+request.getParameter("name")+"%";
+		
+		if (request.getParameterMap().containsKey("creator"))
+			creator = "%"+request.getParameter("creator")+"%";
+		
+		ret.setString(1, name);
+		ret.setString(2, creator);
+		ret.setInt(3, page*9-9);
+		
+    	
+		ResultSet result = ret.executeQuery();
+	    
+	    while(result.next()) 
+	    	items.add(classConstructor.newInstance(result));
+
+	    PreparedStatement ret2 = connection.prepareStatement(queryCount);
+	    
+	    ret2.setString(1, name);
+		ret2.setString(2, creator);
+	    result = ret2.executeQuery();
+		
+		context.put(contextTable, items);
+		context.put("totalitems", result.getInt(1));
+		
+		//Output to client
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+		
+		return output;
+    }
+	
+}

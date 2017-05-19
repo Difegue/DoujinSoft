@@ -1,4 +1,4 @@
-package com.difegue.doujinsoft;
+package com.difegue.doujinsoft.utils;
 
 import com.xperia64.diyedit.Globals;
 import com.xperia64.diyedit.editors.RecordEdit;

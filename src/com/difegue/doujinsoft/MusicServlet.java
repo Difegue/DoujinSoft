@@ -3,6 +3,7 @@ package com.difegue.doujinsoft;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -25,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.templates.Record;
+import com.difegue.doujinsoft.utils.MioUtils.Types;
+import com.difegue.doujinsoft.utils.ServletUtils;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
@@ -50,10 +53,10 @@ public class MusicServlet extends HttpServlet {
 		
 		try {
 			
-	    	output = doStandardPage(application);
+	    	output = ServletUtils.doStandardPageGeneric(Types.RECORD, application);
 			response.getWriter().append(output);
 				
-		} catch (SQLException | PebbleException e) {
+		} catch (Exception e) {
 			ServletLog.log(Level.SEVERE, e.getMessage());
 		}
 
@@ -71,11 +74,11 @@ public class MusicServlet extends HttpServlet {
 		try {
 			
 			if (!request.getParameterMap().isEmpty())
-				output = doSearch(application, request);
+				output = ServletUtils.doSearchGeneric(Types.RECORD, application, request);
 
 			response.getWriter().append(output);
 			
-		} catch (SQLException | PebbleException e) {
+		} catch (Exception e) {
 			ServletLog.log(Level.SEVERE, e.getMessage());
 		}
 		
@@ -89,108 +92,6 @@ public class MusicServlet extends HttpServlet {
         super(); 
         ServletLog = Logger.getLogger("MusicServlet");
         ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));     
-    }
-   
-    
-    //Generates the regular landing page for games.
-    private String doStandardPage(ServletContext application) throws PebbleException, SQLException, IOException {
-    	
-    	ArrayList<Record> items = new ArrayList<Record>();
-    	Map<String, Object> context = new HashMap<>();
-		Connection connection = null;
-		
-    	PebbleEngine engine = new PebbleEngine.Builder().build();
-		PebbleTemplate compiledTemplate;
-
-		//Getting base template
-		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/records.html"));
-		String dataDir = application.getInitParameter("dataDirectory");
-
-	    // create a database connection
-	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-	    Statement statement = connection.createStatement();
-	    statement.setQueryTimeout(30);  // set timeout to 30 sec.
-	    
-	    ResultSet result = statement.executeQuery("select * from Records LIMIT 9");
-	    
-	    while(result.next()) 
-	    	items.add(new Record(result));
-		
-	    result = statement.executeQuery("select COUNT(id) from Records");
-	    
-		context.put("records", items);
-		context.put("totalitems", result.getInt(1));
-		
-		
-		//Output to client
-		Writer writer = new StringWriter();
-		compiledTemplate.evaluate(writer, context);
-		String output = writer.toString();
-		
-		return output;
-    	
-    }
-    
-    //Generates a smaller HTML for searches/pages.
-    private String doSearch(ServletContext application, HttpServletRequest request ) throws SQLException, PebbleException, IOException {
-    	
-    	ArrayList<Record> items = new ArrayList<Record>();
-    	Map<String, Object> context = new HashMap<>();
-		Connection connection = null;
-		
-    	PebbleEngine engine = new PebbleEngine.Builder().build();
-		PebbleTemplate compiledTemplate;
-
-		//We only use the part of the template containing the game cards here
-		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/recordsDetail.html"));	
-		String dataDir = application.getInitParameter("dataDirectory");
-		
-	    // create a database connection
-	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-    	
-	    String query = "SELECT * FROM Records WHERE name LIKE ? AND creator LIKE ? ORDER BY id ASC LIMIT 9 OFFSET ?";
-	    String queryCount = "SELECT COUNT(id) FROM Records WHERE name LIKE ? AND creator LIKE ?";
-		
-		PreparedStatement ret = connection.prepareStatement(query);
-		
-		
-		int page = 1;
-		String name = "%";
-		String creator = "%";
-		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
-			page = Integer.parseInt(request.getParameter("page"));
-		
-		if (request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty())
-			name = "%"+request.getParameter("name")+"%";
-		
-		if (request.getParameterMap().containsKey("creator"))
-			creator = "%"+request.getParameter("creator")+"%";
-		
-		ret.setString(1, name);
-		ret.setString(2, creator);
-		ret.setInt(3, page*9-9);
-		
-    	
-		ResultSet result = ret.executeQuery();
-	    
-	    while(result.next()) 
-	    	items.add(new Record(result));
-
-	    PreparedStatement ret2 = connection.prepareStatement(queryCount);
-	    
-	    ret2.setString(1, name);
-		ret2.setString(2, creator);
-	    result = ret2.executeQuery();
-		
-	    context.put("records", items);
-		context.put("totalitems", result.getInt(1));
-		
-		//Output to client
-		Writer writer = new StringWriter();
-		compiledTemplate.evaluate(writer, context);
-		String output = writer.toString();
-		
-		return output;
     }
 
 }

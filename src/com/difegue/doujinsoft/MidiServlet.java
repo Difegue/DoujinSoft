@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.difegue.doujinsoft.ExportMidi;
+import com.difegue.doujinsoft.utils.ExportMidi;
 import com.xperia64.diyedit.FileByteOperations;
 
 /**

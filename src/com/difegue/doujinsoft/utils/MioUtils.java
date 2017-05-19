@@ -1,4 +1,4 @@
-package com.difegue.doujinsoft;
+package com.difegue.doujinsoft.utils;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

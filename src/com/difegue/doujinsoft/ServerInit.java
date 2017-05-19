@@ -14,7 +14,8 @@ import java.util.logging.StreamHandler;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import com.difegue.doujinsoft.MioUtils.Types;
+import com.difegue.doujinsoft.utils.MioUtils;
+import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.xperia64.diyedit.FileByteOperations;
 import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;

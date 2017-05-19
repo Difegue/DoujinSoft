@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.difegue.doujinsoft.MioUtils;
+import com.difegue.doujinsoft.utils.MioUtils;
 
 /*
  * Class for representing MIO comics. Only difference from base metadata are the base64 encoded pages.

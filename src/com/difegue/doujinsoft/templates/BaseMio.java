@@ -3,7 +3,7 @@ package com.difegue.doujinsoft.templates;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.difegue.doujinsoft.MioUtils;
+import com.difegue.doujinsoft.utils.MioUtils;
 
 /*
  * Base class used for binding with pebble templates.
