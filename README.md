@@ -18,9 +18,22 @@ Uses SQLite, materializeCSS and jQuery.
 ## Deploying  
 
 Get the [release WAR](https://github.com/Difegue/DoujinSoft/releases) (or just build it with maven from the sources)  
-Edit your tomcat 
+Edit your tomcat context to specify your data directory:  
+```
+nano /var/lib/tomcat8/conf/context.xml
+
+<Parameter name="dataDirectory" value="/home/DoujinSoft-data" override="false"/>
+```   
+Create the folder you specified in the Parameter (here /home/DoujinSoft-data), and add .mio files to a "mio" subfolder in it.  
+Don't forget to make it R/W by your tomcat server.  
+```
+cd /home
+mkdir DoujinSoft-data
+chown tomcat8 DoujinSoft-data/
+chmod -R 755 DoujinSoft-data/
+```
 Drop the WAR into your tomcat webapps directory to start deployment.  
-The .mio files you put in the data directory's "mio" subfolder should be parsed and added to the database.  
+The .mio files you put in the data directory's "mio" subfolder should be consumed and added to the database.  
 You can then access the Webapp and check everything's working.
 
 ## More screenshots
