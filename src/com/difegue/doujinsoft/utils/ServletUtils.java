@@ -32,7 +32,9 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
  */
 public class ServletUtils {
 
-	
+	/*
+	 * For GET requests. Grab the standard template, and add the first page of items.
+	 */
 	public static String doStandardPageGeneric(int type, ServletContext application) 
 			throws PebbleException, SQLException, IOException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     	
@@ -100,6 +102,9 @@ public class ServletUtils {
     	
 	}
 	
+	/*
+	 * For POST requests. Perform a request based on the parameters given (search and/or pages) and return the matching subtemplate.
+	 */
 	public static String doSearchGeneric(int type, ServletContext application, HttpServletRequest request ) 
 			throws SQLException, PebbleException, IOException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
     	

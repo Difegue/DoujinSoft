@@ -123,12 +123,13 @@ public void contextInitialized(ServletContextEvent arg0) {
 	} catch (ClassNotFoundException e1) {
 		e1.printStackTrace();
 	}
-	System.out.println("DoujinSoft Database builder started");	
+	System.out.println("DoujinSoft Store Deployed.");	
 	
 	// Hee to the ho and here we go
 	Logger SQLog = Logger.getLogger("SQLite");
 	SQLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
 	
+	SQLog.log(Level.INFO, "Looking for new .mio files...");
 	Connection connection = null;
 	
 	//Create database if nonexistent + parse .mios in "new" folder before renaming+moving them
