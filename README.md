@@ -34,6 +34,7 @@ chmod -R 755 DoujinSoft-data/
 ```
 Drop the WAR into your tomcat webapps directory to start deployment.  
 The .mio files you put in the data directory's "mio" subfolder should be consumed and added to the database.  
+(This part might take a little time, benchmarks show a ~5 minutes deploy time for 2000 .mio files.)  
 You can then access the Webapp and check everything's working.
 
 ## More screenshots
