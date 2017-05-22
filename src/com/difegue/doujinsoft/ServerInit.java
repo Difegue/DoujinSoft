@@ -1,11 +1,18 @@
 package com.difegue.doujinsoft;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -13,6 +20,8 @@ import java.util.logging.StreamHandler;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+
+import org.apache.tomcat.jni.Time;
 
 import com.difegue.doujinsoft.utils.MioUtils;
 import com.difegue.doujinsoft.utils.MioUtils.Types;
@@ -153,9 +162,18 @@ public void contextInitialized(ServletContextEvent arg0) {
       //Let's jam some .mios in this
       File[] files = new File(dataDir+"/mio/").listFiles();
       
+      Date today = Calendar.getInstance().getTime();
+      SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy-hh.mm.ss");
+      String logFileName = "NewMios-"+formatter.format(today);
+
+      // create a logFile for this deployment session
+      FileWriter fw = new FileWriter(dataDir+"/"+logFileName+".log");
+      BufferedWriter bw = new BufferedWriter(fw);
+      
+      
       for (File f: files) {
           if (!f.isDirectory()) {
-        	  
+        	          	  
         	  SQLog.log(Level.INFO, "Parsing file "+f.getName());
         	  byte[] mioFile = FileByteOperations.read(f.getAbsolutePath());
         	  PreparedStatement insertQuery = null;
@@ -174,6 +192,7 @@ public void contextInitialized(ServletContextEvent arg0) {
         		  insertQuery.setInt(9, game.getLogo());
         		  insertQuery.setString(11, MioUtils.getBase64GamePreview(mioFile));
         		  
+                  bw.write("Game;"+ID+";"+game.getName()+"\n");
       	    	}
         	  
         	  if (mioFile.length == Types.MANGA) {
@@ -191,6 +210,7 @@ public void contextInitialized(ServletContextEvent arg0) {
         		  insertQuery.setString(13,MioUtils.getBase64Manga(mioFile, 2));
         		  insertQuery.setString(14,MioUtils.getBase64Manga(mioFile, 3));
 
+                  bw.write("Manga;"+ID+";"+manga.getName()+"\n");
         	    }
         	    
         	  if (mioFile.length == Types.RECORD) {
@@ -203,18 +223,27 @@ public void contextInitialized(ServletContextEvent arg0) {
         	      insertQuery.setString(8, MioUtils.mapColorByte(record.getLogoColor()));
         	      insertQuery.setInt(9, record.getLogo());
         		  
+                  bw.write("Record;"+ID+";"+record.getName()+"\n");
         	    }
         	  
         	  SQLog.log(Level.INFO, "Inserting into DB");
     		  
     		  insertQuery.executeUpdate();
-    		  
-        	  
+
           } 
+          
       }
       
+      // Close stream
+      bw.close();
+      
+      
+      //If logfile is empty, no mios were handled -> delete it
+      File logfile = new File(dataDir+"/"+logFileName+".log");
+      if (logfile.length() == 0)
+    	  logfile.delete();
     }
-    catch(SQLException e){
+    catch(SQLException | IOException e){
       // if the error message is "out of memory",
       // it probably means no database file is found
       SQLog.log(Level.SEVERE, e.getMessage());
@@ -223,6 +252,8 @@ public void contextInitialized(ServletContextEvent arg0) {
       try {
         if(connection != null)
           connection.close();
+        
+        
       }
       catch(SQLException e) {
     	SQLog.log(Level.SEVERE, "connection close failed: " + e.getMessage());

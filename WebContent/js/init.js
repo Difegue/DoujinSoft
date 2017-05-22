@@ -9,7 +9,7 @@
         items: $("#total_items").html(),
         itemsOnPage: 9,
         currentPage: 1,
-        displayedPages: 3,
+        displayedPages: 5,
         ellipsePageSet: false,
         cssStyle: '',
         prevText: '<i class="material-icons">chevron_left</i>',
