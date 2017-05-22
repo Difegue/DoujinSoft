@@ -189,18 +189,9 @@ label.active {
     text-overflow: ellipsis;
 }
 
-.btn-wii {
-	background-image: url('../img/wii.svg'); 
-	background-repeat: no-repeat; 
-	background-size: 100%; 
-	background-position: center;
-}
-
-.btn-nds {
-	background-image: url('../img/nds.svg'); 
-	background-repeat: no-repeat; 
-	background-size: 90%; 
-	background-position: center;
+.selection-card {
+	border-radius: 10px; 
+	background-image:linear-gradient(to bottom, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%), url('../img/bg_mix.png')
 }
 
 .cart-item {

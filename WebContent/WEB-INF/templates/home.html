@@ -1,13 +1,13 @@
 {% extends "./base.html" %}
 
 {% block background %}./img/bg_home.png{% endblock %}
-{% block color %}deep-purple{% endblock %}
-{% block type %}{% endblock %}
+{% block color %}red{% endblock %}
+{% block type %}Your one-stop shop for WarioWare DIY{% endblock %}
 
 
 {% block desc %}
 
-<h1 class="white-text">Your one-stop shop for WarioWare DIY</h1>
+<h1 class="white-text"></h1>
 
 {% endblock %}
 
@@ -21,10 +21,8 @@
 
 <div class="col l9 m8 s12 white-text center"> 
 	
-	<h5>As the evolutionary end-result of years of save data reverse engineering, 
-		the DoujinSoft Store presents a selection of games, music and comics created with the Nintendo DS game WarioWare DIY.<br/><br/>
-		All available for reading, listening, and transferring to your own copies of the game.<br/><br/>
-		Select any of the categories in the upper menu to start exploring!
+	<h5>The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available for reading, listening, and transferring to your own copies of the game.<br/><br/>
+		Select any of the categories in the upper menu to start exploring! <br/>Or you could look at our curated selections below.
 	</h5>
 	<br/><br/>
 	
@@ -52,11 +50,49 @@
 </object>
 
 </div>
-
 	
 {% endblock %}
 
 {% block footdata %}
+
+<!-- Collections go here, as cards. Maybe generate those dynamically later ? -->
+<h2 class="white-text">Our selections:</h2>
+
+<div class="col s12 m4">
+    <div class="card red selection-card">
+        <div class="card-content white-text" >
+            <i class="material-icons" style="height:50px">album</i>
+            <span class="card-title">Big Name Games</span>
+            <p class=""> 
+				<a class="waves-effect waves-light btn red">Browse Collection</a>
+            </p>
+        </div>
+    </div>
+</div>
+               
+<div class="col s12 m4">
+    <div class="card selection-card" >
+        <div class="card-content white-text">
+            <i class="material-icons" style="height:50px">album</i>
+            <span class="card-title">NinSoft Games</span>
+            <p class="">
+				<a class="waves-effect waves-light btn red ">Browse Collection</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="col s12 m4">
+    <div class="card selection-card">
+        <div class="card-content white-text">
+            <i class="material-icons" style="height:50px">album</i>
+            <span class="card-title">Games made in 2017</span>
+            <p class="">
+				<a class="waves-effect waves-light btn red">Browse Collection</a>
+            </p>
+        </div>
+    </div>
+</div>
 
 
 {% endblock %}
