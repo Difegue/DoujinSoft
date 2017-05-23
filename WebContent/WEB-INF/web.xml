@@ -5,7 +5,7 @@
   	<welcome-file>home</welcome-file>
   </welcome-file-list>
   <listener>
-    <listener-class>com.difegue.doujinsoft.ServerInit</listener-class>
+    <listener-class>com.difegue.doujinsoft.utils.ServerInit</listener-class>
   </listener>
   
   <!-- Change this directory to the one you want to store DoujinSoft data to. -->

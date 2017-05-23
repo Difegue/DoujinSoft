@@ -191,14 +191,14 @@ label.active {
 
 .selection-card {
 	border-radius: 10px; 
-	background-image:linear-gradient(to bottom, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%), url('../img/bg_mix.png');
+	background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('../img/bg_mix.png');
 	min-height:166px;
 	background-size: 100%;
 }
 
 .card-bigname {
 	
-	background-image:linear-gradient(to bottom, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%), url('../img/bg_bigname.jpg') !important;
+	background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('../img/bg_bigname.jpg') !important;
 }
 
 .cart-item {

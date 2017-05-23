@@ -1,4 +1,4 @@
-package com.difegue.doujinsoft;
+package com.difegue.doujinsoft.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,7 +12,6 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -21,9 +20,6 @@ import java.util.logging.StreamHandler;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import org.apache.tomcat.jni.Time;
-
-import com.difegue.doujinsoft.utils.MioUtils;
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.xperia64.diyedit.FileByteOperations;
 import com.xperia64.diyedit.editors.GameEdit;
@@ -53,6 +49,9 @@ private void databaseDefinition(Statement statement) throws SQLException
       + "(id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
       + "PRIMARY KEY(`id`) )");
 	
+    statement.executeUpdate("CREATE INDEX IF NOT EXISTS Games_idx ON Games (id);");
+    statement.executeUpdate("CREATE INDEX IF NOT EXISTS Manga_idx ON Manga (id);");
+    statement.executeUpdate("CREATE INDEX IF NOT EXISTS Record_idx ON Records (id);");
 }
 
 /* 
