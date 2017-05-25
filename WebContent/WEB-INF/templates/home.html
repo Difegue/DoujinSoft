@@ -57,7 +57,7 @@
 
 <!-- Collections go here, as cards. Maybe generate those dynamically later ? -->
 <h2 class="white-text">Our selections:</h2>
-
+ 
 {% for collection in collections %}
 
 <div class="col s12 m4">
@@ -71,6 +71,10 @@
         </div>
     </div>
 </div>
+
+ {% else %}
+   
+<h2 class="white-text">We don't have any selections currently available. Our curators are however hard at work!</h2>
 
 {% endfor %}
 
