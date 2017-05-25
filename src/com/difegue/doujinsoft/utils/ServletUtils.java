@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.difegue.doujinsoft.templates.Collection;
 import com.difegue.doujinsoft.templates.Game;
 import com.difegue.doujinsoft.templates.Manga;
 import com.difegue.doujinsoft.templates.Record;
@@ -184,6 +185,116 @@ public class ServletUtils {
 	    result = ret2.executeQuery();
 		
 		context.put(contextTable, items);
+		context.put("totalitems", result.getInt(1));
+		
+		//Output to client
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+		
+		return output;
+    }
+	
+	/*
+	 * Collection versions - Takes a few shortcuts compared to the regular variants.
+	 */
+	public static String doStandardPageCollection(Collection c, ServletContext application) 
+			throws PebbleException, SQLException, IOException {
+    	
+		ArrayList<Game> items = new ArrayList<Game>();
+		
+    	Map<String, Object> context = new HashMap<>();
+		Connection connection = null;
+		
+    	PebbleEngine engine = new PebbleEngine.Builder().build();
+		PebbleTemplate compiledTemplate = null;
+		ResultSet result = null;
+		
+		String dataDir = application.getInitParameter("dataDirectory");
+
+	    // create a database connection
+	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+	    Statement statement = connection.createStatement();
+	    statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));	    
+  		
+	    String query = "select * from Games WHERE id IN "+c.getMioSQL()+" ORDER BY name ASC LIMIT 9";
+	    
+  		result = statement.executeQuery(query);
+  		
+  		while(result.next()) 
+	    	items.add(new Game(result));
+  		
+  		context.put("games", items);
+		context.put("totalitems", c.mios.length);
+		context.put("collection", c);
+		
+		//Output to client
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+		
+		return output;
+    	
+	}
+	
+	/*
+	 * POST requests in collections.
+	 */
+	public static String doSearchCollection(Collection c, ServletContext application, HttpServletRequest request ) 
+			throws SQLException, PebbleException, IOException {
+    	
+    	ArrayList<Game> items = new ArrayList<Game>();
+    	Map<String, Object> context = new HashMap<>();
+		Connection connection = null;
+		String tableName = "";
+		
+    	PebbleEngine engine = new PebbleEngine.Builder().build();
+		PebbleTemplate compiledTemplate = null;
+		
+		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/gameDetail.html"));
+		tableName = "Games";
+
+		String dataDir = application.getInitParameter("dataDirectory");
+		
+	    // create a database connection
+	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+    	
+	    String query = "SELECT * FROM "+tableName+" WHERE id IN "+c.getMioSQL()+" AND name LIKE ? AND creator LIKE ? ORDER BY name ASC LIMIT 9 OFFSET ?";
+	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE id IN "+c.getMioSQL()+" AND name LIKE ? AND creator LIKE ?";
+	    
+		PreparedStatement ret = connection.prepareStatement(query);
+		
+		int page = 1;
+		//Those filters go in the LIKE parts of the query
+		String name = "%";
+		String creator = "%";
+		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
+			page = Integer.parseInt(request.getParameter("page"));
+		
+		if (request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty())
+			name = "%"+request.getParameter("name")+"%";
+		
+		if (request.getParameterMap().containsKey("creator"))
+			creator = "%"+request.getParameter("creator")+"%";
+		
+		ret.setString(1, name);
+		ret.setString(2, creator);
+		ret.setInt(3, page*9-9);
+		
+		ResultSet result = ret.executeQuery();
+	    
+	    while(result.next()) 
+	    	items.add(new Game(result));
+
+	    PreparedStatement ret2 = connection.prepareStatement(queryCount);
+	    
+	    ret2.setString(1, name);
+		ret2.setString(2, creator);
+	    result = ret2.executeQuery();
+		
+		context.put("games", items);
 		context.put("totalitems", result.getInt(1));
 		
 		//Output to client

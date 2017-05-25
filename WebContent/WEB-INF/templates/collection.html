@@ -1,0 +1,57 @@
+{% extends "./base.html" %}
+
+{% block background %}{{ collection.background_pic }}{% endblock %}
+{% block color %}{{ collection.collection_color }}{% endblock %}
+{% block type %}{{ collection.collection_name }}{% endblock %}
+{% block desc %}
+{{ collection.collection_desc }}<br/><br/>
+{{ collection.collection_desc2 }}<br/><br/>
+
+<div id="game-search">
+	
+	<div style="height: 50px; width: 300px;" class="chip">
+	      <div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+	          <i style="margin-top: 15px;" class="material-icons prefix">account_circle</i>
+	          <input id="maker_name" class="validate" type="text">
+	          <label class="" for="maker_name">Creator Name</label>
+	        </div>
+	</div>
+
+	<div style="height: 50px; width: 300px" class="chip">
+        <div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+            <i style="margin-top: 15px;" class="material-icons prefix">videogame_asset</i>
+            <input id="item_name" type="text">
+            <label class="" for="item_name">Game Name</label>
+          </div>
+      </div>
+    <br/>  <br/>   
+  	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
+  		<i class="material-icons left">search</i>Search
+  	</a>
+  	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
+  		<i class="material-icons left">clear</i>Clear
+  	</a>
+  	
+
+</div>
+<br/>
+<div id="pagination-top" class="pagination-wrapper chip">
+  <ul class="pagination"></ul>
+</div>
+
+{% endblock %}
+
+
+{% block content %}
+
+	{% include "./gameDetail.html" %}
+	
+{% endblock %}
+
+{% block footdata %}
+
+<div id="pagination-bottom" class="pagination-wrapper chip">
+  <ul class="pagination"></ul>
+</div>
+
+{% endblock %}

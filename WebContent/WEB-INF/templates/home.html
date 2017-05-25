@@ -58,41 +58,21 @@
 <!-- Collections go here, as cards. Maybe generate those dynamically later ? -->
 <h2 class="white-text">Our selections:</h2>
 
+{% for collection in collections %}
+
 <div class="col s12 m4">
-    <div class="card red selection-card card-bigname">
+    <div class="card selection-card" style="background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('{{collection.background_pic}}') !important;">
         <div class="card-content white-text">
-           <object style="height:30px; margin-bottom:5px" data="./img/fc-cart.svg" type="image/svg+xml"></object>
-            <span class="card-title">Big Name Games</span>
+           <i class="material-icons {{collection.collection_color}}-text" style="font-size: 35px">{{collection.collection_icon}}</i>
+            <span class="card-title">{{collection.collection_name}}</span>
             <p class=""> 
-				<a class="waves-effect waves-light btn red">Browse Collection</a>
-            </p>
-        </div>
-    </div>
-</div>
-               
-<div class="col s12 m4">
-    <div class="card selection-card" >
-        <div class="card-content white-text">
-            <object style="height:30px; margin-bottom:5px" data="./img/diy-car.svg" type="image/svg+xml"></object>
-            <span class="card-title">NinSoft Games</span>
-            <p class="">
-				<a class="waves-effect waves-light btn red ">Browse Collection</a>
+				<a href="./collection?id=bignames" class="waves-effect waves-light btn red">Browse Collection</a>
             </p>
         </div>
     </div>
 </div>
 
-<div class="col s12 m4">
-    <div class="card selection-card">
-        <div class="card-content white-text">
-            <i class="material-icons pink-text" style="font-size: 35px">new_releases</i>
-            <span class="card-title">2017 Games</span>
-            <p class="">
-				<a class="waves-effect waves-light btn red">Browse Collection</a>
-            </p>
-        </div>
-    </div>
-</div>
+{% endfor %}
 
 
 {% endblock %}

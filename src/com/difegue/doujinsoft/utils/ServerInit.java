@@ -166,7 +166,7 @@ public void contextInitialized(ServletContextEvent arg0) {
       String logFileName = "NewMios-"+formatter.format(today);
 
       // create a logFile for this deployment session
-      FileWriter fw = new FileWriter(dataDir+"/"+logFileName+".log");
+      FileWriter fw = new FileWriter(dataDir+"/"+logFileName+".csv");
       BufferedWriter bw = new BufferedWriter(fw);
       
       
@@ -238,7 +238,7 @@ public void contextInitialized(ServletContextEvent arg0) {
       
       
       //If logfile is empty, no mios were handled -> delete it
-      File logfile = new File(dataDir+"/"+logFileName+".log");
+      File logfile = new File(dataDir+"/"+logFileName+".csv");
       if (logfile.length() == 0)
     	  logfile.delete();
     }
