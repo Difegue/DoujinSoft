@@ -37,6 +37,11 @@ The .mio files you put in the data directory's "mio" subfolder should be consume
 (This part might take a little time, benchmarks show a ~5 minutes deploy time for 2000 .mio files.)  
 You can then access the Webapp and check everything's working.
 
+## Adding Collections
+
+Collections allow you to display a specific subset of Games to the user through a simple JSON file.  
+Collection JSON files go in your data directory, subfolder "collections". An example file is included at the root of this project.  
+
 ## More screenshots
 ![screen2](https://cloud.githubusercontent.com/assets/8237712/26278791/4fff292c-3da3-11e7-96be-575c8c96ab0b.png)
 ![screen3](https://cloud.githubusercontent.com/assets/8237712/26278792/50025d7c-3da3-11e7-947d-d87debba05c9.png)
