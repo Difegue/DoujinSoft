@@ -105,7 +105,7 @@ public class WelcomeServlet extends HttpServlet {
 			JsonReader jsonReader = new JsonReader(new FileReader(f));
 			//Auto bind the json to a class
 			Collection c = gson.fromJson(jsonReader, Collection.class);
-			c.id = f.getName();
+			c.id = f.getName().substring(0,f.getName().length()-5);
 			ret.add(c);
         	
         }
