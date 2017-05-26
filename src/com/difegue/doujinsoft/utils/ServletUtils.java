@@ -83,12 +83,12 @@ public class ServletUtils {
   			break;
   		}
   		
-  		result = statement.executeQuery("select * from "+tableName+" ORDER BY name ASC LIMIT 9");
+  		result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY name ASC LIMIT 9");
   		
   		while(result.next()) 
 	    	items.add(classConstructor.newInstance(result));
   		
-	    result = statement.executeQuery("select COUNT(id) from "+tableName);
+	    result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
 	    
 		context.put(contextTable, items);
 		context.put("totalitems", result.getInt(1));
@@ -149,8 +149,8 @@ public class ServletUtils {
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
     	
-	    String query = "SELECT * FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? ORDER BY name ASC LIMIT 9 OFFSET ?";
-	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ?";
+	    String query = "SELECT * FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY name ASC LIMIT 9 OFFSET ?";
+	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
 		PreparedStatement ret = connection.prepareStatement(query);
 		

@@ -57,7 +57,7 @@ label.active {
 	
 	height: 50px; 
 	max-width: 600px; 
-	width: 70%;
+	min-width: 70%;
 	
 }
 
@@ -86,6 +86,10 @@ label.active {
     font-size: 12px;
     display: inline-block;
     margin-top: 5px;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width:150px
 }
 
 .game-data {
@@ -109,6 +113,10 @@ label.active {
 
 .game-brand {
     background-image: url('../img/icons/game/publisher.png'); 
+}
+
+.theme-brand {
+	background-image: url('../img/icons/game/theme.png') !important; 
 }
 
 .manga-brand {
@@ -193,7 +201,8 @@ label.active {
 	border-radius: 10px; 
 	background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('../img/bg_mix.png');
 	min-height:166px;
-	background-size: 100%;
+	background-size: cover;
+	background-position: left bottom;
 }
 
 .cart-item {
@@ -214,6 +223,17 @@ label.active {
   display:none;
 }
 
+.ellipse {
+	cursor: pointer;
+	margin-left:10px;
+	margin-right:10px;
+}
+
+.ellipse > input {
+	width:50px;
+	font-size:20px;
+}
+
 @media screen and (max-width:1700px) and (min-width:992px), screen and (max-width:920px) and (min-width:600px), screen and (max-width: 420px ){
 
     .game-preview, .manga-preview, .record-preview {
@@ -226,6 +246,7 @@ label.active {
         text-align: center;
         display: block;
         float: none;
+        max-width: 30000px;
     }
 
     .game-title {

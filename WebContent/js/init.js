@@ -10,7 +10,7 @@
         itemsOnPage: 9,
         currentPage: 1,
         displayedPages: 5,
-        ellipsePageSet: false,
+        ellipsePageSet: true,
         cssStyle: '',
         prevText: '<i class="material-icons">chevron_left</i>',
         nextText: '<i class="material-icons">chevron_right</i>',
