@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -141,6 +142,14 @@ public class WelcomeServlet extends HttpServlet {
 		context.put("totalComics", result.getInt(1));
 		
 		context.put("collections", getAllCollectionsInDataDir(dataDir));
+		
+		//The little news string at the top of the page is stored in a news.txt file in the data directory.
+		//Simple stuff.
+		String news = "Welcome to DoujinSoft!";
+		if (new File(dataDir+"/news.txt").exists()) {
+			news = new Scanner(new File(dataDir+"/news.txt")).useDelimiter("\\Z").next();
+		}
+		context.put("news", news);
 		
 		//Output to client
 		Writer writer = new StringWriter();
