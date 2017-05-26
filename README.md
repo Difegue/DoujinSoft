@@ -41,6 +41,7 @@ You can then access the Webapp and check everything's working.
 
 Collections allow you to display a specific subset of Games to the user through a simple JSON file.  
 Collection JSON files go in your data directory, subfolder "collections". An example file is included at the root of this project.  
+Correctly written collections will be linked in the home page of the Webapp.
 
 ## More screenshots
 ![screen2](https://cloud.githubusercontent.com/assets/8237712/26278791/4fff292c-3da3-11e7-96be-575c8c96ab0b.png)
