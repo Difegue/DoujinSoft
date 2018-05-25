@@ -1,65 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
   <link rel="shortcut icon" href="./favicon.ico" />
   <title>DoujinSoft Store</title>
 
   <!-- CSS  -->
-  <link href="https://fonts.googleapis.com/css?family=Karla|Material+Icons" rel="stylesheet"> 
-  <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  
+  <link href="https://fonts.googleapis.com/css?family=Karla|Material+Icons" rel="stylesheet">
+  <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+
   <style>
-	body {
-    	background-image: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%), url('{% block background %}./img/bg_gam.png{% endblock %}');
-    	
-	}
+    body {
+      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.8) 100%),
+      url('{% block background %}./img/bg_gam.png{% endblock %}');
+
+    }
   </style>
 
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
-  <script src='http://www.midijs.net/lib/midi.js'></script>
+  <script src='js/midi.js'></script>
   <script src="js/jquery.simplePagination.js"></script>
   <script src="js/init.js"></script>
 
 </head>
+
 <body>
 
 
 
-<div class = "navbar-fixed">
-  <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">
-    <div class="nav-wrapper container">
-    
-      <object data="./img/logo.svg" type="image/svg+xml" style="height:35px; margin-top:15px; margin-right: 10px">
-      </object>
-      <a id="logo-container" href="./" class="brand-logo hide-on-small-and-down">
-      DoujinSoft Store
-      </a>
-      <ul class="right hide-on-med-and-down">
-        <li class="{% block gamepage %}{% endblock %}"><a href="./games">Games</a></li>
-        <li class="{% block recordpage %}{% endblock %}"><a href="./records">Records</a></li>
-        <li class="{% block comicpage %}{% endblock %}"><a href="./comics">Comics</a></li>
-        <li class="{% block cartpage %}{% endblock %}"><a href="./cart">Cart</a></li>
-      </ul>
+  <div class="navbar-fixed">
+    <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">
+      <div class="nav-wrapper container">
 
-      <ul id="nav-mobile" class="side-nav {% block color %}indigo{% endblock %} darken-1">
- 		<li class="{% block gamepage %}{% endblock %}"><a class=" white-text" href="./games">Games</a></li>
-        <li class="{% block recordpage %}{% endblock %}"><a class=" white-text" href="./records">Records</a></li>
-        <li class="{% block comicpage %}{% endblock %}"><a class=" white-text" href="./comics">Comics</a></li>
-        <li class="{% block cartpage %}{% endblock %}"><a class=" white-text" href="./cart">Cart</a></li>
-      </ul>
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-    </div>
-  </nav>
-</div>
+        <object data="./img/logo.svg" type="image/svg+xml" style="height:35px; margin-top:15px; margin-right: 10px">
+        </object>
+        <a id="logo-container" href="./" class="brand-logo hide-on-small-and-down">
+          DoujinSoft Store
+        </a>
+        <ul class="right hide-on-med-and-down">
+          <li class="{% block gamepage %}{% endblock %}">
+            <a href="./games">Games</a>
+          </li>
+          <li class="{% block recordpage %}{% endblock %}">
+            <a href="./records">Records</a>
+          </li>
+          <li class="{% block comicpage %}{% endblock %}">
+            <a href="./comics">Comics</a>
+          </li>
+          <li class="{% block cartpage %}{% endblock %}">
+            <a href="./cart">Cart</a>
+          </li>
+        </ul>
+
+        <ul id="nav-mobile" class="side-nav {% block color %}indigo{% endblock %} darken-1">
+          <li class="{% block gamepage %}{% endblock %}">
+            <a class=" white-text" href="./games">Games</a>
+          </li>
+          <li class="{% block recordpage %}{% endblock %}">
+            <a class=" white-text" href="./records">Records</a>
+          </li>
+          <li class="{% block comicpage %}{% endblock %}">
+            <a class=" white-text" href="./comics">Comics</a>
+          </li>
+          <li class="{% block cartpage %}{% endblock %}">
+            <a class=" white-text" href="./cart">Cart</a>
+          </li>
+        </ul>
+        <a href="#" data-activates="nav-mobile" class="button-collapse">
+          <i class="material-icons">menu</i>
+        </a>
+      </div>
+    </nav>
+  </div>
 
   <div class="section no-pad-bot" id="index-banner">
     <div class="container">
-      <br><br>
+      <br>
+      <br>
       <h1 class="header center {% block color %}green{% endblock %}-text" style="font-family: warioware">{% block type %}Generic title here{% endblock %}</h1>
       <div class="row center">
         <h5 class="header col s12 light white-text">{% block desc %}Generic description here{% endblock %}</h5>
@@ -74,19 +96,15 @@
 
       <!--   Content Section   -->
       <div class="row" id="content">
-		{% block content %}
-		
-    	{% endblock %}   
-	  </div>
-    
+        {% block content %} {% endblock %}
+      </div>
+
       <div class="row center">
-	  	{% block footdata %}
-	    	
-	    {% endblock %}
-	  </div>
-	  
+        {% block footdata %} {% endblock %}
+      </div>
+
     </div>
-   
+
   </div>
 
   <footer class="page-footer {% block color %}indigo{% endblock %} darken-2">
@@ -94,34 +112,47 @@
       <div class="row">
         <div class="col l9 s12">
           <h5 class="white-text">About DoujinSoft</h5>
-          <p class="grey-text text-lighten-4">The DoujinSoft Store is an archive of content created for the videogame WarioWare DIY/Made in Ore. <br/> 
-          	We hope this archive can make people (re)discover content lost to the Nintendo WFC closure.<br/> <br/>
-          	This website is not affiliated with Nintendo in any way.<br/> </p>
+          <p class="grey-text text-lighten-4">The DoujinSoft Store is an archive of content created for the videogame WarioWare DIY/Made in Ore.
+            <br/> We hope this archive can make people (re)discover content lost to the Nintendo WFC closure.
+            <br/>
+            <br/> This website is not affiliated with Nintendo in any way.
+            <br/> </p>
 
 
         </div>
-        
+
         <div class="col l3 s12">
           <h5 class="white-text">Links</h5>
           <ul>
-            <li><a class="white-text" href="./">Home</a></li>
-            <li><a class="white-text" href="./about">FAQ</a></li>
-            <li><a class="white-text" href="https://github.com/Difegue/DoujinSoft">Source Code @ GitHub</a></li>
-            <li><a class="white-text" href="mailto:sugoi@cock.li">Contact</a></li>
+            <li>
+              <a class="white-text" href="./">Home</a>
+            </li>
+            <li>
+              <a class="white-text" href="./about">FAQ</a>
+            </li>
+            <li>
+              <a class="white-text" href="https://github.com/Difegue/DoujinSoft">Source Code @ GitHub</a>
+            </li>
+            <li>
+              <a class="white-text" href="mailto:sugoi@cock.li">Contact</a>
+            </li>
           </ul>
         </div>
       </div>
     </div>
     <div class="footer-copyright">
       <div class="container">
-      	All trademarks and copyrights on this page are owned by their respective parties.<br/>
-      	Powered by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>. Typeface used: <a class="orange-text text-lighten-3" href="https://fonts.google.com/specimen/Karla">Karla</a>. 
+        All trademarks and copyrights on this page are owned by their respective parties.
+        <br/> Powered by
+        <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>. Typeface used:
+        <a class="orange-text text-lighten-3" href="https://fonts.google.com/specimen/Karla">Karla</a>.
       </div>
     </div>
   </footer>
 
 
-  
 
-  </body>
+
+</body>
+
 </html>
