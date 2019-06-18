@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.utils.ExportMidi;
+import com.difegue.doujinsoft.utils.MioCompress;
 import com.xperia64.diyedit.FileByteOperations;
 
 /**
@@ -45,14 +46,14 @@ public class MidiServlet extends HttpServlet {
 		{
 			
 			String id = request.getParameter("id");
-			String filePath = dataDir+"/mio/record/"+id+".mio";
+			String filePath = dataDir + "/mio/record/" + id + ".miozip";
 			
 			if (!new File (dataDir+"/midi/").exists())
 		    	  new File(dataDir+"/midi/").mkdirs();
 			
 			String midiPath = dataDir+"/midi/"+id+".midi";
-			
-			File recordFile = new File(filePath);
+
+			File recordFile = MioCompress.uncompressMio(new File(filePath));
 			File midiFile = new File(midiPath);
 			
 			//If mio file exists, spawn a ExportMidi object from it

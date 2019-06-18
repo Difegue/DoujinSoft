@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import com.difegue.doujinsoft.utils.MioCompress;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -122,15 +123,16 @@ public class CartServlet extends HttpServlet {
 	      fileContent, 
 	      targetFile.toPath(), 
 	      StandardCopyOption.REPLACE_EXISTING);
-	    
-	    //Call DIYEdit's SaveHandler on it, and it only does everything™
+
+		//Call DIYEdit's SaveHandler on it, and it only does everything.
         SaveHandler sHand = new SaveHandler(targetFile.getAbsolutePath());
         
         //Go through our arrays and inject mios from the DB
         for( JsonElement o: games) {
         	
         	String id = o.getAsJsonObject().get("id").getAsString();
-        	String mioPath = dataDir+"/mio/game/"+id+".mio";
+			String mioPath = dataDir + "/mio/game/" + id + ".miozip";
+			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
         	
         	int emptySlot = getEmptySlot(sHand, 0);
         	
@@ -139,29 +141,31 @@ public class CartServlet extends HttpServlet {
         		return false;
         	
         	if (emptySlot != -1)
-        		sHand.setMio(mioPath, emptySlot);
+				sHand.setMio(uncompressedMio.getAbsolutePath(), emptySlot);
         	
         }
         
 		for( JsonElement o: records) {
 		        	
         	String id = o.getAsJsonObject().get("id").getAsString();
-        	String mioPath = dataDir+"/mio/record/"+id+".mio";
+			String mioPath = dataDir + "/mio/record/" + id + ".miozip";
+			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
         	
         	int emptySlot = getEmptySlot(sHand, 1);
         	if (emptySlot != -1)
-        		sHand.setMio(mioPath, emptySlot);
+				sHand.setMio(uncompressedMio.getAbsolutePath(), emptySlot);
         	
         }
 
 		for( JsonElement o: manga) {
 			
 			String id = o.getAsJsonObject().get("id").getAsString();
-			String mioPath = dataDir+"/mio/manga/"+id+".mio";
+			String mioPath = dataDir + "/mio/manga/" + id + ".miozip";
+			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
 			
 			int emptySlot = getEmptySlot(sHand, 2);
 			if (emptySlot != -1)
-				sHand.setMio(mioPath, emptySlot);
+				sHand.setMio(uncompressedMio.getAbsolutePath(), emptySlot);
 			
 		}
         

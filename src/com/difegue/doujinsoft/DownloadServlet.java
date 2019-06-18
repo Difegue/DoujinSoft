@@ -1,5 +1,7 @@
 package com.difegue.doujinsoft;
 
+import com.difegue.doujinsoft.utils.MioCompress;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,13 +49,13 @@ public class DownloadServlet extends HttpServlet {
 			
 			switch (type) {
 				case "game":
-					filePath = dataDir+"/mio/game/"+id+".mio";
+					filePath = dataDir + "/mio/game/" + id + ".miozip";
 					break;
 				case "record":
-					filePath = dataDir+"/mio/record/"+id+".mio";
+					filePath = dataDir + "/mio/record/" + id + ".miozip";
 					break;
 				case "manga":
-					filePath = dataDir+"/mio/manga/"+id+".mio";
+					filePath = dataDir + "/mio/manga/" + id + ".miozip";
 					break;
 				default:
 					filePath = null;
@@ -61,8 +63,8 @@ public class DownloadServlet extends HttpServlet {
 			}
 			
 			if (filePath != null) {
-				
-				File downloadFile = new File(filePath);
+
+				File downloadFile = MioCompress.uncompressMio(new File(filePath));
 				FileInputStream inStream = new FileInputStream(downloadFile);
 				
 				// gets MIME type of the file

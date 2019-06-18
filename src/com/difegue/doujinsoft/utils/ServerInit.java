@@ -1,9 +1,7 @@
 package com.difegue.doujinsoft.utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,6 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -58,7 +58,7 @@ private void databaseDefinition(Statement statement) throws SQLException
  * Standard parsing for every .mio file - Returns the first values of the final SQL Statement.
  */
 private PreparedStatement parseMioBase(Metadata mio, String ID, Connection co, int type) throws SQLException {
-	
+
 	PreparedStatement ret = null;
 	String query = "";
 	
@@ -85,7 +85,7 @@ private PreparedStatement parseMioBase(Metadata mio, String ID, Connection co, i
 
 /*
  * Craft ID from .mio metadata, and check if it's available.
- * If it is, move and rename the original file to the appropriate spot in the data directory.
+ * If it is, compress and move the original file to the appropriate spot in the data directory.
  */
 private String computeMioID(File f, Metadata mio, int type) {
 	
@@ -106,20 +106,28 @@ private String computeMioID(File f, Metadata mio, int type) {
 	//Create directories if they don't exist
 	if (!new File (baseDir).exists())
   	  new File(baseDir).mkdirs();
-	
-	SQLog.log(Level.INFO, "Moving file to "+baseDir+ID+".mio");
-	f2 = new File(baseDir+ID+".mio");
+
+	SQLog.log(Level.INFO, "Moving file to " + baseDir + ID + ".miozip");
+	f2 = new File(baseDir + ID + ".miozip");
 	
 	while(f2.exists() && !f2.isDirectory()) { 
 	    ID = ID+"2";
-	    SQLog.log(Level.INFO, "Name already exists, moving file to "+baseDir+ID+".mio");
-	    f2 = new File(baseDir+ID+".mio");
+		SQLog.log(Level.INFO, "Name already exists, moving file to " + baseDir + ID + ".miozip");
+		f2 = new File(baseDir + ID + ".miozip");
 	}
-	
-	//Once parsed, the file is moved to its appropriate directory.
-	f.renameTo(f2);
-	return ID;
-	
+
+	//Compress file, move to directory and delete initial file.
+	try {
+		MioCompress.compressMio(f, f2);
+		f.delete();
+
+		//Once parsed, the file is moved to its appropriate directory.
+		return ID;
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+	return null;
 }
 
 
@@ -174,51 +182,60 @@ public void contextInitialized(ServletContextEvent arg0) {
           if (!f.isDirectory()) {
         	          	  
         	  SQLog.log(Level.INFO, "Parsing file "+f.getName());
-        	  byte[] mioFile = FileByteOperations.read(f.getAbsolutePath());
+			  byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
         	  PreparedStatement insertQuery = null;
-        	  String ID = "";
+			  String ID;
         	  
               //The file is game, manga or record, depending on its size.
-        	  if (mioFile.length == Types.GAME) {
+			  if (mioData.length == Types.GAME) {
         		  SQLog.log(Level.INFO, "Detected as game.");
-        		  GameEdit game = new GameEdit(mioFile);
+				  GameEdit game = new GameEdit(mioData);
         		  ID = computeMioID(f, game, Types.GAME);
+
+				  // If something went wrong compressing the mio, move on to the next one.
+				  if (ID == null) continue;
         		  insertQuery = parseMioBase(game, ID, connection, Types.GAME);
         		  	  
         		  //Game-specific: add the preview picture	  
         		  insertQuery.setString(7, MioUtils.mapColorByte(game.getCartColor()));
         		  insertQuery.setString(8, MioUtils.mapColorByte(game.getLogoColor()));
         		  insertQuery.setInt(9, game.getLogo());
-        		  insertQuery.setString(11, MioUtils.getBase64GamePreview(mioFile));
+				  insertQuery.setString(11, MioUtils.getBase64GamePreview(mioData));
         		  
                   bw.write("Game;"+ID+";"+game.getName()+"\n");
       	    	}
-        	  
-        	  if (mioFile.length == Types.MANGA) {
+
+			  if (mioData.length == Types.MANGA) {
         		  SQLog.log(Level.INFO, "Detected as comic.");
-        	      MangaEdit manga = new MangaEdit(mioFile);
+				  MangaEdit manga = new MangaEdit(mioData);
         	      ID = computeMioID(f, manga, Types.MANGA);
+
+				  // If something went wrong compressing the mio, move on to the next one.
+				  if (ID == null) continue;
         	      insertQuery = parseMioBase(manga, ID, connection, Types.MANGA);
         	      
         	      //Manga-specific: add the panels
         	      insertQuery.setString(7, MioUtils.mapColorByte(manga.getMangaColor()));
         		  insertQuery.setString(8, MioUtils.mapColorByte(manga.getLogoColor()));
         		  insertQuery.setInt(9, manga.getLogo());
-        		  insertQuery.setString(11,MioUtils.getBase64Manga(mioFile, 0));
-        		  insertQuery.setString(12,MioUtils.getBase64Manga(mioFile, 1));
-        		  insertQuery.setString(13,MioUtils.getBase64Manga(mioFile, 2));
-        		  insertQuery.setString(14,MioUtils.getBase64Manga(mioFile, 3));
+				  insertQuery.setString(11, MioUtils.getBase64Manga(mioData, 0));
+				  insertQuery.setString(12, MioUtils.getBase64Manga(mioData, 1));
+				  insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 2));
+				  insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 3));
 
                   bw.write("Manga;"+ID+";"+manga.getName()+"\n");
         	    }
-        	    
-        	  if (mioFile.length == Types.RECORD) {
+
+			  if (mioData.length == Types.RECORD) {
         		  SQLog.log(Level.INFO, "Detected as record.");
-        	      RecordEdit record = new RecordEdit(mioFile);
+				  RecordEdit record = new RecordEdit(mioData);
         	      ID = computeMioID(f, record, Types.RECORD);
+
+				  // If something went wrong compressing the mio, move on to the next one.
+				  if (ID == null) continue;
         	      insertQuery = parseMioBase(record, ID, connection, Types.RECORD);
-        	      
-        	      insertQuery.setString(7, MioUtils.mapColorByte(record.getRecordColor()));
+
+				  insertQuery.setString(7, MioUtils.mapColorByte(record.getRecordColor()));
         	      insertQuery.setString(8, MioUtils.mapColorByte(record.getLogoColor()));
         	      insertQuery.setInt(9, record.getLogo());
         		  
@@ -235,9 +252,9 @@ public void contextInitialized(ServletContextEvent arg0) {
       
       // Close stream
       bw.close();
-      
-      
-      //If logfile is empty, no mios were handled -> delete it
+
+
+		//If logfile is empty, no mios were handled -> delete it
       File logfile = new File(dataDir+"/"+logFileName+".csv");
       if (logfile.length() == 0)
     	  logfile.delete();
@@ -251,8 +268,6 @@ public void contextInitialized(ServletContextEvent arg0) {
       try {
         if(connection != null)
           connection.close();
-        
-        
       }
       catch(SQLException e) {
     	SQLog.log(Level.SEVERE, "connection close failed: " + e.getMessage());
@@ -262,8 +277,7 @@ public void contextInitialized(ServletContextEvent arg0) {
 
 @Override
 public void contextDestroyed(ServletContextEvent arg0) {
-	// TODO Auto-generated method stub
-	
+
 }
 
 	
