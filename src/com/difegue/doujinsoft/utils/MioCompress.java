@@ -29,7 +29,7 @@ public class MioCompress {
     public static File uncompressMio(File compressedMio) throws IOException {
 
         // Create a temporary file
-        File uncompressedMio = File.createTempFile(compressedMio.toPath().getFileName(), ".mio");
+        File uncompressedMio = File.createTempFile(compressedMio.toPath().getFileName().toString(), ".mio");
 
         // Uncompress given file
         ZipInputStream zis = new ZipInputStream(new FileInputStream(compressedMio.getAbsolutePath()));

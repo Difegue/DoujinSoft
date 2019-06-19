@@ -248,7 +248,7 @@ public void contextInitialized(ServletContextEvent arg0) {
 			  try {
 				  insertQuery.executeUpdate();
 			  } catch (SQLException e) {
-				  SQLog.log(Level.SEVERE, "Couldn't insert "+ID+" in the database - Likely a duplicate file, moving on.");
+				  SQLog.log(Level.SEVERE, "Couldn't insert this mio in the database - Likely a duplicate file, moving on.");
 				  SQLog.log(Level.SEVERE, e.getMessage());
 			  }
     		  
