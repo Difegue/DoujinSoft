@@ -95,7 +95,7 @@ private String computeMioID(File f, Metadata mio, int type) {
 	File f2 = null;
 	String baseDir = "";
 	
-	//Check if ID already exists, add a ' if it does
+	//Check if ID already exists, add a 2 if it does
 	switch (type) {
 	
 		case (Types.GAME): baseDir = f.getParent()+"/game/"; break;
@@ -118,7 +118,7 @@ private String computeMioID(File f, Metadata mio, int type) {
 
 	//Compress file, move to directory and delete initial file.
 	try {
-		MioCompress.compressMio(f, f2);
+		MioCompress.compressMio(f, f2, ID);
 		// Only delete the initial .mio if the zipped variant has been properly processed
 		if (f2.exists())
 			f.delete();

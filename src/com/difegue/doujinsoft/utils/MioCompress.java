@@ -12,13 +12,13 @@ public class MioCompress {
      * Compress and uncompress .mio files with ZipEntry.
      */
 
-    public static void compressMio(File orig, File dest) throws IOException {
+    public static void compressMio(File orig, File dest, String desiredName) throws IOException {
 
         String zipFileName = dest.getAbsolutePath();
 
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));
         // Just put the base ID in the zip, no need for the zip suffix
-        zos.putNextEntry(new ZipEntry(orig.getName() + ".mio"));
+        zos.putNextEntry(new ZipEntry(desiredName + ".mio"));
 
         byte[] bytes = Files.readAllBytes(orig.toPath());
         zos.write(bytes, 0, bytes.length);
@@ -29,7 +29,7 @@ public class MioCompress {
     public static File uncompressMio(File compressedMio) throws IOException {
 
         // Create a temporary file
-        File uncompressedMio = File.createTempFile(compressedMio.getName(), ".mio");
+        File uncompressedMio = File.createTempFile(compressedMio.toPath().getFileName(), ".mio");
 
         // Uncompress given file
         ZipInputStream zis = new ZipInputStream(new FileInputStream(compressedMio.getAbsolutePath()));
