@@ -119,9 +119,10 @@ private String computeMioID(File f, Metadata mio, int type) {
 	//Compress file, move to directory and delete initial file.
 	try {
 		MioCompress.compressMio(f, f2);
-		f.delete();
+		// Only delete the initial .mio if the zipped variant has been properly processed
+		if (f2.exists())
+			f.delete();
 
-		//Once parsed, the file is moved to its appropriate directory.
 		return ID;
 	} catch (Exception e) {
 		e.printStackTrace();
