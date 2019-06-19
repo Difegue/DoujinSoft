@@ -14,7 +14,7 @@ public class MioCompress {
 
     public static void compressMio(File orig, File dest) throws IOException {
 
-        String zipFileName = dest.getName();
+        String zipFileName = dest.getAbsolutePath();
 
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));
         // Just put the base ID in the zip, no need for the zip suffix
