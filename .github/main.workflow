@@ -1,5 +1,10 @@
 workflow "Build Docker image" {
   resolves = ["GitHub Action for Maven"]
+  on = "commit_comment"
+}
+
+workflow "Build Docker image" {
+  resolves = ["GitHub Action for Maven"]
   on = "push"
 }
 
