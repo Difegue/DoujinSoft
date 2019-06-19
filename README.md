@@ -17,6 +17,8 @@ Uses SQLite, materializeCSS and jQuery.
 
 ## Deploying  
 
+You can deploy the provided [Docker image](https://hub.docker.com/r/difegue/doujinsoft) by mapping a volume to /home/doujinsoft
+
 Get the [release WAR](https://github.com/Difegue/DoujinSoft/releases) (or just build it with maven from the sources)  
 Edit your tomcat context to specify your data directory:  
 ```
@@ -40,7 +42,7 @@ You can then access the Webapp and check everything's working.
 ## Adding Collections
 
 Collections allow you to display a specific subset of Games to the user through a simple JSON file.  
-Collection JSON files go in your data directory, subfolder "collections". An example file is included at the root of this project.  
+Collection JSON files go in your data directory, subfolder "data/collections". An example file is included at the root of this project.  
 Correctly written collections will be linked in the home page of the Webapp.
 
 ## More screenshots
