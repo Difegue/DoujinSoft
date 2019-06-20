@@ -32,8 +32,8 @@ public class MioCompress {
         Logger logger = Logger.getLogger("Mio Unzip");
 
         // Create a temporary file
-        String mioName = compressedMio.toPath().getFileName().toString(), ".mio";
-        File uncompressedMio = File.createTempFile(mioName);
+        String mioName = compressedMio.toPath().getFileName().toString();
+        File uncompressedMio = File.createTempFile(mioName, ".mio");
         logger.info("Uncompressing .mio to "+uncompressedMio.getAbsolutePath());
 
         // Uncompress given file
