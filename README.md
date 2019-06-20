@@ -1,5 +1,7 @@
 # DoujinSoft
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/difegue/doujinsoft.svg)](https://hub.docker.com/r/difegue/doujinsoft/)
+
 ![screen1](https://cloud.githubusercontent.com/assets/8237712/26278790/4ffd633a-3da3-11e7-865f-015cab5fef5e.png)
 
 Java Web Application for managing and distributing WWDIY content.  
