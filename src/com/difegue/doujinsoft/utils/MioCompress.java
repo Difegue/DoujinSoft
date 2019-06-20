@@ -32,7 +32,8 @@ public class MioCompress {
         Logger logger = Logger.getLogger("Mio Unzip");
 
         // Create a temporary file
-        File uncompressedMio = File.createTempFile(compressedMio.toPath().getFileName().toString(), ".mio");
+        String mioName = compressedMio.toPath().getFileName().toString(), ".mio";
+        File uncompressedMio = File.createTempFile(mioName);
         logger.info("Uncompressing .mio to "+uncompressedMio.getAbsolutePath());
 
         // Uncompress given file
@@ -44,8 +45,10 @@ public class MioCompress {
 
             String fileName = entry.getName();
             logger.info(fileName);
-            if (!fileName.contains(compressedMio.getName()))
+            if (!fileName.contains(mioName)) {
+                entry = zis.getNextEntry();
                 continue;
+            }
 
             FileOutputStream fos = new FileOutputStream(uncompressedMio);
 
