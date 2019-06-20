@@ -30,27 +30,25 @@ public class MioCompress {
     public static File uncompressMio(File compressedMio) throws IOException {
 
         Logger logger = Logger.getLogger("Mio Unzip");
-
-        // Create a temporary file
-        String mioName = compressedMio.toPath().getFileName().toString();
-        File uncompressedMio = File.createTempFile(mioName, ".mio");
-        logger.info("Uncompressing .mio to "+uncompressedMio.getAbsolutePath());
+        String tDir = System.getProperty("java.io.tmpdir");
 
         // Uncompress given file
         ZipInputStream zis = new ZipInputStream(new FileInputStream(compressedMio.getAbsolutePath()));
         ZipEntry entry = zis.getNextEntry();
         byte[] buffer = new byte[1024];
 
+        File uncompressedMio = null;
         while (entry != null) {
 
             String fileName = entry.getName();
-            logger.info(fileName);
-            if (!fileName.contains(mioName)) {
-                entry = zis.getNextEntry();
-                continue;
+            uncompressedMio = new File(tDir, fileName);
+            if (uncompressedMio.exists()) {
+                // You can get a race condition here if someone starts a download and a concurrent user starts one right afterwards.
+                // User n°2 might get an incomplete .mio file. Big deal.
+                break;
             }
-
             FileOutputStream fos = new FileOutputStream(uncompressedMio);
+            logger.info("Uncompressing .mio to "+uncompressedMio.getAbsolutePath());
 
             int len;
             while ((len = zis.read(buffer)) > 0) {
