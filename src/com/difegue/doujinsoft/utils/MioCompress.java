@@ -2,6 +2,7 @@ package com.difegue.doujinsoft.utils;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -28,18 +29,22 @@ public class MioCompress {
 
     public static File uncompressMio(File compressedMio) throws IOException {
 
+        Logger logger = Logger.getLogger("Mio Unzip");
+
         // Create a temporary file
         File uncompressedMio = File.createTempFile(compressedMio.toPath().getFileName().toString(), ".mio");
+        logger.info("Uncompressing .mio to "+uncompressedMio.getAbsolutePath());
 
         // Uncompress given file
         ZipInputStream zis = new ZipInputStream(new FileInputStream(compressedMio.getAbsolutePath()));
-        ZipEntry ze = zis.getNextEntry();
+        ZipEntry entry = zis.getNextEntry();
         byte[] buffer = new byte[1024];
 
-        while (ze != null) {
+        while (entry != null) {
 
-            String fileName = ze.getName();
-            if (!fileName.equals(compressedMio.getName()))
+            String fileName = entry.getName();
+            logger.info(fileName);
+            if (!fileName.contains(compressedMio.getName()))
                 continue;
 
             FileOutputStream fos = new FileOutputStream(uncompressedMio);
@@ -50,7 +55,7 @@ public class MioCompress {
             }
 
             fos.close();
-            ze = zis.getNextEntry();
+            entry = zis.getNextEntry();
         }
 
         zis.closeEntry();

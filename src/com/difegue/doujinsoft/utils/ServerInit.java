@@ -1,7 +1,6 @@
 package com.difegue.doujinsoft.utils;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,8 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -88,8 +85,7 @@ private PreparedStatement parseMioBase(Metadata mio, String ID, Connection co, i
  * If it is, compress and move the original file to the appropriate spot in the data directory.
  */
 private String computeMioID(File f, Metadata mio, int type) {
-	
-	
+
 	Logger SQLog = Logger.getLogger("SQLite");
 	String ID = mio.getSerial1()+"-"+mio.getSerial2()+"-"+mio.getSerial3();
 	File f2 = null;
