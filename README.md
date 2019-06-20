@@ -15,9 +15,14 @@ Uses SQLite, materializeCSS and jQuery.
 * All the content available on the archive can be automatically inserted into a game save provided by the user.
 
 
-## Deploying  
+## Deploying through Docker 
 
-You can deploy the provided [Docker image](https://hub.docker.com/r/difegue/doujinsoft) by mapping a volume to /home/doujinsoft
+You can deploy the provided [Docker image](https://hub.docker.com/r/difegue/doujinsoft) by mapping a volume to /home/doujinsoft:
+```
+docker run --mount type=bind,src=/my/data/directory,dst=/home/doujinsoft -p 8080:8080 difegue/doujinsoft
+```
+
+## Deploying manually 
 
 Get the [release WAR](https://github.com/Difegue/DoujinSoft/releases) (or just build it with maven from the sources)  
 Edit your tomcat context to specify your data directory:  
@@ -35,7 +40,11 @@ chown tomcat8 DoujinSoft-data/
 chmod -R 755 DoujinSoft-data/
 ```
 Drop the WAR into your tomcat webapps directory to start deployment.  
-The .mio files you put in the data directory's "mio" subfolder should be consumed and added to the database.  
+
+## Adding .mio files
+
+Add .mio files to the "mio" subfolder in your data directory.
+The files will be consumed and added to the database.  
 (This part might take a little time, benchmarks show a ~5 minutes deploy time for 2000 .mio files.)  
 You can then access the Webapp and check everything's working.
 
