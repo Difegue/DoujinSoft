@@ -40,7 +40,7 @@ public class ExportMidi
   public void export(String filename, boolean play)
   {
     String pl = calculatePlaystring();
-    MidiLog.log(Level.INFO, "Music String for this MIO is: "+pl);
+    //MidiLog.log(Level.DEBU, "Music String for this MIO is: "+pl);
     
     File f = new File(filename);
     try
