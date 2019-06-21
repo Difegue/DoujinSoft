@@ -18,8 +18,7 @@ public class MioCompress {
         String zipFileName = dest.getAbsolutePath();
 
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFileName));
-        // Just put the base ID in the zip, no need for the zip suffix
-        zos.putNextEntry(new ZipEntry(desiredName + ".mio"));
+        zos.putNextEntry(new ZipEntry(desiredName));
 
         byte[] bytes = Files.readAllBytes(orig.toPath());
         zos.write(bytes, 0, bytes.length);

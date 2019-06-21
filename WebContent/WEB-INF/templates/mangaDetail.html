@@ -41,10 +41,10 @@
               <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
             </div>
             <div class="card-action">
-              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=manga&id={{ item.mioID }}" style="width:48%" >
+              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=manga&id={{ item.hash }}" style="width:48%" >
                 <i class="material-icons">file_download</i>
               </a>
-              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('manga','{{ item.mioID }}','{{ item.name }}')">
+              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('manga','{{ item.hash }}','{{ item.name }}')">
                 <i class="material-icons">shopping_cart</i>
               </a>
             </div>

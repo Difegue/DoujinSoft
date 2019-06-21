@@ -23,6 +23,8 @@ import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;
 import com.xperia64.diyedit.editors.RecordEdit;
 import com.xperia64.diyedit.metadata.Metadata;
+import net.jpountz.xxhash.StreamingXXHash32;
+import net.jpountz.xxhash.XXHashFactory;
 
 /*
  * Ran on each server startup - Handles database updating.
@@ -35,16 +37,16 @@ private void databaseDefinition(Statement statement) throws SQLException
 {
 	
     statement.executeUpdate("CREATE TABLE IF NOT EXISTS Games "
-      + "(id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, isAdult INTEGER, "
-      + "previewPic TEXT, PRIMARY KEY(`id`) )");
+      + "(hash INTEGER, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
+      + "previewPic TEXT, PRIMARY KEY(`hash`) )");
     
     statement.executeUpdate("CREATE TABLE IF NOT EXISTS Manga "
-      + "(id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, isAdult INTEGER, "
-      + "frame0 TEXT, frame1 TEXT, frame2 TEXT, frame3 TEXT, PRIMARY KEY(`id`) )");
+      + "(hash INTEGER, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
+      + "frame0 TEXT, frame1 TEXT, frame2 TEXT, frame3 TEXT, PRIMARY KEY(`hash`) )");
     
     statement.executeUpdate("CREATE TABLE IF NOT EXISTS Records "
-      + "(id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
-      + "PRIMARY KEY(`id`) )");
+      + "(hash INTEGER, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
+      + "PRIMARY KEY(`hash`) )");
 	
     statement.executeUpdate("CREATE INDEX IF NOT EXISTS Games_idx ON Games (id);");
     statement.executeUpdate("CREATE INDEX IF NOT EXISTS Manga_idx ON Manga (id);");
@@ -54,7 +56,7 @@ private void databaseDefinition(Statement statement) throws SQLException
 /* 
  * Standard parsing for every .mio file - Returns the first values of the final SQL Statement.
  */
-private PreparedStatement parseMioBase(Metadata mio, String ID, Connection co, int type) throws SQLException {
+private PreparedStatement parseMioBase(Metadata mio, int hash, String ID, Connection co, int type) throws SQLException {
 
 	PreparedStatement ret = null;
 	String query = "";
@@ -62,71 +64,21 @@ private PreparedStatement parseMioBase(Metadata mio, String ID, Connection co, i
 	switch (type) {
 		case Types.GAME: query = "INSERT INTO Games VALUES (?,?,?,?,?,?,?,?,?,?,?)"; break;
 		case Types.MANGA: query = "INSERT INTO Manga VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; break;
-		case Types.RECORD: query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?)"; break;
+		case Types.RECORD: query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?,?)"; break;
 	}
 	
 	ret = co.prepareStatement(query);
 	
-	ret.setString(1, ID);
-	ret.setString(2, mio.getName());
-	ret.setString(3, mio.getCreator());
-	ret.setString(4, mio.getBrand());
-	ret.setString(5, mio.getDescription());
-	ret.setInt(6, mio.getTimestamp());
-	
-	if (type == Types.GAME || type == Types.MANGA)
-		ret.setInt(10, 0);
+	ret.setInt(1, hash);
+	ret.setString(2, ID);
+	ret.setString(3, mio.getName());
+	ret.setString(4, mio.getCreator());
+	ret.setString(5, mio.getBrand());
+	ret.setString(6, mio.getDescription());
+	ret.setInt(7, mio.getTimestamp());
 	
 	return ret;
 }
-
-/*
- * Craft ID from .mio metadata, and check if it's available.
- * If it is, compress and move the original file to the appropriate spot in the data directory.
- */
-private String computeMioID(File f, Metadata mio, int type) {
-
-	Logger SQLog = Logger.getLogger("SQLite");
-	String ID = mio.getSerial1()+"-"+mio.getSerial2()+"-"+mio.getSerial3();
-	File f2 = null;
-	String baseDir = "";
-	
-	//Check if ID already exists, add a 2 if it does
-	switch (type) {
-	
-		case (Types.GAME): baseDir = f.getParent()+"/game/"; break;
-		case (Types.MANGA): baseDir = f.getParent()+"/manga/"; break;
-		case (Types.RECORD): baseDir = f.getParent()+"/record/"; break;
-	}
-	
-	//Create directories if they don't exist
-	if (!new File (baseDir).exists())
-  	  new File(baseDir).mkdirs();
-
-	SQLog.log(Level.INFO, "Moving file to " + baseDir + ID + ".miozip");
-	f2 = new File(baseDir + ID + ".miozip");
-	
-	while(f2.exists() && !f2.isDirectory()) { 
-	    ID = ID+"2";
-		SQLog.log(Level.INFO, "Name already exists, moving file to " + baseDir + ID + ".miozip");
-		f2 = new File(baseDir + ID + ".miozip");
-	}
-
-	//Compress file, move to directory and delete initial file.
-	try {
-		MioCompress.compressMio(f, f2, ID);
-		// Only delete the initial .mio if the zipped variant has been properly processed
-		if (f2.exists())
-			f.delete();
-
-		return ID;
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-
-	return null;
-}
-
 
 @Override
 public void contextInitialized(ServletContextEvent arg0) {
@@ -180,23 +132,23 @@ public void contextInitialized(ServletContextEvent arg0) {
         	          	  
         	  SQLog.log(Level.INFO, "Parsing file "+f.getName());
 			  byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
-        	  PreparedStatement insertQuery = null;
-			  String ID;
-        	  
+			  int hash = MioStorage.computeMioHash(mioData);
+        	  String ID;
+			  PreparedStatement insertQuery = null;
+
               //The file is game, manga or record, depending on its size.
 			  if (mioData.length == Types.GAME) {
         		  SQLog.log(Level.INFO, "Detected as game.");
 				  GameEdit game = new GameEdit(mioData);
-        		  ID = computeMioID(f, game, Types.GAME);
 
-				  // If something went wrong compressing the mio, move on to the next one.
-				  if (ID == null) continue;
-        		  insertQuery = parseMioBase(game, ID, connection, Types.GAME);
+        		  ID = MioStorage.computeMioID(f, game);
+        		  insertQuery = parseMioBase(game, hash, ID, connection, Types.GAME);
+				  MioStorage.consumeMio(f, hash, Types.GAME);
         		  	  
         		  //Game-specific: add the preview picture	  
-        		  insertQuery.setString(7, MioUtils.mapColorByte(game.getCartColor()));
-        		  insertQuery.setString(8, MioUtils.mapColorByte(game.getLogoColor()));
-        		  insertQuery.setInt(9, game.getLogo());
+        		  insertQuery.setString(8, MioUtils.mapColorByte(game.getCartColor()));
+        		  insertQuery.setString(9, MioUtils.mapColorByte(game.getLogoColor()));
+        		  insertQuery.setInt(10, game.getLogo());
 				  insertQuery.setString(11, MioUtils.getBase64GamePreview(mioData));
         		  
                   bw.write("Game;"+ID+";"+game.getName()+"\n");
@@ -205,16 +157,15 @@ public void contextInitialized(ServletContextEvent arg0) {
 			  if (mioData.length == Types.MANGA) {
         		  SQLog.log(Level.INFO, "Detected as comic.");
 				  MangaEdit manga = new MangaEdit(mioData);
-        	      ID = computeMioID(f, manga, Types.MANGA);
 
-				  // If something went wrong compressing the mio, move on to the next one.
-				  if (ID == null) continue;
-        	      insertQuery = parseMioBase(manga, ID, connection, Types.MANGA);
+        	      ID = MioStorage.computeMioID(f, manga);
+        	      insertQuery = parseMioBase(manga, hash, ID, connection, Types.MANGA);
+				  MioStorage.consumeMio(f, hash, Types.MANGA);
         	      
         	      //Manga-specific: add the panels
-        	      insertQuery.setString(7, MioUtils.mapColorByte(manga.getMangaColor()));
-        		  insertQuery.setString(8, MioUtils.mapColorByte(manga.getLogoColor()));
-        		  insertQuery.setInt(9, manga.getLogo());
+        	      insertQuery.setString(8, MioUtils.mapColorByte(manga.getMangaColor()));
+        		  insertQuery.setString(9, MioUtils.mapColorByte(manga.getLogoColor()));
+        		  insertQuery.setInt(10, manga.getLogo());
 				  insertQuery.setString(11, MioUtils.getBase64Manga(mioData, 0));
 				  insertQuery.setString(12, MioUtils.getBase64Manga(mioData, 1));
 				  insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 2));
@@ -226,15 +177,14 @@ public void contextInitialized(ServletContextEvent arg0) {
 			  if (mioData.length == Types.RECORD) {
         		  SQLog.log(Level.INFO, "Detected as record.");
 				  RecordEdit record = new RecordEdit(mioData);
-        	      ID = computeMioID(f, record, Types.RECORD);
 
-				  // If something went wrong compressing the mio, move on to the next one.
-				  if (ID == null) continue;
-        	      insertQuery = parseMioBase(record, ID, connection, Types.RECORD);
+        	      ID = MioStorage.computeMioID(f, record);
+        	      insertQuery = parseMioBase(record, hash, ID, connection, Types.RECORD);
+				  MioStorage.consumeMio(f, hash, Types.RECORD);
 
-				  insertQuery.setString(7, MioUtils.mapColorByte(record.getRecordColor()));
-        	      insertQuery.setString(8, MioUtils.mapColorByte(record.getLogoColor()));
-        	      insertQuery.setInt(9, record.getLogo());
+				  insertQuery.setString(8, MioUtils.mapColorByte(record.getRecordColor()));
+        	      insertQuery.setString(9, MioUtils.mapColorByte(record.getLogoColor()));
+        	      insertQuery.setInt(10, record.getLogo());
         		  
                   bw.write("Record;"+ID+";"+record.getName()+"\n");
         	    }
@@ -247,17 +197,13 @@ public void contextInitialized(ServletContextEvent arg0) {
 				  SQLog.log(Level.SEVERE, "Couldn't insert this mio in the database - Likely a duplicate file, moving on.");
 				  SQLog.log(Level.SEVERE, e.getMessage());
 			  }
-    		  
-
-          } 
-          
+          }
       }
       
       // Close stream
       bw.close();
 
-
-		//If logfile is empty, no mios were handled -> delete it
+      //If logfile is empty, no mios were handled -> delete it
       File logfile = new File(dataDir+"/"+logFileName+".csv");
       if (logfile.length() == 0)
     	  logfile.delete();

@@ -43,10 +43,10 @@
               <span class="game-text card-title white-text" style=""><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
             </div>
             <div class="card-action">
-              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=game&id={{ game.mioID }}" style="width:48%" >
+              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=game&id={{ game.hash }}" style="width:48%" >
                 <i class="material-icons">file_download</i>
               </a>
-              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('game','{{ game.mioID }}')">
+              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('game','{{ game.hash }}')">
                 <i class="material-icons">shopping_cart</i>
               </a>
             </div>

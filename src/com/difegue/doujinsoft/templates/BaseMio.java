@@ -24,6 +24,7 @@ public class BaseMio {
     	
     	name = result.getString("name");
     	mioID = result.getString("id");
+    	hash = result.getString("hash");
 		brand = result.getString("brand");
 		creator = result.getString("creator");
 		if (desc.length() > 18) {
@@ -43,7 +44,7 @@ public class BaseMio {
 	
 	}
 	
-	public String name, timestamp, mioID, brand, creator, mioDesc1, mioDesc2, colorLogo, colorCart;
+	public String name, timestamp, mioID, hash, brand, creator, mioDesc1, mioDesc2, colorLogo, colorCart;
 	public int logo;
 	
 }

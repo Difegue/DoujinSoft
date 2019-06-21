@@ -32,7 +32,7 @@
 
                   </div>
                   
-                  	<div class="record-preview tooltipped" data-tooltip="Play/Stop" onclick="playMidi('{{ item.mioID }}')">
+                  	<div class="record-preview tooltipped" data-tooltip="Play/Stop" onclick="playMidi('{{ item.hash }}')">
                   		<div class="record-image" id="{{ item.mioID }}-record">
 						 	<img style="border-radius: 100px; left: 26%; top: 25%; height: 50%; padding: 7px;position: absolute;" class="{{ item.colorLogo }} darken-2" src="./img/icons/music/record_{{ item.logo }}.png" /> 
 						</div>
@@ -43,10 +43,10 @@
               <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
             </div>
             <div class="card-action">
-              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=record&id={{ item.mioID }}" style="width:48%" >
+              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=record&id={{ item.hash }}" style="width:48%" >
                 <i class="material-icons">file_download</i>
               </a>
-              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.mioID }}')">
+              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.hash }}')">
                 <i class="material-icons">shopping_cart</i>
               </a>
             </div>
