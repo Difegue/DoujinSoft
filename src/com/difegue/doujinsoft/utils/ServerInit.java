@@ -149,7 +149,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         insertQuery.setInt(10, game.getLogo());
                         insertQuery.setString(11, MioUtils.getBase64GamePreview(mioData));
 
-                        bw.write("Game;"+ID+";"+game.getName()+"\n");
+                        bw.write("Game;"+hash+";"+ID+";"+game.getName()+"\n");
                     }
 
                     if (mioData.length == Types.MANGA) {
@@ -169,7 +169,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 2));
                         insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 3));
 
-                        bw.write("Manga;"+ID+";"+manga.getName()+"\n");
+                        bw.write("Manga;"+hash+";"+ID+";"+manga.getName()+"\n");
                     }
 
                     if (mioData.length == Types.RECORD) {
@@ -184,7 +184,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         insertQuery.setString(9, MioUtils.mapColorByte(record.getLogoColor()));
                         insertQuery.setInt(10, record.getLogo());
 
-                        bw.write("Record;"+ID+";"+record.getName()+"\n");
+                        bw.write("Record;"+hash+";"+ID+";"+record.getName()+"\n");
                     }
 
                     SQLog.log(Level.INFO, "Inserting into DB");
