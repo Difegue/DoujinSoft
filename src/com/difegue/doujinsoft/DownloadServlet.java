@@ -77,7 +77,7 @@ public class DownloadServlet extends HttpServlet {
 				
 				// forces download
 				String headerKey = "Content-Disposition";
-				String headerValue = String.format("attachment; filename=\"%s\"", URLEncoder.encode(downloadFile.getName(), "UTF-8"));
+				String headerValue = String.format("attachment; filename*=UTF-8''%s", URLEncoder.encode(downloadFile.getName(), "UTF-8"));
 				response.setHeader(headerKey, headerValue);
 				
 				// obtains response's output stream
