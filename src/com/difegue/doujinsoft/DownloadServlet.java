@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -76,7 +77,7 @@ public class DownloadServlet extends HttpServlet {
 				
 				// forces download
 				String headerKey = "Content-Disposition";
-				String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", URLEncoder.encode(downloadFile.getName(), "UTF-8"));
 				response.setHeader(headerKey, headerValue);
 				
 				// obtains response's output stream
