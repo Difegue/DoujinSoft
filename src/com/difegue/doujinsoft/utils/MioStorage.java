@@ -1,32 +1,37 @@
 package com.difegue.doujinsoft.utils;
 
 import com.xperia64.diyedit.metadata.Metadata;
-import net.jpountz.xxhash.StreamingXXHash32;
-import net.jpountz.xxhash.XXHashFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MioStorage {
 
-    public static int computeMioHash(byte[] data) throws IOException {
-        XXHashFactory factory = XXHashFactory.fastestInstance();
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+    public static String computeMioHash(byte[] data) {
 
-        int seed = 0x9747b28c; // used to initialize the hash value
-        StreamingXXHash32 hash32 = factory.newStreamingHash32(seed);
-        byte[] buf = new byte[8192];
-        for (;;) {
-            int read = in.read(buf);
-            if (read == -1) {
-                break;
-            }
-            hash32.update(buf, 0, read);
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(data);
+            byte[] digest = messageDigest.digest();
+
+            return convertByteToHex(digest);
+        } catch (NoSuchAlgorithmException e) {
+            return "";
         }
-        return hash32.getValue();
+
+    }
+
+    private static String convertByteToHex(byte[] byteData) {
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < byteData.length; i++) {
+            sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+        }
+
+        return sb.toString();
     }
 
     /*
@@ -39,7 +44,7 @@ public class MioStorage {
     /*
     Compress file, move to directory and delete initial file.
      */
-    public static boolean consumeMio(File f, int hash, int type) {
+    public static boolean consumeMio(File f, String hash, int type) {
         Logger SQLog = Logger.getLogger("SQLite");
         String baseDir = "";
 
