@@ -170,7 +170,7 @@ public class ServletUtils {
 		
 		ret.setString(1, name);
 		ret.setString(2, creator);
-		ret.setInt(3, page*9-9);
+		ret.setInt(3, page*15-15);
 		
     	
 		ResultSet result = ret.executeQuery();
@@ -281,7 +281,7 @@ public class ServletUtils {
 		
 		ret.setString(1, name);
 		ret.setString(2, creator);
-		ret.setInt(3, page*9-9);
+		ret.setInt(3, page*15-15);
 		
 		ResultSet result = ret.executeQuery();
 	    
