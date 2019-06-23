@@ -71,6 +71,7 @@ public class DownloadServlet extends HttpServlet {
 				String mimeType = "application/octet-stream";
 				// Set response
 				response.setContentType(mimeType);
+				response.setCharacterEncoding("UTF-8");
 				response.setContentLength((int) downloadFile.length());
 				
 				// forces download
