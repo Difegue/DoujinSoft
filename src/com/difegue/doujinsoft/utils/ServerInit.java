@@ -184,9 +184,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                     }
                 }
             }
-
-            // Close stream
-            bw.close();
             
             statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");
