@@ -83,12 +83,12 @@ public class ServletUtils {
   			break;
   		}
   		
-  		result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY Replace(`name`,'?','z') ASC LIMIT 15");
+  		result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY name ASC LIMIT 15");
   		
   		while(result.next()) 
 	    	items.add(classConstructor.newInstance(result));
   		
-	    result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
+	    	result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
 	    
 		context.put(contextTable, items);
 		context.put("totalitems", result.getInt(1));
@@ -149,7 +149,7 @@ public class ServletUtils {
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
     	
-	    String query = "SELECT * FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY Replace(`name`,'?','z') ASC LIMIT 15 OFFSET ?";
+	    String query = "SELECT * FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY name ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
 		PreparedStatement ret = connection.prepareStatement(query);
@@ -181,17 +181,17 @@ public class ServletUtils {
 	    PreparedStatement ret2 = connection.prepareStatement(queryCount);
 	    
 	    ret2.setString(1, name);
-		ret2.setString(2, creator);
+	    ret2.setString(2, creator);
 	    result = ret2.executeQuery();
 		
 		context.put(contextTable, items);
 		context.put("totalitems", result.getInt(1));
-		
+
 		//Output to client
 		Writer writer = new StringWriter();
 		compiledTemplate.evaluate(writer, context);
 		String output = writer.toString();
-		
+
 		return output;
     }
 	
@@ -219,7 +219,7 @@ public class ServletUtils {
 
 	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));	    
   		
-	    String query = "select * from Games WHERE id IN "+c.getMioSQL()+" ORDER BY Replace(`name`,'?','z') ASC LIMIT 15";
+	    String query = "select * from Games WHERE id IN "+c.getMioSQL()+" ORDER BY name ASC LIMIT 15";
 	    
   		result = statement.executeQuery(query);
   		
@@ -261,7 +261,7 @@ public class ServletUtils {
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
     	
-	    String query = "SELECT * FROM "+tableName+" WHERE id IN "+c.getMioSQL()+" AND name LIKE ? AND creator LIKE ? ORDER BY Replace(`name`,'?','z') ASC LIMIT 15 OFFSET ?";
+	    String query = "SELECT * FROM "+tableName+" WHERE id IN "+c.getMioSQL()+" AND name LIKE ? AND creator LIKE ? ORDER BY name ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE id IN "+c.getMioSQL()+" AND name LIKE ? AND creator LIKE ?";
 	    
 		PreparedStatement ret = connection.prepareStatement(query);
