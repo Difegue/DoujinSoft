@@ -116,8 +116,7 @@ public class ServletUtils {
 		String contextTable = "";
 		Constructor classConstructor = null;
 		
-		
-    	PebbleEngine engine = new PebbleEngine.Builder().build();
+    		PebbleEngine engine = new PebbleEngine.Builder().build();
 		PebbleTemplate compiledTemplate = null;
 		
 		//We only use the part of the template containing the item cards here
@@ -148,9 +147,15 @@ public class ServletUtils {
 		
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+	    boolean isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+	    boolean isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
     	
-	    String query = "SELECT * FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY name ASC LIMIT 15 OFFSET ?";
-	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE name LIKE ? AND creator LIKE ? AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
+	    String queryBase = "FROM "+tableName+"WHERE ";
+	    (isNameSearch || isCreatorSearch) ?? queryBase += "name LIKE ? AND creator LIKE ? AND ";
+	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
+		
+	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
+	    String queryCount = "SELECT COUNT(id) " + queryBase;
 		
 		PreparedStatement ret = connection.prepareStatement(query);
 		
@@ -162,16 +167,18 @@ public class ServletUtils {
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
 		
-		if (request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty())
+		if (isNameSearch)
 			name = "%"+request.getParameter("name")+"%";
 		
-		if (request.getParameterMap().containsKey("creator"))
+		if (isCreatorSearch)
 			creator = "%"+request.getParameter("creator")+"%";
 		
-		ret.setString(1, name);
-		ret.setString(2, creator);
-		ret.setInt(3, page*15-15);
-		
+		if (isNameSearch || isCreatorSearch) {
+			ret.setString(1, name);
+			ret.setString(2, creator);
+			ret.setInt(3, page*15-15);
+		} else 
+			ret.setInt(1, page*15-15);
     	
 		ResultSet result = ret.executeQuery();
 	    
@@ -180,8 +187,10 @@ public class ServletUtils {
 
 	    PreparedStatement ret2 = connection.prepareStatement(queryCount);
 	    
-	    ret2.setString(1, name);
-	    ret2.setString(2, creator);
+		if (isNameSearch || isCreatorSearch) {
+		    ret2.setString(1, name);
+		    ret2.setString(2, creator);
+		}
 	    result = ret2.executeQuery();
 		
 		context.put(contextTable, items);
@@ -260,9 +269,16 @@ public class ServletUtils {
 		
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-    	
-	    String query = "SELECT * FROM "+tableName+" WHERE id IN "+c.getMioSQL()+" AND name LIKE ? AND creator LIKE ? ORDER BY name ASC LIMIT 15 OFFSET ?";
-	    String queryCount = "SELECT COUNT(id) FROM "+tableName+" WHERE id IN "+c.getMioSQL()+" AND name LIKE ? AND creator LIKE ?";
+		
+	    boolean isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+	    boolean isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
+		
+	    String queryBase = "FROM "+tableName+"WHERE id IN "+c.getMioSQL();
+	    (isNameSearch || isCreatorSearch) ?? queryBase += " AND name LIKE ? AND creator LIKE ?";
+	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
+		
+	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
+	    String queryCount = "SELECT COUNT(id) " + queryBase;
 	    
 		PreparedStatement ret = connection.prepareStatement(query);
 		
@@ -273,15 +289,18 @@ public class ServletUtils {
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
 		
-		if (request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty())
+		if (isNameSearch)
 			name = "%"+request.getParameter("name")+"%";
 		
-		if (request.getParameterMap().containsKey("creator"))
+		if (isCreatorSearch)
 			creator = "%"+request.getParameter("creator")+"%";
 		
-		ret.setString(1, name);
-		ret.setString(2, creator);
-		ret.setInt(3, page*15-15);
+		if (isNameSearch || isCreatorSearch) {
+			ret.setString(1, name);
+			ret.setString(2, creator);
+			ret.setInt(3, page*15-15);
+		} else 
+			ret.setInt(1, page*15-15);
 		
 		ResultSet result = ret.executeQuery();
 	    
@@ -290,8 +309,10 @@ public class ServletUtils {
 
 	    PreparedStatement ret2 = connection.prepareStatement(queryCount);
 	    
-	    ret2.setString(1, name);
-		ret2.setString(2, creator);
+	    if (isNameSearch || isCreatorSearch) {
+		    ret2.setString(1, name);
+		    ret2.setString(2, creator);
+		}
 	    result = ret2.executeQuery();
 		
 		context.put("games", items);
