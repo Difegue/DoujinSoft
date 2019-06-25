@@ -195,7 +195,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Record_idx ON Records (name ASC, id);");
             
         }
-        catch(SQLException | IOException e){
+        catch(SQLException e){
             // if the error message is "out of memory",
             // it probably means no database file is found
             SQLog.log(Level.SEVERE, e.getMessage());
