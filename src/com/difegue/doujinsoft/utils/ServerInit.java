@@ -115,10 +115,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy-hh.mm.ss");
             String logFileName = "NewMios-"+formatter.format(today);
 
-            // create a logFile for this deployment session
-            FileWriter fw = new FileWriter(dataDir+"/"+logFileName+".csv");
-            BufferedWriter bw = new BufferedWriter(fw);
-
             for (File f: files) {
                 if (!f.isDirectory()) {
 
@@ -130,7 +126,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
                     //The file is game, manga or record, depending on its size.
                     if (mioData.length == Types.GAME) {
-                        SQLog.log(Level.INFO, "Detected as game.");
                         GameEdit game = new GameEdit(mioData);
 
                         ID = MioStorage.computeMioID(f, game);
@@ -143,11 +138,10 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         insertQuery.setInt(10, game.getLogo());
                         insertQuery.setString(11, MioUtils.getBase64GamePreview(mioData));
 
-                        bw.write("Game;"+hash+";"+ID+";"+game.getName()+"\n");
+                        SQLog.log(Level.INFO, "Game;"+hash+";"+ID+";"+game.getName()+"\n");
                     }
 
                     if (mioData.length == Types.MANGA) {
-                        SQLog.log(Level.INFO, "Detected as comic.");
                         MangaEdit manga = new MangaEdit(mioData);
 
                         ID = MioStorage.computeMioID(f, manga);
@@ -163,11 +157,10 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 2));
                         insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 3));
 
-                        bw.write("Manga;"+hash+";"+ID+";"+manga.getName()+"\n");
+                        SQLog.log(Level.INFO, "Manga;"+hash+";"+ID+";"+manga.getName()+"\n");
                     }
 
                     if (mioData.length == Types.RECORD) {
-                        SQLog.log(Level.INFO, "Detected as record.");
                         RecordEdit record = new RecordEdit(mioData);
 
                         ID = MioStorage.computeMioID(f, record);
@@ -178,7 +171,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         insertQuery.setString(9, MioUtils.mapColorByte(record.getLogoColor()));
                         insertQuery.setInt(10, record.getLogo());
 
-                        bw.write("Record;"+hash+";"+ID+";"+record.getName()+"\n");
+                        SQLog.log(Level.INFO, "Record;"+hash+";"+ID+";"+record.getName()+"\n");
                     }
 
                     SQLog.log(Level.INFO, "Inserting into DB");
@@ -195,20 +188,15 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             // Close stream
             bw.close();
             
-            //If logfile is empty, no mios were handled -> delete it
-            File logfile = new File(dataDir+"/"+logFileName+".csv");
-            if (logfile.length() == 0)
-                logfile.delete();
-            else {
-                statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
-                statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");
-                statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");   
-                
-                // Re-create indexes
-                statement.executeUpdate("CREATE INDEX Games_idx ON Games (name ASC, id);");
-                statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (name ASC, id);");
-                statement.executeUpdate("CREATE INDEX Record_idx ON Records (name ASC, id);");
-            }
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");   
+
+            // Re-create indexes
+            statement.executeUpdate("CREATE INDEX Games_idx ON Games (name ASC, id);");
+            statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (name ASC, id);");
+            statement.executeUpdate("CREATE INDEX Record_idx ON Records (name ASC, id);");
+            
         }
         catch(SQLException | IOException e){
             // if the error message is "out of memory",
