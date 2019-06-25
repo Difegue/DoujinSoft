@@ -7,7 +7,7 @@
     
     $('.pagination').pagination({
         items: $("#total_items").html(),
-        itemsOnPage: 9,
+        itemsOnPage: 15,
         currentPage: 1,
         displayedPages: 5,
         ellipsePageSet: true,
