@@ -33,10 +33,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
     //Database structure, straightforward stuff
     private void databaseDefinition(Statement statement) throws SQLException
     {
-        statement.executeUpdate("DROP INDEX Games_idx;");
-        statement.executeUpdate("DROP INDEX Manga_idx;");
-        statement.executeUpdate("DROP INDEX Record_idx;");
-
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Games "
                 + "(hash TEXT, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
                 + "previewPic TEXT, PRIMARY KEY(`hash`) )");
@@ -199,15 +195,20 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             // Close stream
             bw.close();
             
-            // Re-create indexes
-            statement.executeUpdate("CREATE INDEX Games_idx ON Games (id, name);");
-            statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (id, name);");
-            statement.executeUpdate("CREATE INDEX Record_idx ON Records (id, name);");
-
             //If logfile is empty, no mios were handled -> delete it
             File logfile = new File(dataDir+"/"+logFileName+".csv");
             if (logfile.length() == 0)
                 logfile.delete();
+            else {
+                statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
+                statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");
+                statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");   
+                
+                // Re-create indexes
+                statement.executeUpdate("CREATE INDEX Games_idx ON Games (name ASC, id);");
+                statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (name ASC, id);");
+                statement.executeUpdate("CREATE INDEX Record_idx ON Records (name ASC, id);");
+            }
         }
         catch(SQLException | IOException e){
             // if the error message is "out of memory",
