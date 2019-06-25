@@ -33,6 +33,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
     //Database structure, straightforward stuff
     private void databaseDefinition(Statement statement) throws SQLException
     {
+        statement.executeUpdate("DROP INDEX Games_idx;");
+        statement.executeUpdate("DROP INDEX Manga_idx;");
+        statement.executeUpdate("DROP INDEX Record_idx;");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Games "
                 + "(hash TEXT, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
@@ -45,10 +48,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Records "
                 + "(hash TEXT, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
                 + "PRIMARY KEY(`hash`) )");
-
-        statement.executeUpdate("CREATE INDEX IF NOT EXISTS Games_idx ON Games (id);");
-        statement.executeUpdate("CREATE INDEX IF NOT EXISTS Manga_idx ON Manga (id);");
-        statement.executeUpdate("CREATE INDEX IF NOT EXISTS Record_idx ON Records (id);");
     }
 
     /*
@@ -123,7 +122,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             // create a logFile for this deployment session
             FileWriter fw = new FileWriter(dataDir+"/"+logFileName+".csv");
             BufferedWriter bw = new BufferedWriter(fw);
-
 
             for (File f: files) {
                 if (!f.isDirectory()) {
@@ -200,6 +198,11 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
             // Close stream
             bw.close();
+            
+            // Re-create indexes
+            statement.executeUpdate("CREATE INDEX Games_idx ON Games (id, name);");
+            statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (id, name);");
+            statement.executeUpdate("CREATE INDEX Record_idx ON Records (id, name);");
 
             //If logfile is empty, no mios were handled -> delete it
             File logfile = new File(dataDir+"/"+logFileName+".csv");
