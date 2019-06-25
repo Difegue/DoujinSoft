@@ -150,7 +150,7 @@ public class ServletUtils {
 	    boolean isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
 	    boolean isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
     	
-	    String queryBase = "FROM "+tableName+"WHERE ";
+	    String queryBase = "FROM "+tableName+" WHERE ";
 	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
@@ -273,7 +273,7 @@ public class ServletUtils {
 	    boolean isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
 	    boolean isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
 		
-	    String queryBase = "FROM "+tableName+"WHERE id IN "+c.getMioSQL();
+	    String queryBase = "FROM "+tableName+" WHERE id IN "+c.getMioSQL();
 	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
