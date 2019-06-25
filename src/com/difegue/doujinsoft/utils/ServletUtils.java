@@ -151,7 +151,7 @@ public class ServletUtils {
 	    boolean isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
     	
 	    String queryBase = "FROM "+tableName+"WHERE ";
-	    (isNameSearch || isCreatorSearch) ?? queryBase += "name LIKE ? AND creator LIKE ? AND ";
+	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
 	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
@@ -274,7 +274,7 @@ public class ServletUtils {
 	    boolean isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
 		
 	    String queryBase = "FROM "+tableName+"WHERE id IN "+c.getMioSQL();
-	    (isNameSearch || isCreatorSearch) ?? queryBase += " AND name LIKE ? AND creator LIKE ?";
+	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
 	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
