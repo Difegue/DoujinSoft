@@ -34,15 +34,15 @@ public class ServerInit implements javax.servlet.ServletContextListener {
     private void databaseDefinition(Statement statement) throws SQLException
     {
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Games "
-                + "(hash TEXT, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
+                + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
                 + "previewPic TEXT, PRIMARY KEY(`hash`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Manga "
-                + "(hash TEXT, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
+                + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
                 + "frame0 TEXT, frame1 TEXT, frame2 TEXT, frame3 TEXT, PRIMARY KEY(`hash`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Records "
-                + "(hash TEXT, id TEXT, name TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
+                + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
                 + "PRIMARY KEY(`hash`) )");
     }
 
@@ -55,20 +55,23 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         String query = "";
 
         switch (type) {
-            case Types.GAME: query = "INSERT INTO Games VALUES (?,?,?,?,?,?,?,?,?,?,?)"; break;
-            case Types.MANGA: query = "INSERT INTO Manga VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; break;
-            case Types.RECORD: query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?,?)"; break;
+            case Types.GAME: query = "INSERT INTO Games VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"; break;
+            case Types.MANGA: query = "INSERT INTO Manga VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; break;
+            case Types.RECORD: query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?,?,?)"; break;
         }
 
         ret = co.prepareStatement(query);
 
+        String normalizedName = mio.getName().replaceAll("\\p{Punct}", "z");
+        
         ret.setString(1, hash);
         ret.setString(2, ID);
         ret.setString(3, mio.getName());
-        ret.setString(4, mio.getCreator());
-        ret.setString(5, mio.getBrand());
-        ret.setString(6, mio.getDescription());
-        ret.setInt(7, mio.getTimestamp());
+        ret.setString(4, normalizedName);
+        ret.setString(5, mio.getCreator());
+        ret.setString(6, mio.getBrand());
+        ret.setString(7, mio.getDescription());
+        ret.setInt(8, mio.getTimestamp());
 
         return ret;
     }
@@ -133,10 +136,10 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         MioStorage.consumeMio(f, hash, Types.GAME);
 
                         //Game-specific: add the preview picture
-                        insertQuery.setString(8, MioUtils.mapColorByte(game.getCartColor()));
-                        insertQuery.setString(9, MioUtils.mapColorByte(game.getLogoColor()));
-                        insertQuery.setInt(10, game.getLogo());
-                        insertQuery.setString(11, MioUtils.getBase64GamePreview(mioData));
+                        insertQuery.setString(9, MioUtils.mapColorByte(game.getCartColor()));
+                        insertQuery.setString(10, MioUtils.mapColorByte(game.getLogoColor()));
+                        insertQuery.setInt(11, game.getLogo());
+                        insertQuery.setString(12, MioUtils.getBase64GamePreview(mioData));
 
                         SQLog.log(Level.INFO, "Game;"+hash+";"+ID+";"+game.getName()+"\n");
                     }
@@ -149,13 +152,13 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         MioStorage.consumeMio(f, hash, Types.MANGA);
 
                         //Manga-specific: add the panels
-                        insertQuery.setString(8, MioUtils.mapColorByte(manga.getMangaColor()));
-                        insertQuery.setString(9, MioUtils.mapColorByte(manga.getLogoColor()));
-                        insertQuery.setInt(10, manga.getLogo());
-                        insertQuery.setString(11, MioUtils.getBase64Manga(mioData, 0));
-                        insertQuery.setString(12, MioUtils.getBase64Manga(mioData, 1));
-                        insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 2));
-                        insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 3));
+                        insertQuery.setString(9, MioUtils.mapColorByte(manga.getMangaColor()));
+                        insertQuery.setString(10, MioUtils.mapColorByte(manga.getLogoColor()));
+                        insertQuery.setInt(11, manga.getLogo());
+                        insertQuery.setString(12, MioUtils.getBase64Manga(mioData, 0));
+                        insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 1));
+                        insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 2));
+                        insertQuery.setString(15, MioUtils.getBase64Manga(mioData, 3));
 
                         SQLog.log(Level.INFO, "Manga;"+hash+";"+ID+";"+manga.getName()+"\n");
                     }
@@ -167,9 +170,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         insertQuery = parseMioBase(record, hash, ID, connection, Types.RECORD);
                         MioStorage.consumeMio(f, hash, Types.RECORD);
 
-                        insertQuery.setString(8, MioUtils.mapColorByte(record.getRecordColor()));
-                        insertQuery.setString(9, MioUtils.mapColorByte(record.getLogoColor()));
-                        insertQuery.setInt(10, record.getLogo());
+                        insertQuery.setString(9, MioUtils.mapColorByte(record.getRecordColor()));
+                        insertQuery.setString(10, MioUtils.mapColorByte(record.getLogoColor()));
+                        insertQuery.setInt(1, record.getLogo());
 
                         SQLog.log(Level.INFO, "Record;"+hash+";"+ID+";"+record.getName()+"\n");
                     }
@@ -190,9 +193,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");   
 
             // Re-create indexes
-            statement.executeUpdate("CREATE INDEX Games_idx ON Games (name ASC, id);");
-            statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (name ASC, id);");
-            statement.executeUpdate("CREATE INDEX Record_idx ON Records (name ASC, id);");
+            statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
+            statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (normalizedName ASC, id);");
+            statement.executeUpdate("CREATE INDEX Record_idx ON Records (normalizedName ASC, id);");
             
         }
         catch(SQLException e){
