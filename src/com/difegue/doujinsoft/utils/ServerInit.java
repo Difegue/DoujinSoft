@@ -114,26 +114,20 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             //Let's jam some .mios in this
             File[] files = new File(dataDir+"/mio/").listFiles();
 
-            Date today = Calendar.getInstance().getTime();
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy-hh.mm.ss");
-            String logFileName = "NewMios-"+formatter.format(today);
-
             for (File f: files) {
                 if (!f.isDirectory()) {
 
-                    SQLog.log(Level.INFO, "Parsing file "+f.getName());
                     byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
+                    Metadata metadata = new Metadata(mioData);
                     String hash = MioStorage.computeMioHash(mioData);
-                    String ID;
-                    PreparedStatement insertQuery = null;
+                    String ID = MioStorage.computeMioID(f, metadata);
+                    int type = mioData.length;
+
+                    PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, connection, type);
 
                     //The file is game, manga or record, depending on its size.
                     if (mioData.length == Types.GAME) {
                         GameEdit game = new GameEdit(mioData);
-
-                        ID = MioStorage.computeMioID(f, game);
-                        insertQuery = parseMioBase(game, hash, ID, connection, Types.GAME);
-                        MioStorage.consumeMio(f, hash, Types.GAME);
 
                         //Game-specific: add the preview picture
                         insertQuery.setString(9, MioUtils.mapColorByte(game.getCartColor()));
@@ -146,10 +140,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
                     if (mioData.length == Types.MANGA) {
                         MangaEdit manga = new MangaEdit(mioData);
-
-                        ID = MioStorage.computeMioID(f, manga);
-                        insertQuery = parseMioBase(manga, hash, ID, connection, Types.MANGA);
-                        MioStorage.consumeMio(f, hash, Types.MANGA);
 
                         //Manga-specific: add the panels
                         insertQuery.setString(9, MioUtils.mapColorByte(manga.getMangaColor()));
@@ -166,13 +156,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                     if (mioData.length == Types.RECORD) {
                         RecordEdit record = new RecordEdit(mioData);
 
-                        ID = MioStorage.computeMioID(f, record);
-                        insertQuery = parseMioBase(record, hash, ID, connection, Types.RECORD);
-                        MioStorage.consumeMio(f, hash, Types.RECORD);
-
                         insertQuery.setString(9, MioUtils.mapColorByte(record.getRecordColor()));
                         insertQuery.setString(10, MioUtils.mapColorByte(record.getLogoColor()));
-                        insertQuery.setInt(1, record.getLogo());
+                        insertQuery.setInt(11, record.getLogo());
 
                         SQLog.log(Level.INFO, "Record;"+hash+";"+ID+";"+record.getName()+"\n");
                     }
@@ -181,6 +167,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
                     try {
                         insertQuery.executeUpdate();
+                        MioStorage.consumeMio(f, hash, type);
                     } catch (SQLException e) {
                         SQLog.log(Level.SEVERE, "Couldn't insert this mio in the database - Likely a duplicate file, moving on.");
                         SQLog.log(Level.SEVERE, e.getMessage());
