@@ -83,7 +83,7 @@ public class ServletUtils {
   			break;
   		}
   		
-  		result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY name ASC LIMIT 15");
+  		result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
   		
   		while(result.next()) 
 	    	items.add(classConstructor.newInstance(result));
@@ -154,7 +154,7 @@ public class ServletUtils {
 	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
-	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
+	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) " + queryBase;
 		
 		PreparedStatement ret = connection.prepareStatement(query);
@@ -228,7 +228,7 @@ public class ServletUtils {
 
 	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));	    
   		
-	    String query = "select * from Games WHERE id IN "+c.getMioSQL()+" ORDER BY name ASC LIMIT 15";
+	    String query = "select * from Games WHERE id IN "+c.getMioSQL()+" ORDER BY normalizedName ASC LIMIT 15";
 	    
   		result = statement.executeQuery(query);
   		
@@ -277,7 +277,7 @@ public class ServletUtils {
 	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
-	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
+	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) " + queryBase;
 	    
 		PreparedStatement ret = connection.prepareStatement(query);
