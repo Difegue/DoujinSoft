@@ -275,7 +275,7 @@ public class ServletUtils {
 		
 	    String queryBase = "FROM "+tableName+" WHERE id IN "+c.getMioSQL();
 	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
-	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
+	    queryBase += " AND id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
 	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) " + queryBase;
