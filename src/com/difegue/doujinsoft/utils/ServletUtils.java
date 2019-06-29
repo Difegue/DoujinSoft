@@ -277,7 +277,7 @@ public class ServletUtils {
 	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
 		
 	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
-	    String queryCount = "SELECT COUNT(id) " + queryBase;
+	    String queryCount = "SELECT COUNT(hash) " + queryBase;
 	    
 		PreparedStatement ret = connection.prepareStatement(query);
 		
