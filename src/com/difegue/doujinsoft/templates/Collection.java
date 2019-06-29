@@ -13,7 +13,7 @@ public class Collection {
 	  public String collection_desc2;
 	  public String[] mios;
 	  
-	  //Returns a string containing the mio IDs for SQL queries.
+	  //Returns a string containing the mio hashes for SQL queries.
 	  //Format of string is ("id1", "id2", "id3"...)
 	  public String getMioSQL() {
 		  

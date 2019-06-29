@@ -35,8 +35,11 @@ public class BaseMio {
 			mioDesc1 = desc;
 			mioDesc2 = "";
 		}
-		
-		if (mioDesc1.equals(""))
+
+		if (name.replaceAll("\\s+","").equals(""))
+			name = "No Title";
+
+		if (mioDesc1.replaceAll("\\s+","").equals(""))
 			mioDesc1 = "No Description.";
 		
 		colorCart = result.getString("color");
