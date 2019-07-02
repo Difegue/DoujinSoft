@@ -1,0 +1,27 @@
+MAIL FROM: w{{sender}}@{{wc24Server}}
+RCPT TO: w{{recipient}}@{{wc24Server}}
+From: w{{sender}}@{{wc24Server}}
+To: w{{recipient}}@{{wc24Server}}
+Subject: G
+X-Wii-AppId: 0-57413445-3031
+X-Wii-IconNew: 57413445
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="Boundary-NWC24-03BEF88600067"
+
+--Boundary-NWC24-03BEF88600067
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+
+--Boundary-NWC24-03BEF88600067
+Content-Type: application/octet-stream;
+ name=a0000103.dat
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename=a0000103.dat
+
+{{base64EncodedAttachment}}
+
+
+--Boundary-NWC24-03BEF88600067--

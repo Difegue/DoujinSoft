@@ -1,0 +1,29 @@
+MAIL FROM: w{{sender}}@{{wc24Server}}
+RCPT TO: w{{recipient}}@{{wc24Server}}
+From: w{{sender}}@{{wc24Server}}
+To: w{{recipient}}@{{wc24Server}}
+Subject: WC24 Cmd Message
+X-Wii-AppId: 0-00000001-0001
+X-Wii-Cmd: 80010001
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="Boundary-NWC24-03BEF87900066"
+
+--Boundary-NWC24-03BEF87900066
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+WC24 Cmd Message
+--Boundary-NWC24-03BEF87900066
+Content-Type: application/octet-stream;
+ name=a0000102.dat
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename=a0000102.dat
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAA=
+
+
+--Boundary-NWC24-03BEF87900066--

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import com.difegue.doujinsoft.templates.Cart;
 import com.difegue.doujinsoft.utils.MioCompress;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -93,42 +94,13 @@ public class CartServlet extends HttpServlet {
     	ServletContext application = getServletConfig().getServletContext();	
 		String dataDir = application.getInitParameter("dataDirectory");
 
-		//Get byte[] save from request parameters
-	    Part filePart = request.getPart("save"); 
-	    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
-	    InputStream fileContent = filePart.getInputStream();
-	    
-	    
-	    JsonArray games = new JsonArray();
-	    JsonArray manga = new JsonArray();
-	    JsonArray records = new JsonArray();
-	    
-	    //Get the cart data and deserialize it.
-	    JsonElement a = new JsonParser().parse(request.getParameter("games"));
-	    if (a.isJsonArray())
-	    	games = a.getAsJsonArray();
-	    
-	    a = new JsonParser().parse(request.getParameter("manga"));
-	    if (a.isJsonArray())
-	    	manga = a.getAsJsonArray();
-	    
-	    a = new JsonParser().parse(request.getParameter("records"));
-	    if (a.isJsonArray())
-	    	records = a.getAsJsonArray();
-		
-	    //Drop the file in a temp file
-	    File targetFile = File.createTempFile(fileName+System.currentTimeMillis(), "bin");
-
-	    Files.copy(
-	      fileContent, 
-	      targetFile.toPath(), 
-	      StandardCopyOption.REPLACE_EXISTING);
+		Cart cartData = new Cart(request);
 
 		//Call DIYEdit's SaveHandler on it, and it only does everything.
-        SaveHandler sHand = new SaveHandler(targetFile.getAbsolutePath());
+        SaveHandler sHand = new SaveHandler(cartData.getSaveFile().getAbsolutePath());
         
         //Go through our arrays and inject mios from the DB
-        for( JsonElement o: games) {
+        for( JsonElement o: cartData.getGames()) {
         	
         	String id = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/game/" + id + ".miozip";
@@ -145,7 +117,7 @@ public class CartServlet extends HttpServlet {
         	
         }
         
-		for( JsonElement o: records) {
+		for( JsonElement o: cartData.getRecords()) {
 		        	
         	String id = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/record/" + id + ".miozip";
@@ -157,7 +129,7 @@ public class CartServlet extends HttpServlet {
         	
         }
 
-		for( JsonElement o: manga) {
+		for( JsonElement o: cartData.getManga()) {
 			
 			String id = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/manga/" + id + ".miozip";
@@ -186,7 +158,7 @@ public class CartServlet extends HttpServlet {
 		
 		byte[] buffer = new byte[4096];
 		int bytesRead = -1;
-		FileInputStream inStream = new FileInputStream(targetFile);
+		FileInputStream inStream = new FileInputStream(cartData.getSaveFile());
 		
 		while ((bytesRead = inStream.read(buffer)) != -1) {
 			outStream.write(buffer, 0, bytesRead);
@@ -194,7 +166,7 @@ public class CartServlet extends HttpServlet {
 		
 		inStream.close();
 		outStream.close();
-    	targetFile.delete();
+    	cartData.getSaveFile().delete();
     	
     	return true;
 	}
