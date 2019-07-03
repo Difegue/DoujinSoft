@@ -74,5 +74,9 @@ public class Cart {
     public File getSaveFile() {
         return saveFile;
     }
+    
+    public String getRecipientCode() {
+        return recipientFriendCode;
+    }
 
 }
