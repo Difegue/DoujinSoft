@@ -3,49 +3,45 @@ package com.difegue.doujinsoft.wc24;
 import com.difegue.doujinsoft.templates.BaseMio;
 import com.difegue.doujinsoft.utils.MioCompress;
 import com.difegue.doujinsoft.utils.MioUtils;
-import com.xperia64.diyedit.FileByteOperations;
-import java.io.File;
+import com.mitchellbosecke.pebble.PebbleEngine;
+import com.mitchellbosecke.pebble.error.PebbleException;
+import com.mitchellbosecke.pebble.template.PebbleTemplate;
+import com.xperia64.diyedit.metadata.Metadata;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MailItem {
 
-    public String sender, recipient, wc24Server, base64EncodedAttachment;
+    public String sender, recipient, wc24Server, base64EncodedAttachment, dataDir;
+    public int attachmentType;
 
     /**
      * Create a WC24 mail containing DIY data to send to Showcase.
      * @param wiiCode Friend Code to send the mail to
-     * @param diyData DIY file to unzip and send
+     * @param diyData DIY file to send
      * @param type type of the file
-     * @param dataDir doujinsoft data directory to pull .mios from
      * @throws Exception
      */
-    public MailItem(String wiiCode, BaseMio diyData, int type, String dataDir) throws Exception {
+    public MailItem(String wiiCode, Metadata diyData, int type) throws Exception {
 
+        attachmentType = type;
         recipient = wiiCode;
-        InitializeFromEnvironment();
+        initializeFromEnvironment();
 
-        String mioPath = dataDir;
+        ByteArrayInputStream bis = new ByteArrayInputStream(diyData.file);
 
-        switch (type) {
-            case MioUtils.Types
-                    .GAME:   mioPath += "/mio/game/";
-            case MioUtils.Types
-                    .MANGA:  mioPath += "/mio/manga/";
-            case MioUtils.Types
-                    .RECORD: mioPath += "/mio/record/";
+        // Compress the bytes with LZ10/LZSS
+        byte[] mioData = new LZSS(bis).compress().toByteArray();
 
-        }
-        mioPath += diyData.hash + ".miozip";
-
-        File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
-        byte[] mioData = FileByteOperations.read(uncompressedMio.getAbsolutePath());
-
-        // Compress the bytes with LZ10
-
-
-        // Base64 encode 'em and we're good
-        base64EncodedAttachment = Base64.getEncoder().encodeToString(mioData);
+        // Base64 encode 'em and we're good.
+        // Add a linebreak every 76 characters for MIME compliancy (The Wii doesn't care but it looks nicer)
+        base64EncodedAttachment = Base64.getEncoder().encodeToString(mioData).replaceAll("(.{76})", "$1\n");
     }
 
     /**
@@ -53,10 +49,11 @@ public class MailItem {
      * @param wiiCode Friend Code to send the mail to
      * @param contentNames DIY content to enumerate in the mail
      */
-    public MailItem(String wiiCode, String[] contentNames) throws Exception {
+    public MailItem(String wiiCode, List<String> contentNames) throws Exception {
 
+        attachmentType = 1;
         recipient = wiiCode;
-        InitializeFromEnvironment();
+        initializeFromEnvironment();
 
         String message = RECAP_HEADER;
 
@@ -68,10 +65,56 @@ public class MailItem {
 
         // Encode the message in UTF-16BE as expected by the Wii, then wrap it in base64
         byte[] utf16 = StandardCharsets.UTF_16BE.encode(message).array();
-        base64EncodedAttachment = Base64.getEncoder().encodeToString(utf16);
+        base64EncodedAttachment = Base64.getEncoder().encodeToString(utf16).replaceAll("(.{76})", "$1\n");
+
     }
 
-    private void InitializeFromEnvironment() throws Exception {
+    /**
+     * Create a WC24 friend request mail.
+     * @param wiiCode
+     */
+    public MailItem(String wiiCode) throws Exception {
+        attachmentType = 0;
+        recipient = wiiCode;
+        initializeFromEnvironment();
+    }
+
+    /**
+     * Craft the string version of the mail, using templates.
+     * @return
+     * @throws PebbleException
+     * @throws IOException
+     */
+    public String renderString(String templatePath) throws PebbleException, IOException {
+
+        PebbleEngine engine = new PebbleEngine.Builder().build();
+        PebbleTemplate template = null;
+
+        switch (attachmentType) {
+            case 0:          template = engine.getTemplate(templatePath + ("/friend_request.eml"));
+                             break;
+            case 1:          template = engine.getTemplate(templatePath + ("/recap_mail.eml"));
+                             break;
+            case MioUtils.Types
+                    .GAME:   template = engine.getTemplate(templatePath + ("/game_mail.eml"));
+                             break;
+            case MioUtils.Types
+                    .MANGA:  template = engine.getTemplate(templatePath + ("/manga_mail.eml"));
+                             break;
+            case MioUtils.Types
+                    .RECORD: template = engine.getTemplate(templatePath + ("/record_mail.eml"));
+                             break;
+        }
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("mail", this);
+
+        Writer writer = new StringWriter();
+        template.evaluate(writer, context);
+        return writer.toString();
+    }
+
+    private void initializeFromEnvironment() throws Exception {
 
         if (!System.getenv().containsKey("WII_NUMBER"))
             throw new Exception("Wii sender friend number not specified. Please set the WII_NUMBER environment variable.");
@@ -93,5 +136,4 @@ public class MailItem {
             "~~~~~ Service provided for fun ~~~~~\n" +
             "~~~~~   by RiiConnect24 and  ~~~~~\n" +
             "~~~~~  https://tvc-16.science  ~~~~~";
-
 }

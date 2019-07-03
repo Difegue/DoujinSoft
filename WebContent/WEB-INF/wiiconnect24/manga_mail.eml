@@ -1,7 +1,7 @@
-MAIL FROM: w{{sender}}@{{wc24Server}}
-RCPT TO: w{{recipient}}@{{wc24Server}}
-From: w{{sender}}@{{wc24Server}}
-To: w{{recipient}}@{{wc24Server}}
+MAIL FROM: w{{mail.sender}}@{{mail.wc24Server}}
+RCPT TO: w{{mail.recipient}}@{{mail.wc24Server}}
+From: w{{mail.sender}}@{{mail.wc24Server}}
+To: w{{mail.recipient}}@{{mail.wc24Server}}
 Subject: MMM
 X-Wii-AppId: 0-57413445-3031
 X-Wii-IconNew: 57413445
@@ -21,7 +21,7 @@ Content-Transfer-Encoding: base64
 Content-Disposition: attachment;
  filename=a0000106.dat
 
-{{base64EncodedAttachment}}
+{{mail.base64EncodedAttachment}}
 
 
 --Boundary-NWC24-03BEF8890006A--

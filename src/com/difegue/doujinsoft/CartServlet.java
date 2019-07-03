@@ -13,6 +13,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,12 +31,18 @@ import javax.servlet.http.Part;
 
 import com.difegue.doujinsoft.templates.Cart;
 import com.difegue.doujinsoft.utils.MioCompress;
+import com.difegue.doujinsoft.utils.MioUtils;
+import com.difegue.doujinsoft.wc24.MailItem;
+import com.difegue.doujinsoft.wc24.WiiConnect24Api;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
+import com.xperia64.diyedit.editors.GameEdit;
+import com.xperia64.diyedit.editors.MangaEdit;
+import com.xperia64.diyedit.editors.RecordEdit;
 import com.xperia64.diyedit.saveutils.SaveHandler;
 
 
@@ -74,20 +81,86 @@ public class CartServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		boolean result = false;
-		
-		//post contains a gameSave
-		if (!request.getParameterMap().isEmpty()) 
+		String output = "Invalid file.";
+
+		if (request.getParameter("method").equals("wc24")) {
+			//post contains a Wii number
+			try {
+				output = sendWC24(request, response);
+				result = true;
+			} catch (Exception e) {
+				output = e.getMessage();
+			}
+		}
+
+		if (request.getParameter("method").equals("savefile")) {
+			//post contains a gameSave
 			result = injectMios(request, response);
-		
+		}
+
 		if (!result)
 		{
 			response.setContentType("text/html; charset=UTF-8");
-			String output = "Invalid file.";
 			response.getWriter().append(output);
 		}
 		
 	}
 
+	private String sendWC24(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		ServletContext application = getServletConfig().getServletContext();
+		String dataDir = application.getInitParameter("dataDirectory");
+
+		Cart cartData = new Cart(request);
+		String recipientNumber = request.getParameter("recipient");
+
+		List<MailItem> mailsToSend = new ArrayList<>();
+
+		// Friend Request mail
+		mailsToSend.add(new MailItem(recipientNumber));
+
+		// DIY mails
+		List<String> contentNames = new ArrayList<>();
+
+		for( JsonElement o: cartData.getGames()) {
+
+			String hash = o.getAsJsonObject().get("id").getAsString();
+			String mioPath = dataDir + "/mio/game/" + hash + ".miozip";
+			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
+			GameEdit data = new GameEdit(uncompressedMio.getAbsolutePath());
+
+			contentNames.add(data.getName());
+			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.GAME));
+		}
+
+		for( JsonElement o: cartData.getRecords()) {
+
+			String hash = o.getAsJsonObject().get("id").getAsString();
+			String mioPath = dataDir + "/mio/record/" + hash + ".miozip";
+			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
+			RecordEdit data = new RecordEdit(uncompressedMio.getAbsolutePath());
+
+			contentNames.add(data.getName());
+			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.RECORD));
+		}
+
+		for( JsonElement o: cartData.getManga()) {
+
+			String hash = o.getAsJsonObject().get("id").getAsString();
+			String mioPath = dataDir + "/mio/manga/" + hash + ".miozip";
+			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
+			MangaEdit data = new MangaEdit(uncompressedMio.getAbsolutePath());
+
+			contentNames.add(data.getName());
+			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.MANGA));
+		}
+
+		// Recap mail
+		mailsToSend.add(new MailItem(recipientNumber, contentNames));
+
+		WiiConnect24Api wc24 = new WiiConnect24Api();
+		return wc24.sendMails(mailsToSend, application);
+	}
     
     private boolean injectMios(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		

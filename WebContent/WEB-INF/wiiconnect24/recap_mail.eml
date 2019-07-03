@@ -1,7 +1,7 @@
-MAIL FROM: w{{sender}}@{{wc24Server}}
-RCPT TO: w{{recipient}}@{{wc24Server}}
-From: w{{sender}}@{{wc24Server}}
-To: w{{recipient}}@{{wc24Server}}
+MAIL FROM: w{{mail.sender}}@{{mail.wc24Server}}
+RCPT TO: w{{mail.recipient}}@{{mail.wc24Server}}
+From: w{{mail.sender}}@{{mail.wc24Server}}
+To: w{{mail.recipient}}@{{mail.wc24Server}}
 Subject: =?UTF-16BE?B?AFkAbwB1AHIAIABnAGEAbQBlAHMAIABhAHIAZQAgAHIAZQBhAGQAeQAh?=
 X-Wii-AppId: 2-354E4541-4142
 X-Wii-Cmd: 00042019
@@ -17,7 +17,7 @@ Content-Type: multipart/mixed;
 Content-Type: text/plain; charset=utf-16be
 Content-Transfer-Encoding: base64
 
-{{base64EncodedAttachment}}
+{{mail.base64EncodedAttachment}}
 
 
 --Boundary-NWC24-03BF040F00005

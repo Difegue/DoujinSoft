@@ -1,15 +1,22 @@
 package com.difegue.doujinsoft.wc24;
 
-import com.mitchellbosecke.pebble.template.PebbleTemplate;
+import com.mitchellbosecke.pebble.error.PebbleException;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 
+import javax.servlet.ServletContext;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WiiConnect24Api {
 
@@ -31,29 +38,55 @@ public class WiiConnect24Api {
         wc24Pass = System.getenv("WC24_PASSWORD");
     }
 
-    public String CraftMail(MailItem item, PebbleTemplate mailTemplate) {
+    /**
+     * Craft a request with all the mails we have to send, and fire it over to the WC24 server.
+     *
+     * @param mails
+     * @return
+     * @throws IOException
+     */
+    public String sendMails(List<MailItem> mails, ServletContext application) throws IOException {
 
+        Logger log = Logger.getLogger("WC24");
 
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost("https://mtw." + wc24Server + "/cgi-bin/send.cgi?mlid=w" + sender + "&passwd=" + wc24Pass);
 
+        // Request parameters and other properties.
+        List<NameValuePair> params = new ArrayList<>();
+        String templatePath = application.getRealPath("/WEB-INF/wiiconnect24");
+
+        int count = 1;
+        for (MailItem mail : mails) {
+            // m1, m2, etc
+            try {
+                String renderedMail = mail.renderString(templatePath);
+                log.log(Level.INFO, renderedMail);
+                params.add(new BasicNameValuePair("m" + count, renderedMail));
+                count++;
+            } catch (PebbleException e) {
+                log.log(Level.SEVERE, "Couldn't add mailitem to the sendbox: " + e.getPebbleMessage());
+            }
+
+        }
+
+        httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+
+        //Execute and get the response.
+        HttpResponse response = httpclient.execute(httppost);
+        HttpEntity entity = response.getEntity();
+
+        if (entity != null) {
+            try (InputStream inStream = entity.getContent()) {
+
+                // Just return the server response as-is for the time being.
+                String wc24rep = new String(inStream.readAllBytes(), StandardCharsets.UTF_8);
+                log.log(Level.INFO, wc24rep);
+                return wc24rep;
+            }
+        }
+        return null;
     }
-
-    public boolean SendMails(String[] mails) throws IOException {
-
-        URL url = new URL("https://mtw."+wc24Server+"/cgi-bin/send.cgi?mlid=w"+sender+"&passwd="+wc24Pass);
-        URLConnection con = url.openConnection();
-        HttpURLConnection http = (HttpURLConnection)con;
-        http.setRequestMethod("POST"); // PUT is another valid option
-        http.setDoOutput(true);
-
-        // m1, m2, etc
-
-        StringJoiner sj = new StringJoiner("&");
-        for(Map.Entry<String,String> entry : arguments.entrySet())
-            sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "="
-                    + URLEncoder.encode(entry.getValue(), "UTF-8"));
-        byte[] out = sj.toString().getBytes(StandardCharsets.UTF_8);
-        int length = out.length;
-
-    }
-
 }
+
+

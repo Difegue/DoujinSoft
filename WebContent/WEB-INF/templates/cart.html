@@ -6,14 +6,12 @@
 {% block type %}Cart{% endblock %}
 
 {% block desc %}
-Import content into your copies of DIY!
-<br/><br/>
-You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
-<br/> <br/>
-
+	Ship out content to your game, (nearly)all handled by us.
+	<br><br>
+	You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
+	<br>
+	Alternatively, if your Wii console is hooked to <a href="http://rc24.xyz">RiiConnect24</a>, we can send stuff directly to it. No save export/import needed! <br>
 {% endblock %}
-
-
 
 {% block content %}
 
@@ -23,28 +21,53 @@ You can upload a Wii/NDS save here, and we'll import the games/comics/records yo
 	
 	</ul>
 	<br/>
-	<h5 class="amber-text"> <i class="material-icons">filter_2</i> Upload your Save</h5> 
-	  <form id="checkout-form" action="" method="post" enctype='multipart/form-data'>
-	    <div class="file-field input-field">
+	<form id="checkout-form" class="col l6 m12" action="" method="post" enctype='multipart/form-data'>
+		<h5 class="amber-text "> <i class="material-icons">filter_2</i> Shipping Method
+
+			<label>
+				<input class="with-gap" name="method" type="radio" id="wc24-radio" value="wc24" checked onclick="updateShipping('wc24')">
+				<span>RiiConnect24</span>
+			</label>
+
+			<label>
+				<input class="with-gap" name="method" type="radio" id="save-radio" value="savefile" onclick="updateShipping('save')">
+				<span>Save Import</span>
+			</label>
+
+		</h5>
+
+	    <div class="file-field input-field" id="save-ship" style="display:none">
 	      <div class="btn">
 	        <span>Select file </span>
 	        <input type="file" name="save" required>
 	      </div>
 	      <div class="file-path-wrapper white-text">
 	        <input class="file-path validate white-text" type="text" id="filename">
-	        Wii 6MB data.bin and NDS 32MB save files are supported.
-	      </div>
+	        Wii 6MB data.bin and NDS 32MB save files are supported. <br/> If there's no more space in the save, the remaining items will not be imported.
+		  </div>
 	    </div>
+
+		<div class="input-field white-text" id="wc24-ship">
+			<i class="material-icons prefix">contact_mail</i>
+			<input id="recipient" type="text" class="validate white-text" data-length="16">
+			<label for="recipient" class="">Wii Friend Code</label>
+			This will send the content to your Wii through RiiConnect24. <br/> Make sure you're friends with us and have DIY Showcase installed!
+		</div>
+
 	    <input id="cartg" name="games" type="text" style="display:none">
 	    <input id="cartm" name="manga" type="text" style="display:none">
 	    <input id="cartr" name="records" type="text" style="display:none">
 	  </form>
-	  <br/>
-  <h5 class="amber-text"> <i class="material-icons">filter_3</i> Let's get it on</h5> 
-  <center class="white-text" id="checkout-confirm">
-  		<a class="btn-large" style="width:300px" onclick="checkoutSave()"> Checkout </a>
-  		 <br/>Checking out will import the items in your cart to your save. <br/>If there's no more space in the save, the remaining items will not be imported.
-  </center>
+	<br/>
+
+	<div class="col l6 m12 white-text">
+	  <h5 class="amber-text"> <i class="material-icons">filter_3</i> Let's get it on</h5>
+		If you're all set, press this big button to start shipping!
+		<br/><br/>
+	  <center class="white-text" id="checkout-confirm">
+			<a class="btn-large" style="width:300px" onclick="checkoutSave()"> Checkout </a>
+	  </center>
+	</div>
  
         
 </div>
@@ -95,6 +118,8 @@ for (i=0; i< record.length; i++)
 		  '		</a>',
 		  '</li>'
 		].join("\n"));
+
+$('input#recipient').characterCounter();
 
 </script>
 
