@@ -11,6 +11,7 @@ import com.xperia64.diyedit.metadata.Metadata;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -34,10 +35,16 @@ public class MailItem {
         recipient = wiiCode;
         initializeFromEnvironment();
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(diyData.file);
+        Path compressedMio = Files.createTempFile("mio",".lz10");
+        try (FileOutputStream fos = new FileOutputStream(compressedMio.toFile())) {
+            // Re-write the diy data to a file that we'll compress with LZSS native
+            fos.write(diyData.file);
+        }
 
         // Compress the bytes with LZ10/LZSS
-        byte[] mioData = new LZSS(bis).compress().toByteArray();
+        String filePath = compressedMio.toFile().getAbsolutePath();
+        LZSS.INSTANCE.LZS_Encode(filePath, LZSS.LZS_VRAM);
+        byte[] mioData = Files.readAllBytes(compressedMio);
 
         // Base64 encode 'em and we're good.
         // Add a linebreak every 76 characters for MIME compliancy (The Wii doesn't care but it looks nicer)
@@ -61,7 +68,7 @@ public class MailItem {
             message += "* "+ s + "\n";
         }
 
-        message += RECAP_FOOTER;
+        message += "\n" + RECAP_FOOTER;
 
         // Encode the message in UTF-16BE as expected by the Wii, then wrap it in base64
         byte[] utf16 = StandardCharsets.UTF_16BE.encode(message).array();
@@ -130,7 +137,7 @@ public class MailItem {
     private static String RECAP_HEADER =
             "Thank you for using DoujinSoft!\n" +
             "\n" +
-            "The following content has been sent to your Wii alongside this message:\n\n";
+            "The following content has been sent  to your Wii alongside this message:\n\n";
 
     private static String RECAP_FOOTER =
             "~~~~~ Service provided for fun ~~~~~\n" +

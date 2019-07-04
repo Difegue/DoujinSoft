@@ -1,7 +1,11 @@
 MAIL FROM: w{{mail.sender}}@{{mail.wc24Server}}
+
 RCPT TO: w{{mail.recipient}}@{{mail.wc24Server}}
+
 From: w{{mail.sender}}@{{mail.wc24Server}}
+
 To: w{{mail.recipient}}@{{mail.wc24Server}}
+
 Subject: WC24 Cmd Message
 X-Wii-AppId: 0-00000001-0001
 X-Wii-Cmd: 80010001

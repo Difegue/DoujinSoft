@@ -1,7 +1,11 @@
 MAIL FROM: w{{mail.sender}}@{{mail.wc24Server}}
+
 RCPT TO: w{{mail.recipient}}@{{mail.wc24Server}}
+
 From: w{{mail.sender}}@{{mail.wc24Server}}
+
 To: w{{mail.recipient}}@{{mail.wc24Server}}
+
 Subject: RR
 X-Wii-AppId: 0-57413445-3031
 X-Wii-IconNew: 57413445

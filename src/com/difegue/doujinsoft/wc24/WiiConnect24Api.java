@@ -7,6 +7,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -53,7 +55,7 @@ public class WiiConnect24Api {
         HttpPost httppost = new HttpPost("https://mtw." + wc24Server + "/cgi-bin/send.cgi?mlid=w" + sender + "&passwd=" + wc24Pass);
 
         // Request parameters and other properties.
-        List<NameValuePair> params = new ArrayList<>();
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         String templatePath = application.getRealPath("/WEB-INF/wiiconnect24");
 
         int count = 1;
@@ -62,7 +64,7 @@ public class WiiConnect24Api {
             try {
                 String renderedMail = mail.renderString(templatePath);
                 log.log(Level.INFO, renderedMail);
-                params.add(new BasicNameValuePair("m" + count, renderedMail));
+                builder.addTextBody("m" + count, renderedMail);
                 count++;
             } catch (PebbleException e) {
                 log.log(Level.SEVERE, "Couldn't add mailitem to the sendbox: " + e.getPebbleMessage());
@@ -70,7 +72,8 @@ public class WiiConnect24Api {
 
         }
 
-        httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+        HttpEntity formDataEntity = builder.build();
+        httppost.setEntity(formDataEntity);
 
         //Execute and get the response.
         HttpResponse response = httpclient.execute(httppost);
