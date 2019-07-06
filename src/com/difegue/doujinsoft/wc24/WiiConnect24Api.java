@@ -63,7 +63,7 @@ public class WiiConnect24Api {
             // m1, m2, etc
             try {
                 String renderedMail = mail.renderString(templatePath);
-                log.log(Level.INFO, renderedMail);
+                log.log(Level.FINE, renderedMail);
                 builder.addTextBody("m" + count, renderedMail);
                 count++;
             } catch (PebbleException e) {

@@ -218,6 +218,23 @@ function updateShipping(type) {
         $("#wc24-ship").show();
 }
 
+function registerFriendCode() {
+
+    code = $("#friendreg").val();
+
+    if (code.length == 16 && /^\d+$/.test(code)) {
+        $("#regresult").html("Sending Friend Request...");
+
+        $.get("./friendreq?code="+code, function(data, status){
+            console.log(data);
+            $("#regresult").html("✔ All set! You can now close this popup window.");
+          });
+
+    } else {
+        $("#regresult").html("❌ Please enter a valid Friend Code!");
+    }
+}
+
 function checkoutSave() {
 
 	//Fill form with localStorage if available

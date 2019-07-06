@@ -6,11 +6,11 @@
 {% block type %}Cart{% endblock %}
 
 {% block desc %}
-	Ship out content to your game, (nearly)all handled by us.
+	Ship out content to your game, (nearly) all handled by us.
 	<br><br>
 	You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
 	<br>
-	Alternatively, if your Wii console is hooked to <a href="http://rc24.xyz">RiiConnect24</a>, we can send stuff directly to it. No save export/import needed! <br>
+	Alternatively, if your Wii console is using <a href="http://rc24.xyz">RiiConnect24</a>, we can send stuff directly to it. No save export/import needed! <br>
 {% endblock %}
 
 {% block content %}
@@ -51,7 +51,7 @@
 			<i class="material-icons prefix">contact_mail</i>
 			<input id="recipient" name="recipient" type="text" class="validate white-text" data-length="16">
 			<label for="recipient" class="">Wii Friend Code</label>
-			This will send the content to your Wii through RiiConnect24. <br/> Make sure you're friends with us and have DIY Showcase installed!
+			This will send the content to your Wii through RiiConnect24. <br/> Make sure you're <a href="#regmodal" class="modal-trigger">friends</a> with us before using this!
 		</div>
 
 	    <input id="cartg" name="games" type="text" style="display:none">
@@ -60,7 +60,7 @@
 	  </form>
 	<br/>
 
-	<div class="col l6 m12 white-text">
+	<div class="col l6 m12 white-text" style="margin-top:-25px">
 	  <h5 class="amber-text"> <i class="material-icons">filter_3</i> Let's get it on</h5>
 		If you're all set, press this big button to start shipping!
 		<br/><br/>
@@ -71,6 +71,34 @@
  
         
 </div>
+
+<!-- Modal Structure -->
+<div id="regmodal" class="modal">
+    <div class="modal-content black-text">
+        <h4>Register your Wii with DoujinSoft</h4>
+        <p>
+            In order to use RiiConnect24 to receive games from DoujinSoft, you must first register your Wii Friend Code.
+            <br>
+            Add our <b>Friend Code</b> to your Wii first:
+        </p>
+        <center><h2>2227 5376 9960 6042</h2></center>
+        <p>
+            Then give us your own Friend Code here :
+
+            <input id="friendreg" type="text" class="validate" data-length="16">
+            <label for="friendreg" class="">Wii Friend Code</label>
+            <br>
+            <a class="waves-effect waves-light btn" onclick="registerFriendCode()">Add me!</a> <span id="regresult" style="margin-left:10px"> </span>
+            <br><br><br>
+            If you don't want to use RiiConnect24, just close this popup and we won't ask again! 🙏
+
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+    </div>
+</div>
+
 
 <script>
 
@@ -120,6 +148,14 @@ for (i=0; i< record.length; i++)
 		].join("\n"));
 
 $('input#recipient').characterCounter();
+$('#regmodal').modal();
+
+// Check if user has registered his FC (it's all localStorage based I am a horrible person)
+if (!localStorage.hasOwnProperty("sawFCDialog")) {
+
+    localStorage.sawFCDialog = true;
+    M.Modal.getInstance($('#regmodal')[0]).open();
+}
 
 </script>
 
