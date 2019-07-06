@@ -1,7 +1,7 @@
 (function($){
   $(function(){
 	 
-    $('.button-collapse').sideNav();
+    $('.sidenav').sidenav();
 
     idPlaying = "";
     

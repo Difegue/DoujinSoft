@@ -116,9 +116,6 @@ public class CartServlet extends HttpServlet {
 
 		List<MailItem> mailsToSend = new ArrayList<>();
 
-		// Friend Request mail
-		mailsToSend.add(new MailItem(recipientNumber));
-
 		// DIY mails
 		List<String> contentNames = new ArrayList<>();
 
