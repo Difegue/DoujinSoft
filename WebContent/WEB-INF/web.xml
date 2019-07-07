@@ -11,7 +11,7 @@
   <!-- Change this directory to the one you want to store DoujinSoft data to. -->
   <context-param>
     <param-name>dataDirectory</param-name>
-    <param-value>C:\Users\Vincent\Desktop\DoujinSoftDataFolder</param-value>
+    <param-value></param-value>
   </context-param>
   
 </web-app>
