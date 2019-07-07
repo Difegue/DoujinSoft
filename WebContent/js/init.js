@@ -90,7 +90,8 @@ function searchForUser(creator) {
 
 function drawManga(page1, page2, page3, page4) {
 
-	  M.Materialbox.init($('.materialboxed')[0]);
+	  M.Materialbox.init($('.materialboxed')[0], {onOpenEnd: function(){
+	    $('.materialboxed')[0].src = $('#canvas_manga')[0].toDataURL();}});
 
 	  ctx = $('#canvas_manga')[0].getContext('2d');
 	  img1 = new Image();
@@ -120,8 +121,9 @@ function drawManga(page1, page2, page3, page4) {
 		  ctx.drawImage(img4, 1, 385);
 		}, false);
 
-      $('.materialboxed')[0].src = $('#canvas_manga')[0].toDataURL();
-      $('.materialboxed').click();
+      $('.materialboxed')[0].src = "";
+      M.Materialbox.getInstance($('.materialboxed')[0]).open();
+
 
 	  //Fix materialize's auto-generated styling
       $('.materialboxed')[0].style.width = "auto";
