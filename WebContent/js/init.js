@@ -46,8 +46,11 @@ function escapeHtml (string) {
 
 function loadItems(pageNumber) {
 	
-	//showSpinner();
-	
+	// Show a preloader
+	$("#content").html('<center><div class="preloader-wrapper big active"><div class="spinner-layer"><div class="circle-clipper left">'+
+	'<div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div>'+
+	'</div></div></div></center>');
+	  
 	//Posts to itself -> one function for all three pages
 	$.post( window.location.href, { page: pageNumber, name: $("#item_name").val(), creator: $("#maker_name").val() } )
 		.done(function( data ) {		
@@ -64,8 +67,6 @@ function loadItems(pageNumber) {
 		});
 
 }
-
-
 
 function clearSearch() {
 	
@@ -207,6 +208,12 @@ function deleteFromCart(item) {
 
 }
 
+function clearCart() {
+    localStorage.removeItem("game");
+    localStorage.removeItem("manga");
+    localStorage.removeItem("record");
+}
+
 function updateShipping(type) {
 
     $("#save-ship").hide();
@@ -252,8 +259,9 @@ function checkoutSave() {
 
         if ($("#filename").val() !== "") {
 
+            // Since this downloads a file it's easier to just submit the form as-is
             $("#checkout-form").submit();
-            localStorage.clear();
+            clearCart();
             $("#checkout-confirm").html('<div class="progress"><div class="indeterminate amber"></div></div>Thanks for using DoujinSoft! Your save file will automatically download once done.');
         }
         else
@@ -262,11 +270,31 @@ function checkoutSave() {
 
     if ($("#wc24-radio")[0].checked) {
 
-        if ($("#recipient").val() !== "") {
+		code = $("#recipient").val();
+        if (code.length == 16 && /^\d+$/.test(code)) {
 
-           $("#checkout-form").submit();
-           localStorage.clear();
-           $("#checkout-confirm").html('<div class="progress"><div class="indeterminate amber"></div></div>Thanks for using DoujinSoft! Look out for the blue light on your Wii.');
+           $("#checkout-confirm").html('<div class="progress"><div class="indeterminate amber"></div></div>Sending data over...');
+           // POST the form to display progress
+           var formData = new FormData($("#checkout-form")[0]);
+           $.ajax({
+               type: "POST",
+               url: "./cart",
+               data: formData,
+               processData: false,
+               contentType: false,
+               success: function(data) {
+				console.log(data);
+				if (data.startsWith("cd=100")) {
+					$("#checkout-confirm").html('<div class="progress"><div class="determinate green" style="width: 100%"></div></div>Thanks for using DoujinSoft! Look out for the blue light on your Wii.');
+                	clearCart();
+				} else {
+					$("#checkout-confirm").html('<div class="progress"><div class="determinate red" style="width: 100%"></div></div>'+
+					'Something seems to have gone wrong! Here\'s an error message: </br> <pre>'+data+'</pre>');
+				}
+                
+               }
+           });
+
         }
         else
            M.toast({html:"Please enter a Wii Friend Code before checking out your content."});

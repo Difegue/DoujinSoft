@@ -39,35 +39,24 @@ public class WC24FriendServlet extends HttpServlet {
 		
 		// obtains ServletContext
 		ServletContext application = getServletConfig().getServletContext();
+		response.setContentType("text/html; charset=UTF-8");
 
 		if (request.getParameterMap().containsKey("code")) {
 
 			String code = request.getParameter("code");
 
-			if (!validateFriendCode(code))
-				response.getOutputStream().print("Invalid Friend Code!");
-			else
-				try {
-					// Friend Request mail
-					MailItem friendReq = new MailItem(code);
-					WiiConnect24Api wc24 = new WiiConnect24Api();
-					String wc24Response = wc24.sendMails(List.of(friendReq), application);
+			try {
+				// Friend Request mail
+				MailItem friendReq = new MailItem(code);
+				WiiConnect24Api wc24 = new WiiConnect24Api();
+				String wc24Response = wc24.sendMails(List.of(friendReq), application);
 
-					response.getOutputStream().print(wc24Response);
-				} catch (Exception e) {
-					response.getOutputStream().print(e.getMessage());
-				}
+				response.getOutputStream().print(wc24Response);
+			} catch (Exception e) {
+				response.getOutputStream().print(e.getMessage());
+			}
 		} else
 			response.getOutputStream().print("Please add a friend code.");
-		
-	}
-
-	private boolean validateFriendCode(String code) {
-
-		if (code.length() != 16)
-			return false;
-
-		return code.chars().allMatch(x -> Character.isDigit(x));
 	}
 
 	/**

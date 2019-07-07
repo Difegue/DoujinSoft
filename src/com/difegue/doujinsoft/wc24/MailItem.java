@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class MailItem {
 
-    public String sender, recipient, wc24Server, base64EncodedAttachment, dataDir;
+    public String sender, recipient, wc24Server, base64EncodedAttachment;
     public int attachmentType;
 
     /**
@@ -32,8 +32,7 @@ public class MailItem {
     public MailItem(String wiiCode, Metadata diyData, int type) throws Exception {
 
         attachmentType = type;
-        recipient = wiiCode;
-        initializeFromEnvironment();
+        initializeFromEnvironment(wiiCode);
 
         Path compressedMio = Files.createTempFile("mio",".lz10");
         try (FileOutputStream fos = new FileOutputStream(compressedMio.toFile())) {
@@ -59,8 +58,7 @@ public class MailItem {
     public MailItem(String wiiCode, List<String> contentNames) throws Exception {
 
         attachmentType = 1;
-        recipient = wiiCode;
-        initializeFromEnvironment();
+        initializeFromEnvironment(wiiCode);
 
         String message = RECAP_HEADER;
 
@@ -82,8 +80,7 @@ public class MailItem {
      */
     public MailItem(String wiiCode) throws Exception {
         attachmentType = 0;
-        recipient = wiiCode;
-        initializeFromEnvironment();
+        initializeFromEnvironment(wiiCode);
     }
 
     /**
@@ -121,7 +118,7 @@ public class MailItem {
         return writer.toString();
     }
 
-    private void initializeFromEnvironment() throws Exception {
+    private void initializeFromEnvironment(String recipientCode) throws Exception {
 
         if (!System.getenv().containsKey("WII_NUMBER"))
             throw new Exception("Wii sender friend number not specified. Please set the WII_NUMBER environment variable.");
@@ -129,9 +126,20 @@ public class MailItem {
         if (!System.getenv().containsKey("WC24_SERVER"))
             throw new Exception("WiiConnect24 server url not specified. Please set the WC24_SERVER environment variable.");
 
+        if (!validateFriendCode(recipientCode))
+            throw new Exception("Invalid Wii Friend Code.");
+
         sender = System.getenv("WII_NUMBER");
         wc24Server = System.getenv("WC24_SERVER");
+        recipient = recipientCode;
+    }
 
+    private boolean validateFriendCode(String code) {
+
+        if (code.length() != 16)
+            return false;
+
+        return code.chars().allMatch(x -> Character.isDigit(x));
     }
 
     private static String RECAP_HEADER =

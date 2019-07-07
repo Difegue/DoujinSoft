@@ -59,7 +59,7 @@ public class CartServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws  IOException {
 
 		response.setContentType("text/html; charset=UTF-8");
 		ServletContext application = getServletConfig().getServletContext();			
@@ -70,7 +70,7 @@ public class CartServlet extends HttpServlet {
 	    	output = doStandardPage(application);
 			response.getWriter().append(output);
 				
-		} catch (SQLException | PebbleException e) {
+		} catch (PebbleException e) {
 			ServletLog.log(Level.SEVERE, e.getMessage());
 		}
 
@@ -80,14 +80,13 @@ public class CartServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		boolean result = false;
+		boolean gotFileContentType = false;
 		String output = "Invalid file.";
 
 		if (request.getParameter("method").equals("wc24")) {
 			//post contains a Wii number
 			try {
 				output = sendWC24(request, response);
-				result = true;
 			} catch (Exception e) {
 				output = e.getMessage();
 			}
@@ -95,10 +94,11 @@ public class CartServlet extends HttpServlet {
 
 		if (request.getParameter("method").equals("savefile")) {
 			//post contains a gameSave
-			result = injectMios(request, response);
+			gotFileContentType = injectMios(request, response);
 		}
 
-		if (!result)
+		//Output is CT text/html unless we're sending out a file
+		if (!gotFileContentType)
 		{
 			response.setContentType("text/html; charset=UTF-8");
 			response.getWriter().append(output);
@@ -270,10 +270,9 @@ public class CartServlet extends HttpServlet {
         ServletLog = Logger.getLogger("CartServlet");
         ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));     
     }
-   
-    
-    //Generates the regular landing page for games.
-    private String doStandardPage(ServletContext application) throws PebbleException, SQLException, IOException {
+
+    //Generates the regular landing page for the cart.
+    private String doStandardPage(ServletContext application) throws PebbleException, IOException {
     	
     	Map<String, Object> context = new HashMap<>();
 		
