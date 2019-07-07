@@ -75,7 +75,7 @@ char *Memory(int length, int size);
 #if   defined _WIN32
 __declspec(dllexport) void  LZS_Decode(char *filename);
 __declspec(dllexport) void  LZS_Encode(char *filename, int mode);
-#elif 
+#else
 void  LZS_Decode(char *filename);
 void  LZS_Encode(char *filename, int mode);
 #endif
