@@ -275,6 +275,7 @@ public class CartServlet extends HttpServlet {
     private String doStandardPage(ServletContext application) throws PebbleException, IOException {
     	
     	Map<String, Object> context = new HashMap<>();
+    	context.put("wiiNumber", System.getenv("WII_NUMBER"));
 		
     	PebbleEngine engine = new PebbleEngine.Builder().build();
 		PebbleTemplate compiledTemplate;

@@ -22,7 +22,9 @@ Uses SQLite, materializeCSS and jQuery.
 You can deploy the provided [Docker image](https://hub.docker.com/r/difegue/doujinsoft) by mapping a volume to /home/doujinsoft:
 ```
 docker run --mount type=bind,src=/my/data/directory,dst=/home/doujinsoft -p 8080:8080 difegue/doujinsoft
-```
+```  
+
+If you want to use WC24 interop, the environment variables WII_NUMBER, WC24_SERVER and WC24_PASSWORD must be defined.  
 
 ## Deploying manually 
 

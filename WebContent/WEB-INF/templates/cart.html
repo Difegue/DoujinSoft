@@ -81,7 +81,7 @@
             <br>
             Add our <b>Friend Code</b> to your Wii first:
         </p>
-        <center><h2>2227 5376 9960 6042</h2></center>
+        <center><h2 id="wii-number">{{wiiNumber}}</h2></center>
         <p>
             Then give us your own Friend Code here :
 
@@ -149,6 +149,14 @@ for (i=0; i< record.length; i++)
 
 $('input#recipient').characterCounter();
 $('#regmodal').modal();
+
+formattedFC = $("#wii-number").html().replace(/(\d{4}\s*)/g, function(match){
+            //Strip spaces
+            if(match.match(/\s/)){return match;}
+            return match + " ";
+    });
+
+$("#wii-number").html(formattedFC);
 
 // Check if user has registered his FC (it's all localStorage based I am a horrible person)
 if (!localStorage.hasOwnProperty("sawFCDialog")) {
