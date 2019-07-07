@@ -75,7 +75,7 @@ function clearSearch() {
 	
 	$("#item_name").val("");
 	$("#maker_name").val("");
-	Materialize.updateTextFields();
+	M.updateTextFields();
 	loadItems(1);
 }
 
@@ -83,13 +83,15 @@ function searchForUser(creator) {
 	
 	$("#item_name").val("");
 	$("#maker_name").val(creator);
-	Materialize.updateTextFields();
+	M.updateTextFields();
 	loadItems(1);
 	
 }
 
 function drawManga(page1, page2, page3, page4) {
-	
+
+	  M.Materialbox.init($('.materialboxed')[0]);
+
 	  ctx = $('#canvas_manga')[0].getContext('2d');
 	  img1 = new Image();
 	  img2 = new Image();
@@ -117,9 +119,13 @@ function drawManga(page1, page2, page3, page4) {
 	  img4.addEventListener('load', function() {
 		  ctx.drawImage(img4, 1, 385);
 		}, false);
-	   
-	  $('.materialboxed').click();
 
+      $('.materialboxed').click();
+	  $('.materialboxed')[0].src = $('#canvas_manga')[0].toDataURL();
+
+	  //Fix materialize's auto-generated styling
+      $('.materialboxed')[0].style.width = "auto";
+      $('.materialboxed')[0].style.left = "30%";
 }
 
 function popToast(message) {
