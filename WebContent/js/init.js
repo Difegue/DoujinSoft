@@ -50,7 +50,10 @@ function loadItems(pageNumber) {
 	$("#content").html('<center><div class="preloader-wrapper big active"><div class="spinner-layer"><div class="circle-clipper left">'+
 	'<div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div>'+
 	'</div></div></div></center>');
-	  
+
+	// Scroll up
+	window.scrollTo(0,0);  
+
 	//Posts to itself -> one function for all three pages
 	$.post( window.location.href, { page: pageNumber, name: $("#item_name").val(), creator: $("#maker_name").val() } )
 		.done(function( data ) {		
@@ -119,6 +122,9 @@ function drawManga(page1, page2, page3, page4) {
 
 }
 
+function popToast(message) {
+	M.toast({html:message, displayLength: 4000, classes: 'rounded grey lighten-4 black-text'});
+}
 
 function playMidi(id) {
 	
@@ -130,7 +136,7 @@ function playMidi(id) {
 		//Set the function as message callback
 		MIDIjs.message_callback = function(mes){
 			if (!mes.includes("Loading instruments"))
-				Materialize.toast(mes, 4000, 'rounded grey lighten-4 black-text');
+				popToast(mes);
 		};
 		
 		idPlaying=id;
@@ -141,7 +147,7 @@ function playMidi(id) {
 	else {
 		MIDIjs.stop();
 		idPlaying = "";
-		Materialize.toast("Playback Stopped.", 4000, 'rounded grey lighten-4 black-text');
+		popToast("Playback Stopped.");
 	}
 }
 
@@ -153,7 +159,7 @@ function addToCart(type, id) {
 	if (localStorage.getItem(type) === null) {
 		var items = [item];
 		localStorage.setItem(type, JSON.stringify(items));
-		Materialize.toast("Item added to cart successfully.", 4000, 'rounded grey lighten-4 black-text');
+		popToast("Item added to cart successfully.");
 	}
 	else {
 		var items = JSON.parse(localStorage.getItem(type));
@@ -166,10 +172,10 @@ function addToCart(type, id) {
 		if (!itemExists) {
 			items.push(item);
 			localStorage.setItem(type, JSON.stringify(items));
-			Materialize.toast("Item added to cart successfully.", 4000, 'rounded grey lighten-4 black-text');
+			popToast("Item added to cart successfully.");
 			}
 		else
-			Materialize.toast("Item already in cart.", 4000, 'rounded grey lighten-4 black-text');
+			popToast("Item already in cart.");
 		
 	}
 	
@@ -265,7 +271,7 @@ function checkoutSave() {
             $("#checkout-confirm").html('<div class="progress"><div class="indeterminate amber"></div></div>Thanks for using DoujinSoft! Your save file will automatically download once done.');
         }
         else
-            M.toast({html:"Please upload a savefile before checking out your content."});
+            popToast("Please upload a savefile before checking out your content.");
     }
 
     if ($("#wc24-radio")[0].checked) {
@@ -297,7 +303,7 @@ function checkoutSave() {
 
         }
         else
-           M.toast({html:"Please enter a Wii Friend Code before checking out your content."});
+           popToast("Please enter a Wii Friend Code before checking out your content.");
 
     }
 
