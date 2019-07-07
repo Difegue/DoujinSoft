@@ -120,8 +120,8 @@ function drawManga(page1, page2, page3, page4) {
 		  ctx.drawImage(img4, 1, 385);
 		}, false);
 
+      $('.materialboxed')[0].src = $('#canvas_manga')[0].toDataURL();
       $('.materialboxed').click();
-	  $('.materialboxed')[0].src = $('#canvas_manga')[0].toDataURL();
 
 	  //Fix materialize's auto-generated styling
       $('.materialboxed')[0].style.width = "auto";
