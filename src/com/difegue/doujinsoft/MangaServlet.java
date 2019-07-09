@@ -1,17 +1,6 @@
 package com.difegue.doujinsoft;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -24,12 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.difegue.doujinsoft.templates.Manga;
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.difegue.doujinsoft.utils.ServletUtils;
-import com.mitchellbosecke.pebble.PebbleEngine;
-import com.mitchellbosecke.pebble.error.PebbleException;
-import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
 
 /**

@@ -21,7 +21,6 @@ public class Cart {
     private JsonArray records = new JsonArray();
 
     private File saveFile = null;
-    private boolean useWC24 = false;
     private String recipientFriendCode;
 
     public Cart(HttpServletRequest request) throws IOException, ServletException {
@@ -41,7 +40,6 @@ public class Cart {
                     saveFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } else {
-            useWC24 = true;
             recipientFriendCode = request.getParameter("recipient");
         }
 

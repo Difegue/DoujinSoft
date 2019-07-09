@@ -3,8 +3,6 @@ package com.difegue.doujinsoft.templates;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.difegue.doujinsoft.utils.MioUtils;
-
 /*
  * Class for representing MIO Records. There are no differences in metadata..for now.
  */

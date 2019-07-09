@@ -1,7 +1,5 @@
 package com.difegue.doujinsoft.wc24;
 
-import com.difegue.doujinsoft.templates.BaseMio;
-import com.difegue.doujinsoft.utils.MioCompress;
 import com.difegue.doujinsoft.utils.MioUtils;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
@@ -150,5 +148,5 @@ public class MailItem {
     private static String RECAP_FOOTER =
             "~~~~~ Service provided for fun ~~~~~\n" +
             "~~~~~   by RiiConnect24 and  ~~~~~\n" +
-            "~~~~~  https://tvc-16.science  ~~~~~";
+            "~~~~~     Difegue@TVC-16     ~~~~~";
 }

@@ -1,23 +1,17 @@
 package com.difegue.doujinsoft;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -34,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.templates.Collection;
-import com.difegue.doujinsoft.templates.Game;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.mitchellbosecke.pebble.PebbleEngine;
@@ -43,7 +36,7 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
 
 /**
- * Servlet implementation class GameListing
+ * Servlet implementation class Home
  */
 @WebServlet("/home")
 public class WelcomeServlet extends HttpServlet {
