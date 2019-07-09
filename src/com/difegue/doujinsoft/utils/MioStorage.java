@@ -70,8 +70,7 @@ public class MioStorage {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
             return false;
-        }
+        } 
     }
 }

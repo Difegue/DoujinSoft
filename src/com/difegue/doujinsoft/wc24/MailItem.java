@@ -148,5 +148,5 @@ public class MailItem {
     private static String RECAP_FOOTER =
             "~~~~~ Service provided for fun ~~~~~\n" +
             "~~~~~   by RiiConnect24 and  ~~~~~\n" +
-            "~~~~~     Difegue@TVC-16     ~~~~~";
+            "~~~~~    Difegue @ TVC-16    ~~~~~";
 }

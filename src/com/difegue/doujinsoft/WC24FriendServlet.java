@@ -1,20 +1,14 @@
 package com.difegue.doujinsoft;
 
-import com.difegue.doujinsoft.utils.MioCompress;
 import com.difegue.doujinsoft.wc24.MailItem;
 import com.difegue.doujinsoft.wc24.WiiConnect24Api;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.util.List;
 
 /**

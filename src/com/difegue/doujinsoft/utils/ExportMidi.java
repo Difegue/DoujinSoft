@@ -3,18 +3,15 @@ package com.difegue.doujinsoft.utils;
 import com.xperia64.diyedit.Globals;
 import com.xperia64.diyedit.editors.RecordEdit;
 
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
 
 import org.jfugue.MidiRenderer;
 import org.jfugue.MusicStringParser;
