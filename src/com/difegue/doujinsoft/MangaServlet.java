@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.utils.MioUtils.Types;
-import com.difegue.doujinsoft.utils.ServletUtils;
+import com.difegue.doujinsoft.utils.TemplateBuilder;
 
 
 /**
@@ -37,7 +37,7 @@ public class MangaServlet extends HttpServlet {
 		
 		try {
 			
-	    	output = ServletUtils.doStandardPageGeneric(Types.MANGA, application);
+	    	output = new TemplateBuilder(application, request).doStandardPageGeneric(Types.MANGA);
 			response.getWriter().append(output);
 				
 		} catch (Exception e) {
@@ -58,7 +58,7 @@ public class MangaServlet extends HttpServlet {
 		try {
 			
 			if (!request.getParameterMap().isEmpty())
-				output = ServletUtils.doSearchGeneric(Types.MANGA, application, request);
+				output = new TemplateBuilder(application, request).doSearchGeneric(Types.MANGA);
 
 			response.getWriter().append(output);
 			

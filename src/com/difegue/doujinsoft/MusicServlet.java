@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.utils.MioUtils.Types;
-import com.difegue.doujinsoft.utils.ServletUtils;
+import com.difegue.doujinsoft.utils.TemplateBuilder;
 
 /**
  * Servlet implementation class for Records
@@ -36,7 +36,7 @@ public class MusicServlet extends HttpServlet {
 		
 		try {
 			
-	    	output = ServletUtils.doStandardPageGeneric(Types.RECORD, application);
+	    	output = new TemplateBuilder(application, request).doStandardPageGeneric(Types.RECORD);
 			response.getWriter().append(output);
 				
 		} catch (Exception e) {
@@ -57,7 +57,7 @@ public class MusicServlet extends HttpServlet {
 		try {
 			
 			if (!request.getParameterMap().isEmpty())
-				output = ServletUtils.doSearchGeneric(Types.RECORD, application, request);
+				output = new TemplateBuilder(application, request).doSearchGeneric(Types.RECORD);
 
 			response.getWriter().append(output);
 			

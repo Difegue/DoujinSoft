@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.templates.Collection;
-import com.difegue.doujinsoft.utils.ServletUtils;
+import com.difegue.doujinsoft.utils.TemplateBuilder;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
@@ -71,7 +71,7 @@ public class CollectionServlet extends HttpServlet {
 		try {
 			Collection c = initCollection(request);
 			if (c!=null)
-				output = ServletUtils.doStandardPageCollection(c, application);
+				output = new TemplateBuilder(application, request).doStandardPageCollection(c);
 			
 			response.getWriter().append(output);
 		} catch (Exception e) {
@@ -94,7 +94,7 @@ public class CollectionServlet extends HttpServlet {
 			Collection c = initCollection(request);
 			
 			if (!request.getParameterMap().isEmpty() && c!=null)
-				output = ServletUtils.doSearchCollection(c, application, request);
+				output = new TemplateBuilder(application, request).doSearchCollection(c);
 
 			response.getWriter().append(output);
 			

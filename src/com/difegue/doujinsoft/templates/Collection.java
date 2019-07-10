@@ -1,10 +1,13 @@
 package com.difegue.doujinsoft.templates;
 
+import com.difegue.doujinsoft.utils.MioUtils.Types;
+
 /*
  * Instances of this class are created when gson parses a collection json specifier file.
  */
 public class Collection {
 	  public String id;
+	  public String type;
 	  public String collection_name;
 	  public String collection_color;
 	  public String collection_icon;
@@ -27,6 +30,18 @@ public class Collection {
 	    query+=")";
 	    
 	    return query;
+	  }
+
+	  public int getType() {
+		  
+		switch (type) {
+			case "game": return Types.GAME;
+			case "manga": return Types.MANGA;
+			case "record": return Types.RECORD;
+		}
+
+		//Default to games
+		return Types.GAME;
 	  }
 
 }
