@@ -13,13 +13,9 @@ public class Game extends BaseMio{
 		super(result);
 		
 		preview = result.getString("previewPic");
-		
-		isTheme = (this.mioID.contains("them"));
-			
 	}
 	
 	public String preview;
-	public boolean isTheme;
 }
 
 

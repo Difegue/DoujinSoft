@@ -19,9 +19,9 @@
 
                     <div style="width:125px; float:left">
 
-					{% if game.isTheme == true %}
-					  <div class="brand theme-brand white-text"></div> 
-					{% else %}
+                    {% if game.specialBrand != null %}
+                      <div class="brand {{ game.specialBrand }}-brand white-text"></div> 
+                    {% else %}
                       <div class="brand game-brand white-text">
                       	{{ game.brand }} <br/>Software
                       </div>  

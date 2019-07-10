@@ -19,9 +19,13 @@
 
                     <div style="width:125px; float:left">
 
-                      <div class="brand manga-brand white-text">
-                      {{ item.brand }} <br/>Publishing
-                      </div>
+                      {% if item.specialBrand != null %}
+                      <div class="brand {{ item.specialBrand }}-brand white-text"></div> 
+                      {% else %}
+                        <div class="brand manga-brand white-text">
+                        {{ item.brand }} <br/>Publishing
+                        </div>
+                      {% endif %}
 
                       <div class="game-creator black white-text">
                         Creator

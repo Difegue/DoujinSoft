@@ -27,6 +27,7 @@ public class BaseMio {
     	hash = result.getString("hash");
 		brand = result.getString("brand");
 		creator = result.getString("creator");
+
 		if (desc.length() > 18) {
 			mioDesc1 = desc.substring(0,18);
 			mioDesc2 = desc.substring(18);
@@ -42,12 +43,20 @@ public class BaseMio {
 		if (mioDesc1.replaceAll("\\s+","").equals(""))
 			mioDesc1 = "No Description.";
 		
+
+		if (this.mioID.contains("them"))
+			specialBrand = "theme";
+		if (this.mioID.contains("wari"))
+			specialBrand = "wario";
+		if (this.mioID.contains("nint"))
+			specialBrand = "nintendo";
+		
 		colorCart = result.getString("color");
 		logo = result.getInt("logo");
 	
 	}
 	
-	public String name, timestamp, mioID, hash, brand, creator, mioDesc1, mioDesc2, colorLogo, colorCart;
+	public String name, timestamp, mioID, hash, brand, creator, mioDesc1, mioDesc2, colorLogo, colorCart, specialBrand;
 	public int logo;
 	
 }

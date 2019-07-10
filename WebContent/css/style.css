@@ -116,7 +116,15 @@ label.active {
 }
 
 .theme-brand {
-	background-image: url('../img/icons/game/theme.png') !important; 
+	background-image: url('../img/icons/theme.png') !important; 
+}
+
+.wario-brand {
+	background-image: url('../img/icons/wario.png') !important; 
+}
+
+.nintendo-brand {
+	background-image: url('../img/icons/ninsoft.png') !important; 
 }
 
 .manga-brand {
