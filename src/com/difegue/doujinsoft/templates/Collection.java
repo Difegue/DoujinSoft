@@ -7,7 +7,7 @@ import com.difegue.doujinsoft.utils.MioUtils.Types;
  */
 public class Collection {
 	  public String id;
-	  public String type;
+	  public String collection_type;
 	  public String collection_name;
 	  public String collection_color;
 	  public String collection_icon;
@@ -34,7 +34,7 @@ public class Collection {
 
 	  public int getType() {
 		  
-		switch (type) {
+		switch (collection_type) {
 			case "game": return Types.GAME;
 			case "manga": return Types.MANGA;
 			case "record": return Types.RECORD;
