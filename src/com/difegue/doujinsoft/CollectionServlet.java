@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -75,10 +77,13 @@ public class CollectionServlet extends HttpServlet {
 			
 			response.getWriter().append(output);
 		} catch (Exception e) {
-			ServletLog.log(Level.SEVERE, e.getMessage());
+
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+
+			ServletLog.log(Level.SEVERE, sw.toString());
 		}
-	
-		//SELECT * FROM TABLE 
 	}
 
 	/**

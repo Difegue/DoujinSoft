@@ -55,7 +55,7 @@ public class TemplateBuilder {
 
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-	    Statement statement = connection.createStatement();
+	    statement = connection.createStatement();
 		statement.setQueryTimeout(30);  // set timeout to 30 sec.
 		
 	}
