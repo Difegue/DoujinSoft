@@ -1,0 +1,11 @@
+{
+	"collection_name": "Games from RiiConnect24",
+	"collection_color": "light-blue",
+	"collection_icon": "autorenew",
+	"background_pic": "./img/rc24.jpg",
+	"collection_desc": "These games have been sent directly from RC24 users!",
+	"collection_desc2": "You can do the same by adding us as friends from the Cart.",
+	"mios": [
+		
+	]
+}

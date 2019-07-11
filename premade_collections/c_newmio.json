@@ -1,9 +1,9 @@
 {
-    "collection_name": "Post-WFC Games",
+    "collection_name": "DoujinSoft Exclusives",
     "collection_color": "deep-orange",
     "collection_icon": "fiber_new",
     "background_pic": "./img/bg_ninsoft.png",
-    "collection_desc": "Those games are DoujinSoft exclusives! Thanks to everyone who pitched in a game.",
+    "collection_desc": "Those games have been made after the WFC Shutdown! Thanks to everyone who pitched in a game.",
     "collection_desc2": "",
     "mios": [
         "f393bfbba4a0cfdfd75aebd691b88a89",
