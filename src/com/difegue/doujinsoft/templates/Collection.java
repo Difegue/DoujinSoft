@@ -34,11 +34,12 @@ public class Collection {
 
 	  public int getType() {
 		  
-		switch (collection_type) {
-			case "game": return Types.GAME;
-			case "manga": return Types.MANGA;
-			case "record": return Types.RECORD;
-		}
+		if (collection_type != null) 
+			switch (collection_type) {
+				case "game": return Types.GAME;
+				case "manga": return Types.MANGA;
+				case "record": return Types.RECORD;
+			}
 
 		//Default to games
 		return Types.GAME;
