@@ -149,8 +149,8 @@ public class CartServlet extends HttpServlet {
 		// Recap mail
 		mailsToSend.add(new MailItem(recipientNumber, contentNames));
 
-		WiiConnect24Api wc24 = new WiiConnect24Api();
-		return wc24.sendMails(mailsToSend, application);
+		WiiConnect24Api wc24 = new WiiConnect24Api(application);
+		return wc24.sendMails(mailsToSend);
 	}
     
     private boolean injectMios(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

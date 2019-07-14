@@ -42,8 +42,8 @@ public class WC24FriendServlet extends HttpServlet {
 			try {
 				// Friend Request mail
 				MailItem friendReq = new MailItem(code);
-				WiiConnect24Api wc24 = new WiiConnect24Api();
-				String wc24Response = wc24.sendMails(List.of(friendReq), application);
+				WiiConnect24Api wc24 = new WiiConnect24Api(application);
+				String wc24Response = wc24.sendMails(List.of(friendReq));
 
 				response.getOutputStream().print(wc24Response);
 			} catch (Exception e) {

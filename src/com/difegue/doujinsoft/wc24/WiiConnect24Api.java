@@ -4,6 +4,7 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -11,16 +12,20 @@ import org.apache.http.impl.client.HttpClients;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class WiiConnect24Api {
 
     private String sender, wc24Server, wc24Pass;
+    private ServletContext application;
 
-    public WiiConnect24Api() throws Exception {
+    public WiiConnect24Api(ServletContext application) throws Exception {
 
         if (!System.getenv().containsKey("WII_NUMBER"))
             throw new Exception("Wii sender friend number not specified. Please set the WII_NUMBER environment variable.");
@@ -34,6 +39,8 @@ public class WiiConnect24Api {
         sender = System.getenv("WII_NUMBER");
         wc24Server = System.getenv("WC24_SERVER");
         wc24Pass = System.getenv("WC24_PASSWORD");
+
+        this.application = application;
     }
 
     /**
@@ -43,7 +50,7 @@ public class WiiConnect24Api {
      * @return
      * @throws IOException
      */
-    public String sendMails(List<MailItem> mails, ServletContext application) throws IOException {
+    public String sendMails(List<MailItem> mails) throws IOException {
 
         Logger log = Logger.getLogger("WC24");
 
@@ -86,6 +93,25 @@ public class WiiConnect24Api {
         }
         return null;
     }
+
+    /***
+     * Phones up the WC24 server to grab mails, and consume them. See MailItemParser.
+     * @throws Exception
+     */
+    public void receiveMails() throws Exception{
+
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpGet request = new HttpGet("https://mtw." + wc24Server + "/cgi-bin/receive.cgi?mlid=w" + sender + "&passwd=" + wc24Pass +"&maxsize=2000000");
+
+        //Execute and get the response.
+        HttpResponse response = httpclient.execute(request);
+        HttpEntity entity = response.getEntity();
+
+        if (entity != null)
+        try (InputStream inStream = entity.getContent()) {
+
+           String responseText = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
+           MailItemParser.consumeEmails(responseText, application);
+        }
+    }
 }
-
-
