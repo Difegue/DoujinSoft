@@ -3,13 +3,14 @@ package com.difegue.doujinsoft.wc24;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.*;
 
 import javax.servlet.ServletContext;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Address;
+
+import com.xperia64.diyedit.metadata.*;
+
+import javax.mail.*;
 import javax.mail.Message.RecipientType;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.InternetAddress;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.*;
 import java.util.List;
+
+
 
 public class MailItemParser {
 
@@ -82,30 +85,33 @@ public class MailItemParser {
             return null;
         }
 
+        String subject = message.getSubject();
+
         // Friend request 
-        if (message.getSubject().equals("WC24 Cmd Message")) {
+        if (subject.equals("WC24 Cmd Message")) {
             return new MailItem(wiiCode);
         }
 
         // Survey box
-        if (message.getSubject().equals("QUESTION")) {
+        if (subject.equals("QUESTION")) {
 
 
             // No mail to send
             return null;
         }
 
-        // Games
-        if (message.getSubject().equals("G")) {
+        // Games/Records/Manga
+        if (subject.equals("G") || subject.equals("RR") || subject.equals("MMM")) {
+
+            byte[] data = getLZ10BodyPart(message);
+            Metadata metadata = new Metadata(data);
+
+            // Store data in a .mio file
 
 
             // Send thank-you mail
-            return new MailItem(wiiCode, List.of("A game"));
+            return new MailItem(wiiCode, List.of(metadata.getName()), true);
         }
-
-        // Records
-
-        // Manga
 
         // Other
         // Change From: and To: to the server's wii address and the backup wii address respectively
@@ -132,6 +138,29 @@ public class MailItemParser {
         }
         // No match = not a Wii
         return null;
+    }
+
+    /**
+     * Recover the attachment from a DIY Showcase Message and decode it to a file.
+     * @param m the message to recover the attachment from
+     * @return LZ10-decompressed data
+     * @throws IOException
+     * @throws MessagingException
+     */
+    private static byte[] getLZ10BodyPart(Message m) throws IOException, MessagingException {
+
+        // Get the second bodypart of the message
+        Multipart content = (Multipart)m.getContent();
+        
+        // Write bodypart to a file
+        Path compressedMio = Files.createTempFile("mio",".lz10");
+        Files.copy(content.getBodyPart(1).getInputStream(), compressedMio);
+
+        // LZSS-decode it
+        String filePath = compressedMio.toFile().getAbsolutePath();
+        LZSS.INSTANCE.LZS_Decode(filePath);
+        
+        return Files.readAllBytes(compressedMio);
     }
 
 }

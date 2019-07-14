@@ -52,13 +52,22 @@ public class MailItem {
      * Create a WC24 recap mail to send to the Wii Message Board.
      * @param wiiCode Friend Code to send the mail to
      * @param contentNames DIY content to enumerate in the mail
+     * @param incoming Whether this recap is for incoming or outgoing content.
      */
-    public MailItem(String wiiCode, List<String> contentNames) throws Exception {
+    public MailItem(String wiiCode, List<String> contentNames, boolean incoming) throws Exception {
 
-        attachmentType = 1;
+        String message;
+
+        if (incoming) {
+            attachmentType = 2;
+            message = RECAP_HEADER_INCOMING;
+        }
+        else {
+            attachmentType = 1;
+            message = RECAP_HEADER_OUTGOING;
+        }
+
         initializeFromEnvironment(wiiCode);
-
-        String message = RECAP_HEADER;
 
         for (String s: contentNames) {
             message += "* "+ s + "\n";
@@ -97,6 +106,8 @@ public class MailItem {
                              break;
             case 1:          template = engine.getTemplate(templatePath + ("/recap_mail.eml"));
                              break;
+            case 2:          template = engine.getTemplate(templatePath + ("/recap_mail.eml"));
+                             break;                 
             case MioUtils.Types
                     .GAME:   template = engine.getTemplate(templatePath + ("/game_mail.eml"));
                              break;
@@ -140,13 +151,18 @@ public class MailItem {
         return code.chars().allMatch(x -> Character.isDigit(x));
     }
 
-    private static String RECAP_HEADER =
-            "Thank you for using DoujinSoft!\n" +
-            "\n" +
-            "The following content has been sent  to your Wii alongside this message:\n\n";
+    private static String RECAP_HEADER_INCOMING =
+        "Thank you for using DoujinSoft!\n" +
+        "\n" +
+        "You're receiving this message to acknowledge that we've received and added   the following to our database:\n\n";
+
+    private static String RECAP_HEADER_OUTGOING =
+        "Thank you for using DoujinSoft!\n" +
+        "\n" +
+        "The following content has been sent  to your Wii alongside this message:\n\n";
 
     private static String RECAP_FOOTER =
-            "~~~~~ Service provided for fun ~~~~~\n" +
-            "~~~~~   by RiiConnect24 and  ~~~~~\n" +
-            "~~~~~    Difegue @ TVC-16    ~~~~~";
+        "~~~~~ Service provided for fun ~~~~~\n" +
+        "~~~~~   by RiiConnect24 and  ~~~~~\n" +
+        "~~~~~    Difegue @ TVC-16    ~~~~~";
 }

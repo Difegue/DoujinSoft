@@ -147,7 +147,7 @@ public class CartServlet extends HttpServlet {
 		}
 
 		// Recap mail
-		mailsToSend.add(new MailItem(recipientNumber, contentNames));
+		mailsToSend.add(new MailItem(recipientNumber, contentNames, false));
 
 		WiiConnect24Api wc24 = new WiiConnect24Api(application);
 		return wc24.sendMails(mailsToSend);

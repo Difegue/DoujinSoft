@@ -43,8 +43,7 @@ public class MioUtils {
 	 */
 	public static String getTimeString(int timestamp)
 	{
-		
-		DateTime dateMio = date.plusDays(timestamp);
+		  DateTime dateMio = date.plusDays(timestamp);
     	return  dateMio.toString(formatter);
 	}
 	
@@ -123,7 +122,7 @@ public class MioUtils {
 	{
 		
 		int x = 0;
-	    int y = 0;
+	  int y = 0;
 		boolean done = false;
 		GameEdit gameMeta = new GameEdit(mioFile);
 		
