@@ -10,11 +10,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
+import java.util.Scanner;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import com.difegue.doujinsoft.utils.MioUtils.Types;
+import com.difegue.doujinsoft.wc24.MailItemParser;
 import com.xperia64.diyedit.FileByteOperations;
 import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;
@@ -25,7 +27,6 @@ import com.xperia64.diyedit.metadata.Metadata;
  * Ran on each server startup - Handles database updating.
  */
 public class ServerInit implements javax.servlet.ServletContextListener {
-
 
     //Database structure, straightforward stuff
     private void databaseDefinition(Statement statement) throws SQLException
@@ -41,6 +42,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Records "
                 + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
                 + "PRIMARY KEY(`hash`) )");
+
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Surveys "
+                + "(type INTEGER, name TEXT, stars INTEGER, commentId INTEGER)");
     }
 
     /*
@@ -86,16 +90,13 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         // Hee to the ho and here we go
         Logger SQLog = Logger.getLogger("SQLite");
         SQLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
-
-        SQLog.log(Level.INFO, "Looking for new .mio files...");
-        Connection connection = null;
-
-        //Create database if nonexistent + parse .mios in "new" folder before renaming+moving them
         ServletContext application = arg0.getServletContext();
         String dataDir = application.getInitParameter("dataDirectory");
+       
+        Connection connection = null;
 
         try {
-            // create a database connection
+            // Create database if nonexistent
             SQLog.log(Level.INFO, "Connecting to database at "+dataDir+"/mioDatabase.sqlite");
 
             connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
@@ -104,11 +105,23 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
             databaseDefinition(statement);
 
+            // Look for a WC24 mail dump file and parse it if it exists
+            SQLog.log(Level.INFO, "Looking for mails.wc24 file...");
+            File wc24Mails = new File(dataDir+"/mails.wc24");
+            
+            if (wc24Mails.exists()) 
+            try (Scanner s = new Scanner(wc24Mails)) {
+                String emailData = s.useDelimiter("\\Z").next();
+                new MailItemParser(application).consumeEmails(emailData);
+            }
+
+            // Parse .mios in "new" folder before renaming+moving them
+            SQLog.log(Level.INFO, "Looking for new .mio files...");
+
             //Create the mio directory if it doesn't exist - although that means we probably won't find any games to parse...
             if (!new File (dataDir+"/mio/").exists())
                 new File(dataDir+"/mio/").mkdirs();
-
-            //Let's jam some .mios in this
+            
             File[] files = new File(dataDir+"/mio/").listFiles();
 
             for (File f: files) {
@@ -117,7 +130,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                     byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
                     Metadata metadata = new Metadata(mioData);
                     String hash = MioStorage.computeMioHash(mioData);
-                    String ID = MioStorage.computeMioID(f, metadata);
+                    String ID = MioStorage.computeMioID(metadata);
                     int type = mioData.length;
 
                     PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, connection, type);
@@ -182,7 +195,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Record_idx ON Records (normalizedName ASC, id);");
             
         }
-        catch(SQLException e){
+        catch(Exception e){
             // if the error message is "out of memory",
             // it probably means no database file is found
             SQLog.log(Level.SEVERE, e.getMessage());

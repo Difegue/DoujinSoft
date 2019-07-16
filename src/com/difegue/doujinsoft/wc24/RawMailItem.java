@@ -8,8 +8,8 @@ public class RawMailItem extends MailItem {
 
     private String mail;
 
-    public RawMailItem(String raw) throws Exception {
-        super("0");
+    public RawMailItem(String wiiCode, String raw) throws Exception {
+        super(wiiCode);
         mail = raw;
     }
 

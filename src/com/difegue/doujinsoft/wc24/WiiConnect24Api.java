@@ -20,27 +20,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class WiiConnect24Api {
-
-    private String sender, wc24Server, wc24Pass;
-    private ServletContext application;
+public class WiiConnect24Api extends WC24Base {
 
     public WiiConnect24Api(ServletContext application) throws Exception {
-
-        if (!System.getenv().containsKey("WII_NUMBER"))
-            throw new Exception("Wii sender friend number not specified. Please set the WII_NUMBER environment variable.");
-
-        if (!System.getenv().containsKey("WC24_SERVER"))
-            throw new Exception("WiiConnect24 server url not specified. Please set the WC24_SERVER environment variable.");
-
-        if (!System.getenv().containsKey("WC24_PASSWORD"))
-            throw new Exception("WiiConnect24 account password not specified. Please set the WC24_PASSWORD environment variable.");
-
-        sender = System.getenv("WII_NUMBER");
-        wc24Server = System.getenv("WC24_SERVER");
-        wc24Pass = System.getenv("WC24_PASSWORD");
-
-        this.application = application;
+        super(application);
     }
 
     /**
@@ -111,7 +94,7 @@ public class WiiConnect24Api {
         try (InputStream inStream = entity.getContent()) {
 
            String responseText = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
-           MailItemParser.consumeEmails(responseText, application);
+           new MailItemParser(application).consumeEmails(responseText);
         }
     }
 }

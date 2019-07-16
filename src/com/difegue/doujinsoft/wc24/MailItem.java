@@ -106,7 +106,7 @@ public class MailItem {
                              break;
             case 1:          template = engine.getTemplate(templatePath + ("/recap_mail.eml"));
                              break;
-            case 2:          template = engine.getTemplate(templatePath + ("/recap_mail.eml"));
+            case 2:          template = engine.getTemplate(templatePath + ("/recap_mail_blue.eml"));
                              break;                 
             case MioUtils.Types
                     .GAME:   template = engine.getTemplate(templatePath + ("/game_mail.eml"));

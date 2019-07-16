@@ -37,7 +37,7 @@ public class MioStorage {
     /*
      * Craft ID from .mio metadata.
      */
-    public static String computeMioID(File f, Metadata mio) {
+    public static String computeMioID(Metadata mio) {
         return mio.getSerial1() + "-" + mio.getSerial2() + "-" + mio.getSerial3();
     }
 
