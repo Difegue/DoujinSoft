@@ -2,7 +2,7 @@
 	"collection_name": "Comics from RiiConnect24",
 	"collection_color": "light-blue",
 	"collection_icon": "autorenew",
-	"collection_type": "record",
+	"collection_type": "manga",
 	"background_pic": "./img/bg_rc24.jpg",
 	"collection_desc": "These comics have been sent directly from RC24 users!",
 	"collection_desc2": "You can do the same by adding us as friends from the Cart.",

@@ -31,11 +31,13 @@ public class MioUtils {
 	private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy");
 	
 	// Basic enum to distinguish mio files quickly. 
-	//Game = 64KB, Manga = 14KB, Record = 8KB.
+  // Game = 64KB, Manga = 14KB, Record = 8KB.
+  // Surveys are added here as a quick-and-dirty shortcut.
 	public class Types {
 		   public static final int GAME = 65536;
 		   public static final int MANGA = 14336;
-		   public static final int RECORD = 8192;
+       public static final int RECORD = 8192;
+       public static final int SURVEY = 255;
 		}
 	
 	/*

@@ -44,7 +44,8 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                 + "PRIMARY KEY(`hash`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Surveys "
-                + "(type INTEGER, name TEXT, stars INTEGER, commentId INTEGER)");
+                + "(timestamp INTEGER, type INTEGER, name TEXT, stars INTEGER, commentId INTEGER, "
+                + "PRIMARY KEY(`timestamp`) )");
     }
 
     /*
@@ -113,6 +114,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             try (Scanner s = new Scanner(wc24Mails)) {
                 String emailData = s.useDelimiter("\\Z").next();
                 new MailItemParser(application).consumeEmails(emailData);
+                wc24Mails.delete();
             }
 
             // Parse .mios in "new" folder before renaming+moving them

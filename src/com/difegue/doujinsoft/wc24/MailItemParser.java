@@ -78,7 +78,7 @@ public class MailItemParser extends WC24Base {
 
         // Send out reply mails, if there are any.
         try {
-            //new WiiConnect24Api(application).sendMails(mailsToSend);
+            new WiiConnect24Api(application).sendMails(mailsToSend);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Couldn't send out mails: " + e);
         }
@@ -202,11 +202,12 @@ public class MailItemParser extends WC24Base {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
 
-            PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?)");
-            ret.setInt(1, type & 0xFF);
-            ret.setString(2, title);
-            ret.setInt(3, stars & 0xFF);
-            ret.setInt(4, comment & 0xFF);
+            PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?)");
+            ret.setLong(1, System.currentTimeMillis());
+            ret.setInt(2, type & 0xFF);
+            ret.setString(3, title);
+            ret.setInt(4, stars & 0xFF);
+            ret.setInt(5, comment & 0xFF);
 
             ret.executeUpdate();
             return true;

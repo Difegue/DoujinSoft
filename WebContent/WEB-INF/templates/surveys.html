@@ -1,0 +1,33 @@
+{% extends "./base.html" %}
+
+{% block surveypage %}active{% endblock %}
+{% block background %}./img/bg_contact.png{% endblock %}
+{% block color %}orange{% endblock %}
+{% block type %}Surveys{% endblock %}
+{% block desc %}
+Hot takes and opinions, coming directly from RiiConnect24 users!
+<br/><br/>
+Games/Records/Comics sent to DIY Showcase on Wii can be rated by users. <br/> This page is a simple way to display all the ratings we've received.
+<br/><br/>
+
+<br/>
+<div id="pagination-top" class="pagination-wrapper chip">
+  <ul class="pagination"></ul>
+</div>
+
+{% endblock %}
+
+
+{% block content %}
+
+	{% include "./surveysDetail.html" %}
+	
+{% endblock %}
+
+{% block footdata %}
+
+<div id="pagination-bottom" class="pagination-wrapper chip">
+  <ul class="pagination"></ul>
+</div>
+
+{% endblock %}

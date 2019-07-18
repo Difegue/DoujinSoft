@@ -154,7 +154,7 @@ public class MailItem {
     private static String RECAP_HEADER_INCOMING =
         "Thank you for using DoujinSoft!\n" +
         "\n" +
-        "You're receiving this message to acknowledge that we've received and added   the following to our database:\n\n";
+        "You're receiving this message to     acknowledge that we've received and  added the following to our database:\n\n";
 
     private static String RECAP_HEADER_OUTGOING =
         "Thank you for using DoujinSoft!\n" +

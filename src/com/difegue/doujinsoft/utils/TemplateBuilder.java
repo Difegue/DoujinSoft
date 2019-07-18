@@ -17,10 +17,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.difegue.doujinsoft.templates.Collection;
-import com.difegue.doujinsoft.templates.Game;
-import com.difegue.doujinsoft.templates.Manga;
-import com.difegue.doujinsoft.templates.Record;
+import com.difegue.doujinsoft.templates.*;
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
@@ -32,20 +29,20 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
  */
 public class TemplateBuilder {
 
-	private ArrayList items = new ArrayList();
-	private Constructor classConstructor;
+	protected ArrayList items = new ArrayList();
+	protected Constructor classConstructor;
 
-	private Map<String, Object> context = new HashMap<>();
-	private Connection connection;
-	private Statement statement;
-	private ServletContext application;
-	private HttpServletRequest request;
+	protected Map<String, Object> context = new HashMap<>();
+	protected Connection connection;
+	protected Statement statement;
+	protected ServletContext application;
+	protected HttpServletRequest request;
 
-	private String tableName, dataDir;
-	private boolean isNameSearch, isCreatorSearch;
+	protected String tableName, dataDir;
+	protected boolean isNameSearch, isCreatorSearch;
 	
-	private PebbleEngine engine = new PebbleEngine.Builder().build();
-	private PebbleTemplate compiledTemplate;
+	protected PebbleEngine engine = new PebbleEngine.Builder().build();
+	protected PebbleTemplate compiledTemplate;
 
 	public TemplateBuilder(ServletContext application, HttpServletRequest request) throws SQLException {
 
@@ -57,10 +54,9 @@ public class TemplateBuilder {
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
 	    statement = connection.createStatement();
 		statement.setQueryTimeout(30);  // set timeout to 30 sec.
-		
 	}
 
-	private void initializeTemplate(int type, boolean isDetail) throws NoSuchMethodException, PebbleException {
+	protected void initializeTemplate(int type, boolean isDetail) throws NoSuchMethodException, PebbleException {
 
 		String templatePath = "/WEB-INF/templates/";
 		//Getting base template and other type dependant data
@@ -81,10 +77,14 @@ public class TemplateBuilder {
 				tableName = "Records";
 				classConstructor = Record.class.getConstructor(ResultSet.class);
 				break;
+			case Types.SURVEY:
+				templatePath += "surveys";
+				tableName = "Surveys";
+				classConstructor = Survey.class.getConstructor(ResultSet.class);
 			}
 
 		if (isDetail) {
-			templatePath += "Detail";	
+			templatePath   += "Detail";	
 			isNameSearch    = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
 			isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
 		}
@@ -92,7 +92,7 @@ public class TemplateBuilder {
 		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath+".html"));
 	}
 
-	private String writeToTemplate() throws PebbleException, IOException {
+	protected String writeToTemplate() throws PebbleException, IOException {
 
 		Writer writer = new StringWriter();
 		compiledTemplate.evaluate(writer, context);
@@ -117,25 +117,6 @@ public class TemplateBuilder {
 		context.put("totalitems", result.getInt(1));
 		
 		//Output to client
-		return writeToTemplate();
-	}
-	
-	/*
-	 * Collection version - Uses the collection's specific type and a custom query.
-	 */
-	public String doStandardPageCollection(Collection c) throws Exception {
-		
-		initializeTemplate(c.getType(), false);
-	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));	    
-  		ResultSet result = statement.executeQuery("select * from "+tableName+" WHERE hash IN "+c.getMioSQL()+" ORDER BY normalizedName ASC LIMIT 15");
-  		
-  		while(result.next()) 
-		  	items.add(classConstructor.newInstance(result));
-  		
-  		context.put("items", items);
-		context.put("totalitems", c.mios.length);
-		context.put("collection", c);
-		
 		return writeToTemplate();
 	}
 
@@ -182,50 +163,6 @@ public class TemplateBuilder {
 		context.put("items", items);
 		context.put("totalitems", retCount.executeQuery().getInt(1));
 
-		return writeToTemplate();
-    }
-	
-	/*
-	 * POST requests in collections.
-	 */
-	public String doSearchCollection(Collection c) throws Exception {
-		
-		initializeTemplate(c.getType(), true);
-		
-	    String queryBase = "FROM "+tableName+" WHERE hash IN "+c.getMioSQL();
-	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
-		
-	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
-	    String queryCount = "SELECT COUNT(hash) " + queryBase;
-	    
-		PreparedStatement ret = connection.prepareStatement(query);
-		PreparedStatement retCount = connection.prepareStatement(queryCount);
-
-		//Those filters go in the LIKE parts of the query
-		String name    = isNameSearch ? "%"+request.getParameter("name")+"%" : "%";
-		String creator = isCreatorSearch ? "%"+request.getParameter("creator")+"%" : "%";
-
-		int page = 1;
-		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
-			page = Integer.parseInt(request.getParameter("page"));
-		
-		if (isNameSearch || isCreatorSearch) {
-			ret.setString(1, name);
-			ret.setString(2, creator);
-			retCount.setString(1, name);
-		    retCount.setString(2, creator);
-			ret.setInt(3, page*15-15);
-		} else 
-			ret.setInt(1, page*15-15);
-		
-		ResultSet result = ret.executeQuery();
-		
-	    while(result.next()) 
-			items.add(classConstructor.newInstance(result));
-		
-		context.put("items", items);
-		context.put("totalitems", retCount.executeQuery().getInt(1));
-		
 		return writeToTemplate();
     }
 	
