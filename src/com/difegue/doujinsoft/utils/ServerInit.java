@@ -14,6 +14,9 @@ import java.util.Scanner;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.difegue.doujinsoft.wc24.MailItemParser;
@@ -29,6 +32,8 @@ import com.xperia64.diyedit.metadata.Metadata;
  */
 public class ServerInit implements javax.servlet.ServletContextListener {
 
+    private ScheduledExecutorService scheduler;
+    
     //Database structure, straightforward stuff
     private void databaseDefinition(Statement statement) throws SQLException
     {
@@ -219,7 +224,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
-
+        scheduler.shutdownNow();
     }
 
     public class WiiConnect24MailCollection implements Runnable {
