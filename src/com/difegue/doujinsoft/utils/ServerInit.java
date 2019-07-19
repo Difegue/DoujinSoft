@@ -17,6 +17,7 @@ import javax.servlet.ServletContextEvent;
 
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.difegue.doujinsoft.wc24.MailItemParser;
+import com.difegue.doujinsoft.wc24.WiiConnect24Api;
 import com.xperia64.diyedit.FileByteOperations;
 import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;
@@ -211,6 +212,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                 SQLog.log(Level.SEVERE, "connection close failed: " + e.getMessage());
             }
         }
+        
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(new WiiConnect24MailCollection(application), 0, 1, TimeUnit.DAYS);
     }
 
     @Override
@@ -218,5 +222,20 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
     }
 
+    public class WiiConnect24MailCollection implements Runnable {
 
+        private ServletContext application;
+        
+        public WiiConnect24MailCollection(ServletContext a) {
+            application = a;   
+        }
+        
+        @Override
+        public void run() {
+            // Do your hourly job here.
+            new WiiConnect24Api(application).receiveMails();
+          }
+    }
+    
+    
 }
