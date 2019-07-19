@@ -237,8 +237,12 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         
         @Override
         public void run() {
-            // Do your hourly job here.
-            new WiiConnect24Api(application).receiveMails();
+            // Receive mails once a day.
+            try {
+                new WiiConnect24Api(application).receiveMails();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
           }
     }
     
