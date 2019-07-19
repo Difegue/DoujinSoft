@@ -107,14 +107,24 @@ public class TemplateBuilder {
 	public String doStandardPageGeneric(int type) throws Exception {
 
 		initializeTemplate(type, false);
-  		ResultSet result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
+		ResultSet result;
+		if (request.getParameterMap().containsKey("hash"))
+			result = statement.executeQuery("select * from "+tableName+" WHERE hash EQUALS '"+request.getParameter("hash")+"'");
+		else
+  			result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
   		
   		while(result.next()) 
-	    	items.add(classConstructor.newInstance(result));
+	    		items.add(classConstructor.newInstance(result));
   		
-	    result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
 		context.put("items", items);
-		context.put("totalitems", result.getInt(1));
+		
+		// If the request is for a specific hash, disable search by setting totalitems to -1
+		if (request.getParameterMap().containsKey("hash")) {
+			context.put("totalitems", -1);	
+		} else {	
+	        	result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
+			context.put("totalitems", result.getInt(1));
+		}
 		
 		//Output to client
 		return writeToTemplate();
