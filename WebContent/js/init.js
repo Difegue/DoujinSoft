@@ -21,7 +21,23 @@
         	loadItems(page);
         }
     });
-    
+   
+   $('.pagination-survey').pagination({
+        items: $("#total_items").html(),
+        itemsOnPage: 50,
+        currentPage: 1,
+        displayedPages: 5,
+        ellipsePageSet: true,
+        cssStyle: '',
+        prevText: '<i class="material-icons">chevron_left</i>',
+        nextText: '<i class="material-icons">chevron_right</i>',
+        onInit: function () {
+            // fire first page loading
+        },
+        onPageClick: function (page, evt) {
+        	loadItems(page);
+        }
+    });
     
   }); // end of document ready
 })(jQuery); // end of jQuery name space
@@ -61,6 +77,8 @@ function loadItems(pageNumber) {
 			
 			$('.pagination').pagination('updateItems', $("#total_items").html());
 			$('.pagination').pagination('drawPage', pageNumber);
+			$('.pagination-survey').pagination('updateItems', $("#total_items").html());
+			$('.pagination-survey').pagination('drawPage', pageNumber);
 			$('.tooltipped').tooltip({delay: 50});
 			$("#"+idPlaying+"-record").addClass("playing");
 		})
