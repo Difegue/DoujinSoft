@@ -35,9 +35,17 @@ import com.difegue.doujinsoft.templates.Collection;
 public class MailItemParser extends WC24Base {
 
     private String dataDir;
+    private String mailFallbackCode;
+	
     public MailItemParser(ServletContext application) throws Exception{
         super(application);
         dataDir = application.getInitParameter("dataDirectory");
+	    
+        if (!System.getenv().containsKey("WII_FALLBACK"))
+        throw new Exception(
+	    "Fallback Wii number not specified. Please set the WII_FALLBACK environment variable.");
+	
+	mailFallbackCode = System.getenv("WII_FALLBACK");
     }
 
     /***
@@ -149,11 +157,10 @@ public class MailItemParser extends WC24Base {
 
         // Other emails...
         // Change From: and To: to the server's wii address and the backup wii address respectively
-        String sender = System.getenv("WII_NUMBER");
-        message.setFrom(new InternetAddress("w"+sender+"@rc24.xyz"));
-        message.addHeader("MAIL FROM", "w"+sender+"@rc24.xyz");
-        message.setRecipients(RecipientType.TO, new Address[]{new InternetAddress("w7475328617225276@rc24.xyz")});
-        message.addHeader("RCPT TO", "w7475328617225276@rc24.xyz");
+        message.setFrom(new InternetAddress("w"+sender+"@"+wc24Server));
+        message.addHeader("MAIL FROM", "w"+sender+"@"+wc24Server);
+        message.setRecipients(RecipientType.TO, new Address[]{new InternetAddress("w"+mailFallbackCode+"@"+wc24Server)});
+        message.addHeader("RCPT TO", "w"+mailFallbackCode+"@"+wc24Server);
         // Output a string and pipe that into a RawMailItem
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         message.writeTo(os);
