@@ -19,16 +19,21 @@ public class LZSS {
 
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             rt.exec(binaryDir+"\\gbalzss.exe e "+filename+" "+output);
-        else
+        else {
+            rt.exec("chmod +x "+binaryDir+"/gbalzss").waitFor();
             rt.exec(binaryDir+"/gbalzss e "+filename+" "+output);
+        }
+            
     }
     public void LZS_Decode(String filename, String output) throws Exception {
         Runtime rt = Runtime.getRuntime();
 
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             rt.exec(binaryDir+"\\gbalzss.exe d "+filename+" "+output).waitFor();
-        else
+        else {
+            rt.exec("chmod +x "+binaryDir+"/gbalzss").waitFor();
             rt.exec(binaryDir+"/gbalzss d "+filename+" "+output).waitFor();
+        }
     }
 
 }
