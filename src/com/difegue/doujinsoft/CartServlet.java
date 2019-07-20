@@ -121,7 +121,7 @@ public class CartServlet extends HttpServlet {
 			GameEdit data = new GameEdit(uncompressedMio.getAbsolutePath());
 
 			contentNames.add(data.getName());
-			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.GAME));
+			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.GAME, application));
 		}
 
 		for( JsonElement o: cartData.getRecords()) {
@@ -132,7 +132,7 @@ public class CartServlet extends HttpServlet {
 			RecordEdit data = new RecordEdit(uncompressedMio.getAbsolutePath());
 
 			contentNames.add(data.getName());
-			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.RECORD));
+			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.RECORD, application));
 		}
 
 		for( JsonElement o: cartData.getManga()) {
@@ -143,7 +143,7 @@ public class CartServlet extends HttpServlet {
 			MangaEdit data = new MangaEdit(uncompressedMio.getAbsolutePath());
 
 			contentNames.add(data.getName());
-			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.MANGA));
+			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.MANGA, application));
 		}
 
 		// Recap mail

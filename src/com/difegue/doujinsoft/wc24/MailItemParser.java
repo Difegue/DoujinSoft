@@ -191,7 +191,7 @@ public class MailItemParser extends WC24Base {
      * @throws IOException
      * @throws MessagingException
      */
-    private byte[] getLZ10BodyPart(Message m) throws IOException, MessagingException {
+    private byte[] getLZ10BodyPart(Message m) throws Exception {
 
         // Get the second bodypart of the message
         Multipart content = (Multipart)m.getContent();
@@ -202,9 +202,9 @@ public class MailItemParser extends WC24Base {
 
         // LZSS-decode it
         String filePath = compressedMio.toFile().getAbsolutePath();
-        LZSS.INSTANCE.LZS_Decode(filePath);
+        new LZSS(application).LZS_Decode(filePath, filePath+"d");
         
-        return Files.readAllBytes(compressedMio);
+        return Files.readAllBytes(new File(filePath+"d").toPath());
     }
 
     private boolean saveSurveyAnswer(byte type, String title, byte stars, byte comment) {

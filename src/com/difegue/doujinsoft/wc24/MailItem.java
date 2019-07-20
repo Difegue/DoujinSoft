@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 public class MailItem {
 
     public String sender, recipient, wc24Server, base64EncodedAttachment;
@@ -25,9 +27,10 @@ public class MailItem {
      * @param wiiCode Friend Code to send the mail to
      * @param diyData DIY file to send
      * @param type type of the file
+     * @param context servletContext to find the folder where the lzss executables are located this is absolutely disgusting holy fuck spare him his life from this monstrosity
      * @throws Exception
      */
-    public MailItem(String wiiCode, Metadata diyData, int type) throws Exception {
+    public MailItem(String wiiCode, Metadata diyData, int type, ServletContext context) throws Exception {
 
         attachmentType = type;
         initializeFromEnvironment(wiiCode);
@@ -40,8 +43,8 @@ public class MailItem {
 
         // Compress the bytes with LZ10/LZSS
         String filePath = compressedMio.toFile().getAbsolutePath();
-        LZSS.INSTANCE.LZS_Encode(filePath, LZSS.LZS_VRAM);
-        byte[] mioData = Files.readAllBytes(compressedMio);
+        new LZSS(context).LZS_Encode(filePath, filePath+"d");
+        byte[] mioData = Files.readAllBytes(new File(filePath+"d").toPath());
 
         // Base64 encode 'em and we're good.
         // Add a linebreak every 76 characters for MIME compliancy (The Wii doesn't care but it looks nicer)
