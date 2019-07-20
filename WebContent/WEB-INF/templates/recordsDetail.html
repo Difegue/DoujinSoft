@@ -1,6 +1,10 @@
 {% for item in items %}
 	
-	<div class="col s12 m6 l4">
+  {% if singleitem != true %}
+  <div class="col s12 m6 l4">
+  {% else %}
+  <div class="col s12 m12 l12"></div>
+  {% endif %}
 
           <div class="card {{ item.colorCart }} darken-2">
             <div class="game-header {{ item.colorLogo }} accent-4">
@@ -48,11 +52,15 @@
 
               <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
             </div>
-            <div class="card-action">
-              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=record&id={{ item.hash }}" style="width:48%" >
+
+            <div class="card-action center">
+              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=record&id={{ item.hash }}" style="width:31%" >
                 <i class="material-icons">file_download</i>
               </a>
-              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.hash }}')">
+              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Get sharing link" onclick="copyShareLink('records','{{ item.hash }}')" style=" width:31%">
+                <i class="material-icons">share</i>
+              </a>
+              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.hash }}')" style="width:31%">
                 <i class="material-icons">shopping_cart</i>
               </a>
             </div>

@@ -80,18 +80,19 @@
     </nav>
   </div>
 
+  
   <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br>
       <br>
       <h1 class="header center {% block color %}green{% endblock %}-text" style="font-family: warioware">{% block type %}Generic title here{% endblock %}</h1>
       <div class="row center">
+        {% if singleitem != true %}
         <h5 class="header col s12 light white-text">{% block desc %}Generic description here{% endblock %}</h5>
+        {% endif %}
       </div>
-
     </div>
   </div>
-
 
   <div class="container">
     <div class="section">
@@ -102,7 +103,9 @@
       </div>
 
       <div class="row center">
-        {% block footdata %} {% endblock %}
+          {% if singleitem != true %}
+          {% block footdata %} {% endblock %}
+          {% endif %}
       </div>
 
     </div>

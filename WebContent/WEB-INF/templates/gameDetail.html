@@ -1,7 +1,10 @@
 {% for game in items %}
-	
+  
+  {% if singleitem != true %}
 	<div class="col s12 m6 l4">
-
+  {% else %}
+	<div class="col s12 m12 l12"></div>
+  {% endif %}
           <div class="card {{ game.colorCart }} darken-2">
             <div class="game-header {{ game.colorLogo }} accent-4">
                 <div class="chip game-title" id="{{ game.hash }}-name">
@@ -42,11 +45,15 @@
 
               <span class="game-text card-title white-text" style=""><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
             </div>
-            <div class="card-action">
-              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" data-tooltip="Download" href="./download?type=game&id={{ game.hash }}" style="width:48%" >
+
+            <div class="card-action center">
+              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=game&id={{ game.hash }}" style="width:31%" >
                 <i class="material-icons">file_download</i>
               </a>
-              <a class="btn waves-effect tooltipped" style="float:right; width:48%" data-position="top" data-delay="50" data-tooltip="Add to cart" onclick="addToCart('game','{{ game.hash }}')">
+              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" style=" width:31%" onclick="copyShareLink('games','{{ game.hash }}')" data-tooltip="Get sharing link">
+                <i class="material-icons">share</i>
+              </a>
+              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Add to cart" onclick="addToCart('game','{{ game.hash }}')" style="width:31%">
                 <i class="material-icons">shopping_cart</i>
               </a>
             </div>

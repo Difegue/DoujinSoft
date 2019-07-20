@@ -1,18 +1,22 @@
 {% for item in items %}
 	
-	<div class="col s12 m6 l4">
+	<div>
 
-          <div class="card {{ item.type }} darken-2">
+          <div class="card {{ item.color }} darken-2">
             <div class="game-header accent-4">
                 <div class="chip game-title" >
                   {{ item.name }}
                 </div>
-                <div class="game-metadata black-text">
-                  {{ item.starCount }}
+                <div class="game-metadata note-{{ item.starCount }}">
+                    <i class="material-icons star-1">star</i>
+                    <i class="material-icons star-2">star</i>
+                    <i class="material-icons star-3">star</i>
+                    <i class="material-icons star-4">star</i>
+                    <i class="material-icons star-5">star</i>
                 </div>
             </div>
 
-            <div class="card-content black-text">
+            <div class="card-content white-text">
                 {{ item.comment }}
 						</div>
 					</div>

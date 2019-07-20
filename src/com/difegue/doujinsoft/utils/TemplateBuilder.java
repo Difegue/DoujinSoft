@@ -108,8 +108,8 @@ public class TemplateBuilder {
 
 		initializeTemplate(type, false);
 		ResultSet result;
-		if (request.getParameterMap().containsKey("hash"))
-			result = statement.executeQuery("select * from "+tableName+" WHERE hash EQUALS '"+request.getParameter("hash")+"'");
+		if (request.getParameterMap().containsKey("id"))
+			result = statement.executeQuery("select * from "+tableName+" WHERE hash LIKE '"+request.getParameter("id")+"'");
 		else
   			result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
   		
@@ -119,10 +119,11 @@ public class TemplateBuilder {
 		context.put("items", items);
 		
 		// If the request is for a specific hash, disable search by setting totalitems to -1
-		if (request.getParameterMap().containsKey("hash")) {
+		if (request.getParameterMap().containsKey("id")) {
 			context.put("totalitems", -1);	
+			context.put("singleitem", true);
 		} else {	
-	        	result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
+			result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
 			context.put("totalitems", result.getInt(1));
 		}
 		

@@ -1,7 +1,8 @@
 (function($){
   $(function(){
 	 
-    $('.sidenav').sidenav();
+	$('.sidenav').sidenav();
+	$('.tooltipped').tooltip({enterDelay: 50});
 
     idPlaying = "";
     
@@ -18,7 +19,7 @@
             // fire first page loading
         },
         onPageClick: function (page, evt) {
-        	loadItems(page);
+			loadItems(page);
         }
     });
    
@@ -35,7 +36,7 @@
             // fire first page loading
         },
         onPageClick: function (page, evt) {
-        	loadItems(page);
+			loadItems(page);
         }
     });
     
@@ -74,12 +75,11 @@ function loadItems(pageNumber) {
 	$.post( window.location.href, { page: pageNumber, name: $("#item_name").val(), creator: $("#maker_name").val() } )
 		.done(function( data ) {		
 			$("#content").html(data);
-			
+			$('.tooltipped').tooltip({enterDelay: 50});
 			$('.pagination').pagination('updateItems', $("#total_items").html());
 			$('.pagination').pagination('drawPage', pageNumber);
 			$('.pagination-survey').pagination('updateItems', $("#total_items").html());
 			$('.pagination-survey').pagination('drawPage', pageNumber);
-			$('.tooltipped').tooltip({delay: 50});
 			$("#"+idPlaying+"-record").addClass("playing");
 		})
 		.fail(function() {
@@ -175,6 +175,31 @@ function playMidi(id) {
 		idPlaying = "";
 		popToast("Playback Stopped.");
 	}
+}
+
+function copyShareLink(type, id) {
+
+	str = window.location.hostname+"/"+type+"?id="+id;
+
+	// A minimal polyfill for `navigator.clipboard.writeText()` that works most of the time in most modern browsers.
+	return new Promise(function(resolve, reject) {
+	  var success = false;
+	  function listener(e) {
+		e.clipboardData.setData("text/plain", str);
+		e.preventDefault();
+		success = true;
+	  }
+	  document.addEventListener("copy", listener);
+	  document.execCommand("copy");
+	  document.removeEventListener("copy", listener);
+	  success ? resolve(): reject();
+
+	  if (success) 
+		popToast("Link copied to your clipboard!");
+	  else
+	    popToast("Couldn't copy link to your clipboard.");
+	});
+
 }
 
 function addToCart(type, id) {

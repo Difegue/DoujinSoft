@@ -53,6 +53,13 @@ label.active {
     line-height: 30px;
 }
 
+.pagination-survey li.active {
+    background-color: #EE6E73;
+    font-size: 1.2rem;
+    padding: 0px 10px;
+    line-height: 30px;
+}
+
 .pagination-wrapper {
 	
 	height: 50px; 
@@ -240,6 +247,14 @@ label.active {
 .ellipse > input {
 	width:50px;
 	font-size:20px;
+}
+
+.note-1 > .star-1, 
+.note-2 > .star-1, .note-2 > .star-2, 
+.note-3 > .star-1, .note-3 > .star-2, .note-3 > .star-3,
+.note-4 > .star-1, .note-4 > .star-2, .note-4 > .star-3, .note-4 > .star-4, 
+.note-5 > .star-1, .note-5 > .star-2, .note-5 > .star-3, .note-5 > .star-4, .note-5 > .star-5{
+    color: #ffc107 !important;
 }
 
 @media screen and (max-width:1700px) and (min-width:992px), screen and (max-width:920px) and (min-width:600px), screen and (max-width: 420px ){

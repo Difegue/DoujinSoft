@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 
 /**
- * Template Builder for Surveys.
+ * TemplateBuilder Extension for Surveys.
  */
 public class TemplateBuilderSurvey extends TemplateBuilder {
 
@@ -21,7 +21,7 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
     public String doGetSurveys() throws Exception {
 
         initializeTemplate(Types.SURVEY, false);
-        ResultSet result = statement.executeQuery("select * from "+tableName+" ORDER BY timestamp ASC LIMIT 50");
+        ResultSet result = statement.executeQuery("select * from "+tableName+" ORDER BY timestamp DESC LIMIT 50");
         
         while(result.next()) 
             items.add(classConstructor.newInstance(result));
@@ -38,7 +38,7 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
 
         initializeTemplate(Types.SURVEY, true);
         
-        String query = "SELECT * FROM "+tableName + " ORDER BY timestamp ASC LIMIT 50 OFFSET ?";
+        String query = "SELECT * FROM "+tableName + " ORDER BY timestamp DESC LIMIT 50 OFFSET ?";
         String queryCount = "SELECT COUNT(timestamp) FROM "+tableName;
         
         PreparedStatement ret = connection.prepareStatement(query);

@@ -116,6 +116,7 @@ public class MailItemParser extends WC24Base {
 
         // Friend request 
         if (subject.equals("WC24 Cmd Message")) {
+            log.log(Level.INFO, "Friend request from "+ wiiCode);
             return new MailItem(wiiCode);
         }
 
@@ -129,6 +130,8 @@ public class MailItemParser extends WC24Base {
             // 0x19 (25 bytes) for the title, a byte for the type, a byte for how many stars, and a byte for the comment
             String title = new String(Arrays.copyOfRange(survey, 0, 24));
             saveSurveyAnswer(survey[25], title, survey[26], survey[27]);
+
+            log.log(Level.INFO, "Survey for " + title);
 
             // No mail to send
             return null;
@@ -152,6 +155,7 @@ public class MailItemParser extends WC24Base {
 
             // Send thank-you mail
             String name = metadata.getName();
+            log.log(Level.INFO, "Received DIY content: " + name);
             return new MailItem(wiiCode, List.of(name), true);
         }
 
@@ -164,7 +168,8 @@ public class MailItemParser extends WC24Base {
         // Output a string and pipe that into a RawMailItem
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         message.writeTo(os);
-        return new RawMailItem("7475328617225276",new String(os.toByteArray(), "UTF-8"));
+        log.log(Level.INFO, "Unknown mail with subject " + message.getSubject() + " Forwarding to "+ mailFallbackCode);
+        return new RawMailItem(mailFallbackCode,new String(os.toByteArray(), "UTF-8"));
     }
 
     private String getWiiCode(String address) {
