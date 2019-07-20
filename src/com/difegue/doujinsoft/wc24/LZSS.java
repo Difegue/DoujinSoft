@@ -18,10 +18,10 @@ public class LZSS {
         Runtime rt = Runtime.getRuntime();
 
         if (System.getProperty("os.name").toLowerCase().contains("win"))
-            rt.exec(binaryDir+"\\gbalzss.exe e "+filename+" "+output);
+            rt.exec(binaryDir+"\\gbalzss.exe e "+filename+" "+output).waitFor();
         else {
             rt.exec("chmod +x "+binaryDir+"/gbalzss").waitFor();
-            rt.exec(binaryDir+"/gbalzss e "+filename+" "+output);
+            rt.exec(binaryDir+"/gbalzss e "+filename+" "+output).waitFor();
         }
             
     }
