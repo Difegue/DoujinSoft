@@ -290,7 +290,9 @@ function registerFriendCode() {
         $("#regresult").html("Sending Friend Request...");
 
         $.get("./friendreq?code="+code, function(data, status){
-            console.log(data);
+			console.log(data);
+			localStorage.userWiiCode = code;
+			$("#recipient").val(localStorage.userWiiCode);
             $("#regresult").html("✔ All set! You can now close this popup window.");
           });
 
@@ -329,6 +331,9 @@ function checkoutSave() {
 
 		code = $("#recipient").val();
         if (code.length == 16 && /^\d+$/.test(code)) {
+
+		   // Save user's code to localStorage
+		   localStorage.userWiiCode = $("#recipient").val();
 
            $("#checkout-confirm").html('<div class="progress"><div class="indeterminate amber"></div></div>Sending data over...');
            // POST the form to display progress
