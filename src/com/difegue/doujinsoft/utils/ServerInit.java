@@ -226,7 +226,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         }
         
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(new WiiConnect24MailCollection(application), 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(new WiiConnect24MailCollection(application), 0, 1, TimeUnit.HOURS);
     }
 
     @Override
@@ -244,8 +244,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         
         @Override
         public void run() {
-            // Receive mails once a day.
+            // Receive mails once per hour.
             try {
+                System.out.println("grabbin' mails");
                 new WiiConnect24Api(application).receiveMails();
             } catch (Exception e) {
                 e.printStackTrace();
