@@ -129,7 +129,7 @@ public class TemplateBuilder {
 		}
 
 		// JSON hijack if specified in the parameters
-		if (request.getParameterMap().containsKey("json")) {
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
 			Gson gson = new Gson();
 			return gson.toJson(context);
 		}
@@ -182,7 +182,7 @@ public class TemplateBuilder {
 		context.put("totalitems", retCount.executeQuery().getInt(1));
 
 		// JSON hijack if specified in the parameters
-		if (request.getParameterMap().containsKey("json")) {
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
 			Gson gson = new Gson();
 			return gson.toJson(context);
 		}

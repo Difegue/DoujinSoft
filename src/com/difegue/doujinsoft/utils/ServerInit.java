@@ -197,11 +197,17 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");   
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx;");  
 
             // Re-create indexes
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
             statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (normalizedName ASC, id);");
             statement.executeUpdate("CREATE INDEX Record_idx ON Records (normalizedName ASC, id);");
+            statement.executeUpdate("CREATE INDEX Games_search_idx ON Games (name, creator);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx ON Manga (name, creator);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx ON Records (name, creator);");
             
         }
         catch(Exception e){

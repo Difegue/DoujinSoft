@@ -26,7 +26,7 @@ public abstract class ContentServletBase extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response, int contentType) throws ServletException, IOException {
 
-		if (request.getParameterMap().containsKey("json")) 
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json"))
 			response.setContentType("application/json; charset=UTF-8");
 		else 
 			response.setContentType("text/html; charset=UTF-8");
@@ -48,7 +48,7 @@ public abstract class ContentServletBase extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response, int contentType) throws ServletException, IOException {
 		
-		if (request.getParameterMap().containsKey("json")) 
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) 
 			response.setContentType("application/json; charset=UTF-8");
 		else 
             response.setContentType("text/html; charset=UTF-8");
