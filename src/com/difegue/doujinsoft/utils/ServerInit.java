@@ -246,7 +246,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         public void run() {
             // Receive mails once per hour.
             try {
-                System.out.println("grabbin' mails");
+                Logger.getLogger("WiiCOnnect24").info("Collecting mails from WiiConnect24 now.");
                 new WiiConnect24Api(application).receiveMails();
             } catch (Exception e) {
                 e.printStackTrace();
