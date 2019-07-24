@@ -116,10 +116,11 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             SQLog.log(Level.INFO, "Looking for mails.wc24 file...");
             File wc24Mails = new File(dataDir+"/mails.wc24");
             
-            if (wc24Mails.exists()) 
-            try (Scanner s = new Scanner(wc24Mails)) {
-                String emailData = s.useDelimiter("\\Z").next();
-                new MailItemParser(application).consumeEmails(emailData);
+            if (wc24Mails.exists()) {
+                try (Scanner s = new Scanner(wc24Mails)) {
+                    String emailData = s.useDelimiter("\\Z").next();
+                    new MailItemParser(application).consumeEmails(emailData);
+                }
                 wc24Mails.delete();
             }
 

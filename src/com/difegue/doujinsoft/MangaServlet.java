@@ -1,49 +1,24 @@
 package com.difegue.doujinsoft;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.difegue.doujinsoft.utils.MioUtils.Types;
-import com.difegue.doujinsoft.utils.TemplateBuilder;
-
 
 /**
- * Servlet implementation class GameListing
+ * Servlet implementation class ComicListing
  */
 @WebServlet("/comics")
-public class MangaServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-    private Logger ServletLog;
-    
+public class MangaServlet extends ContentServletBase {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		response.setContentType("text/html; charset=UTF-8");
-		ServletContext application = getServletConfig().getServletContext();			
-		String output = "";
-		
-		try {
-			
-	    	output = new TemplateBuilder(application, request).doStandardPageGeneric(Types.MANGA);
-			response.getWriter().append(output);
-				
-		} catch (Exception e) {
-			ServletLog.log(Level.SEVERE, e.getMessage());
-		}
-
+		super.doGet(request, response, Types.MANGA);
 	}
 
 	/**
@@ -51,30 +26,11 @@ public class MangaServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		response.setContentType("text/html; charset=UTF-8");
-		ServletContext application = getServletConfig().getServletContext();	
-		String output = "Who are you running from?";
-		
-		try {
-			
-			if (!request.getParameterMap().isEmpty())
-				output = new TemplateBuilder(application, request).doSearchGeneric(Types.MANGA);
-
-			response.getWriter().append(output);
-			
-		} catch (Exception e) {
-			ServletLog.log(Level.SEVERE, e.getMessage());
-		}
-		
+		super.doPost(request, response, Types.MANGA);
 	}
 
-    
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
     public MangaServlet() {
-        super(); 
-        ServletLog = Logger.getLogger("MangaServlet");
-        ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));     
+        super("MangaServlet"); 
     }
+   
 }

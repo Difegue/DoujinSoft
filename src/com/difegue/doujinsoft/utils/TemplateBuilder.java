@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import com.google.gson.Gson;
 
 import com.difegue.doujinsoft.templates.*;
 import com.difegue.doujinsoft.utils.MioUtils.Types;
@@ -126,7 +127,13 @@ public class TemplateBuilder {
 			result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
 			context.put("totalitems", result.getInt(1));
 		}
-		
+
+		// JSON hijack if specified in the parameters
+		if (request.getParameterMap().containsKey("json")) {
+			Gson gson = new Gson();
+			return gson.toJson(context);
+		}
+
 		//Output to client
 		return writeToTemplate();
 	}
@@ -173,6 +180,12 @@ public class TemplateBuilder {
 
 		context.put("items", items);
 		context.put("totalitems", retCount.executeQuery().getInt(1));
+
+		// JSON hijack if specified in the parameters
+		if (request.getParameterMap().containsKey("json")) {
+			Gson gson = new Gson();
+			return gson.toJson(context);
+		}
 
 		return writeToTemplate();
     }
