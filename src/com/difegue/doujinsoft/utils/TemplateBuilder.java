@@ -150,7 +150,7 @@ public class TemplateBuilder {
 	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
-	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
+	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) " + queryBase;
 		
 		PreparedStatement ret = connection.prepareStatement(query);	
