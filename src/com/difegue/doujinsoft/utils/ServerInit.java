@@ -200,14 +200,20 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx;");  
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx2;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx2;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx2;");  
 
             // Re-create indexes
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
             statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (normalizedName ASC, id);");
             statement.executeUpdate("CREATE INDEX Record_idx ON Records (normalizedName ASC, id);");
-            statement.executeUpdate("CREATE INDEX Games_search_idx ON Games (name COLLATE NOCASE, creator COLLATE NOCASE);");
-            statement.executeUpdate("CREATE INDEX Manga_search_idx ON Manga (name COLLATE NOCASE, creator COLLATE NOCASE);");
-            statement.executeUpdate("CREATE INDEX Record_search_idx ON Records (name COLLATE NOCASE, creator COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Games_search_idx ON Games (name COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx ON Manga (name COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx ON Records (name COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Games_search_idx2 ON Games (creator COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx2 ON Manga (creator COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx2 ON Records (creator COLLATE NOCASE);");
             
         }
         catch(Exception e){
