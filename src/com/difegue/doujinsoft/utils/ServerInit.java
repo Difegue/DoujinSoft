@@ -205,9 +205,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
             statement.executeUpdate("CREATE INDEX Manga_idx ON Manga (normalizedName ASC, id);");
             statement.executeUpdate("CREATE INDEX Record_idx ON Records (normalizedName ASC, id);");
-            statement.executeUpdate("CREATE INDEX Games_search_idx ON Games (name, creator);");
-            statement.executeUpdate("CREATE INDEX Manga_search_idx ON Manga (name, creator);");
-            statement.executeUpdate("CREATE INDEX Record_search_idx ON Records (name, creator);");
+            statement.executeUpdate("CREATE INDEX Games_search_idx ON Games (name COLLATE NOCASE, creator COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx ON Manga (name COLLATE NOCASE, creator COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx ON Records (name COLLATE NOCASE, creator COLLATE NOCASE);");
             
         }
         catch(Exception e){
