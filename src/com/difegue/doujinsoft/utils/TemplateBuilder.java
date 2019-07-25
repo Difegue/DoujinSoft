@@ -150,15 +150,15 @@ public class TemplateBuilder {
 	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
 	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
 		
-	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
+	    String query = "SELECT * " + queryBase + " ORDER BY name ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) " + queryBase;
 		
 		PreparedStatement ret = connection.prepareStatement(query);	
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
 		//Those filters go in the LIKE parts of the query
-		String name    = isNameSearch ? "%"+request.getParameter("name")+"%" : "%";
-		String creator = isCreatorSearch ? "%"+request.getParameter("creator")+"%" : "%";
+		String name    = isNameSearch ? request.getParameter("name")+"%" : "%";
+		String creator = isCreatorSearch ? request.getParameter("creator")+"%" : "%";
 
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
