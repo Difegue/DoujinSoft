@@ -157,8 +157,8 @@ public class TemplateBuilder {
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
 		//Those filters go in the LIKE parts of the query
-		String name    = isNameSearch ? "%"+request.getParameter("name")+"%" : "%";
-		String creator = isCreatorSearch ? "%"+request.getParameter("creator")+"%" : "%";
+		String name    = isNameSearch ? request.getParameter("name")+"%" : "%";
+		String creator = isCreatorSearch ? request.getParameter("creator")+"%" : "%";
 
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
