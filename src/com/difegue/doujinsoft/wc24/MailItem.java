@@ -14,12 +14,13 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.ServletContext;
 
 public class MailItem {
 
-    public String sender, recipient, wc24Server, base64EncodedAttachment;
+    public String sender, recipient, wc24Server, base64EncodedAttachment, wiiFace;
     public int attachmentType;
 
     /**
@@ -82,6 +83,9 @@ public class MailItem {
         byte[] utf16 = StandardCharsets.UTF_16BE.encode(message).array();
         base64EncodedAttachment = Base64.getEncoder().encodeToString(utf16).replaceAll("(.{76})", "$1\n");
 
+        // Pick a random Mii
+        int idx = new Random().nextInt(LETTERHEAD_MIIS.length);
+        wiiFace = LETTERHEAD_MIIS[idx];
     }
 
     /**
@@ -168,4 +172,11 @@ public class MailItem {
         "~~~~~ Service provided for fun ~~~~~\n" +
         "~~~~~   by RiiConnect24 and  ~~~~~\n" +
         "~~~~~    Difegue @ TVC-16    ~~~~~";
+
+    private static String[] LETTERHEAD_MIIS = {
+        "gBYAQwAuAE4AbwByAHIAaQBzAAAAAFtAgZX3KDb4KCzG7AuQaKuokFxM\n BmloSrjSAIr9DiUEAFcAbwBsAHYAZQByAGkAbgBlAAA=", 
+        "AAQAaABhAG0AYgB1AHIAZwBlAHIAAAB/hi1UtDbuCKWogDxAEUAxAEhs\n r4AgIDqCAIpCYiUEAAAAAAAAAAAAAAAAAAAAAAAAAAA=", 
+        "gAAATQBpAHkAYQBtAG8AdABvAAAAAFtAhl8LZ29KhAglQIQAsj0EolyN\n BEBCSYitAIoAiiUEAE0AYQB0AHkAegB1AHoAdQAAAAA=",
+        "FuQAVAAuACAATQBlAGkAagBpAG4AAExggkpBim9KhAgkBDxAoX0oolxs\n CERTSHiNAIoAiiUFAFQALgAgAE0AZQBpAGoAaQBuAAA="
+    };
 }

@@ -10,8 +10,7 @@ Subject: =?UTF-16BE?B?AFkAbwB1AHIAIABnAGEAbQBlAHMAIABhAHIAZQAgAHIAZQBhAGQAeQAh?=
 X-Wii-AppId: 2-354E4541-4142
 X-Wii-Cmd: 00042019
 X-Wii-AltName: AEQAbwB1AGoAaQBuAFMAbwBmAHQAIABTAHQAbwByAGU=
-X-WiiFace: gBYAQwAuAE4AbwByAHIAaQBzAAAAAFtAgZX3KDb4KCzG7AuQaKuokFxM
- BmloSrjSAIr9DiUEAFcAbwBsAHYAZQByAGkAbgBlAAA=
+X-WiiFace: {{mail.wiiFace}}
 X-Wii-MB-NoReply: -
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
