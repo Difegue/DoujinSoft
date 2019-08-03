@@ -26,6 +26,12 @@ public class ExportMidi
   private int offset = 43;
   private byte[] bb;
   
+  // Modified conversion arrays to map to the WarioWare DIY SoundFont (https://musical-artifacts.com/artifacts/490)
+  public static final String[] instrumentCodes = new String[]{"Piano", "Organ", "Harpsichord", "Melodica", "Flute", "Trumpet", "Saxophone", "Wood Flute", "Acoustic Guitar", "Electric Guitar", "Banjo", "Bass", "Violin", "Marimba", "Vibraphone", "Timpani", "Star Drop", "UFO", "Alien", "Robot", "Rocket", "Moon", "Green Dude", "Phone Dial", "Cat", "Dog", "Pig", "Insects", "Frog", "Yoshi", "Birds", "Monkeys", "DoReMi Voice", "Wah Dude", "Opera Man", "Soul Girl", "Baby", "Laughing Men", "KungFu Men", "Humming", "DingDing", "PongPong", "FahFah", "BongBong", "BingBing", "TingTing", "BlingBling", "BoonBoon"};
+  public static final String[] instrumentConversion = new String[]{"0","18","6","22","73","56","65","75","24","29","106","33","40","13","11","47","72","78","17","38","77","59","126","124","60","61","62","123","66","125","68","122","53","54","52","49","67","121","119","48","80","80","80","80","80","80","80","80"};
+  public static final String[] drumCodes = new String[]{"Normal Drums", "Electric Drums", "Samba Drums", "Asian Drums", "Kitchen Drums", "Toy Drums", "BeatBox Drums", "8bit Drums"};
+  public static final String[] drumConversion = new String[]{"[ACOUSTIC_BASS_DRUM]", "[ACOUSTIC_SNARE]", "[CLOSED_HI_HAT]", "[OPEN_HI_HAT]", "[CRASH_CYMBAL_1]", "[LOW_FLOOR_TOM]", "[HIGH_FLOOR_TOM]", "[LOW_MID_TOM]", "[SIDE_STICK]", "[HAND_CLAP]", "[TAMBOURINE]", "[SHORT_GUIRO]", "[MUTE_TRIANGLE]", "[OPEN_TRIANGLE]"};
+  
   public ExportMidi(byte[] b)
   {
     this.bb = b;
@@ -71,8 +77,6 @@ public class ExportMidi
 
       MidiSystem.write(sequence, writers[0], file);
   }
-
-
   
   /*
    * Calculate the midi string from the mio. 
@@ -103,7 +107,7 @@ public class ExportMidi
         int instrument = ed.getInstrument(i, x);
         float correctLength = Globals.instrumentLengths[instrument];
         int correctDecay = Globals.instrumentDecay[instrument];
-        s.append(String.format(" V%d I%s X[Pan_Position]=%d X[Volume]=%d X72=%d", new Object[] { Integer.valueOf(x), Globals.instrumentConversion[instrument], Integer.valueOf(3200 * ed.getPanning(i, x)), Integer.valueOf(3200 * ed.getVolume(i, x)), Integer.valueOf(correctDecay) }));
+        s.append(String.format(" V%d I%s X[Pan_Position]=%d X[Volume]=%d X72=%d", new Object[] { Integer.valueOf(x), instrumentConversion[instrument], Integer.valueOf(3200 * ed.getPanning(i, x)), Integer.valueOf(3200 * ed.getVolume(i, x)), Integer.valueOf(correctDecay) }));
         int correctPitch = Globals.instrumentOctave[instrument];
         for (int o = 0; o < 32; o++) {
           if (((ed.getSwing()) || (this.forceSwing)) && (!this.forceUnSwing))
@@ -208,7 +212,7 @@ public class ExportMidi
             {
               if (drum1 != -1)
               {
-                s.append(Globals.drumConversion[drum1]);
+                s.append(drumConversion[drum1]);
                 if (drum2 == -1) {
                   s.append("i ");
                 } else {
@@ -217,7 +221,7 @@ public class ExportMidi
               }
               if (drum2 != -1)
               {
-                s.append(Globals.drumConversion[drum2]);
+                s.append(drumConversion[drum2]);
                 if (drum3 == -1) {
                   s.append("i ");
                 } else {
@@ -226,7 +230,7 @@ public class ExportMidi
               }
               if (drum3 != -1)
               {
-                s.append(Globals.drumConversion[drum3]);
+                s.append(drumConversion[drum3]);
                 if (drum4 == -1) {
                   s.append("i ");
                 } else {
@@ -234,7 +238,7 @@ public class ExportMidi
                 }
               }
               if (drum4 != -1) {
-                s.append(Globals.drumConversion[drum2] + "i ");
+                s.append(drumConversion[drum2] + "i ");
               }
             }
           }
@@ -249,7 +253,7 @@ public class ExportMidi
             {
               if (drum1 != -1)
               {
-                s.append(Globals.drumConversion[drum1]);
+                s.append(drumConversion[drum1]);
                 if (drum2 == -1) {
                   s.append("q ");
                 } else {
@@ -258,7 +262,7 @@ public class ExportMidi
               }
               if (drum2 != -1)
               {
-                s.append(Globals.drumConversion[drum2]);
+                s.append(drumConversion[drum2]);
                 if (drum3 == -1) {
                   s.append("q ");
                 } else {
@@ -267,7 +271,7 @@ public class ExportMidi
               }
               if (drum3 != -1)
               {
-                s.append(Globals.drumConversion[drum3]);
+                s.append(drumConversion[drum3]);
                 if (drum4 == -1) {
                   s.append("q ");
                 } else {
@@ -275,7 +279,7 @@ public class ExportMidi
                 }
               }
               if (drum4 != -1) {
-                s.append(Globals.drumConversion[drum4] + "q ");
+                s.append(drumConversion[drum4] + "q ");
               }
             }
           }
@@ -288,7 +292,7 @@ public class ExportMidi
         {
           if (drum1 != -1)
           {
-            s.append(Globals.drumConversion[drum1]);
+            s.append(drumConversion[drum1]);
             if (drum2 == -1) {
               s.append("q ");
             } else {
@@ -297,7 +301,7 @@ public class ExportMidi
           }
           if (drum2 != -1)
           {
-            s.append(Globals.drumConversion[drum2]);
+            s.append(drumConversion[drum2]);
             if (drum3 == -1) {
               s.append("q ");
             } else {
@@ -306,7 +310,7 @@ public class ExportMidi
           }
           if (drum3 != -1)
           {
-            s.append(Globals.drumConversion[drum3]);
+            s.append(drumConversion[drum3]);
             if (drum4 == -1) {
               s.append("q ");
             } else {
@@ -314,7 +318,7 @@ public class ExportMidi
             }
           }
           if (drum4 != -1) {
-            s.append(Globals.drumConversion[drum4] + "q ");
+            s.append(drumConversion[drum4] + "q ");
           }
         }
       }
