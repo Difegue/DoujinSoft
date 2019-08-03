@@ -4,6 +4,9 @@
 	$('.sidenav').sidenav();
 	$('.tooltipped').tooltip({enterDelay: 50});
 
+	// Due to quirks with libTimidity, the exact location of the folder containing the .wasm must be set here.
+	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/js/timidity".
+	player = window.timidity("js/timidity");
     idPlaying = "";
     
     $('.pagination').pagination({
@@ -156,22 +159,18 @@ function playMidi(id) {
 	
 	$("#toast-container .toast").remove();
 	$(".playing").removeClass("playing");
-	
+
 	if (id != idPlaying) {
 	
-		//Set the function as message callback
-		MIDIjs.message_callback = function(mes){
-			if (!mes.includes("Loading instruments"))
-				popToast(mes);
-		};
-		
 		idPlaying=id;
+		popToast("Playing MIDI for id "+id);
 		
 		$("#"+id+"-record").addClass("playing");
-		MIDIjs.play('midi?id='+id);
+		player.load('../../midi?id='+id);
+		player.play();
 	}
 	else {
-		MIDIjs.stop();
+		player.pause();
 		idPlaying = "";
 		popToast("Playback Stopped.");
 	}

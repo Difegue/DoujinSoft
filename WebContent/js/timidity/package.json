@@ -1,0 +1,87 @@
+{
+  "_from": "timidity",
+  "_id": "timidity@1.1.2",
+  "_inBundle": false,
+  "_integrity": "sha512-6Im3kvp7dwg1vdITzjrhy0MVGlaLBJd3JlKo0XopiqL1FdFfpmdk9SyhJ3sImo3+4/Uvf/YnMIBEpVVaTsMYew==",
+  "_location": "/timidity",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "timidity",
+    "name": "timidity",
+    "escapedName": "timidity",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/timidity/-/timidity-1.1.2.tgz",
+  "_shasum": "5e2a624622fe79c927fe224258c55d6d05434e1c",
+  "_spec": "timidity",
+  "_where": "/mnt/c/Users/tiki/IdeaProjects/DoujinSoft",
+  "author": {
+    "name": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org"
+  },
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/feross/timidity/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "brfs": "^2.0.2",
+    "debug": "^4.1.1",
+    "freepats": "^1.0.1"
+  },
+  "deprecated": false,
+  "description": "Play MIDI files in the browser w/ Web Audio, WebAssembly, and libtimidity",
+  "devDependencies": {
+    "babel-minify": "^0.5.0",
+    "browserify": "^16.2.2",
+    "standard": "*"
+  },
+  "homepage": "https://bitmidi.com",
+  "keywords": [
+    "api",
+    "libtimidity",
+    "mid file",
+    "midi",
+    "midi api",
+    "midi file",
+    "midi player",
+    "player",
+    "timidity",
+    "browser",
+    "web audio",
+    "webassembly",
+    "soundfont"
+  ],
+  "license": "-",
+  "main": "index.js",
+  "name": "timidity",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/feross/timidity.git"
+  },
+  "scripts": {
+    "build": "./tools/build.sh",
+    "download": "./tools/download.sh",
+    "size": "npm run build && browserify . | minify | gzip | wc -c && cat libtimidity.wasm | gzip | wc -c",
+    "test": "standard"
+  },
+  "standard": {
+    "ignore": [
+      "libtimidity.js"
+    ]
+  },
+  "version": "1.1.2"
+}
