@@ -112,7 +112,7 @@ public class TemplateBuilder {
 		if (request.getParameterMap().containsKey("id"))
 			result = statement.executeQuery("select * from "+tableName+" WHERE hash LIKE '"+request.getParameter("id")+"'");
 		else
-  			result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
+  			result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
   		
   		while(result.next()) 
 	    		items.add(classConstructor.newInstance(result));
@@ -124,7 +124,7 @@ public class TemplateBuilder {
 			context.put("totalitems", -1);	
 			context.put("singleitem", true);
 		} else {	
-			result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%nint%' AND id NOT LIKE '%them%'");
+			result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%them%'");
 			context.put("totalitems", result.getInt(1));
 		}
 
@@ -148,7 +148,7 @@ public class TemplateBuilder {
 		// Build both data and count queries
 	    String queryBase = "FROM "+tableName+" WHERE ";
 	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
-	    queryBase += "id NOT LIKE '%nint%' AND id NOT LIKE '%them%'";
+	    queryBase += "id NOT LIKE '%them%'";
 		
 	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) " + queryBase;
