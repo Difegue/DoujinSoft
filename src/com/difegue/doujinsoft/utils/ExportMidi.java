@@ -238,7 +238,7 @@ public class ExportMidi
                 }
               }
               if (drum4 != -1) {
-                s.append(drumConversion[drum2] + "i ");
+                s.append(drumConversion[drum4] + "i ");
               }
             }
           }
