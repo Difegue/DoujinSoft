@@ -1,0 +1,21 @@
+name: Backup TVC-16 DB to MEGA
+on:
+  schedule:
+  - cron: 0 9 * * *
+
+jobs:
+  backup:
+    name: The backupening
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download backup from TVC-16
+      uses: wei/wget@v1
+      with:
+        args: -O backup.zip https://tvc-16.science/dsoft-backup.zip
+    - name: Upload backup to MEGA
+      uses: difegue/action-megacmd@master
+      env:
+        PASSWORD: ${{ secrets.MEGA_PASSWORD }}
+        USERNAME: ${{ secrets.MEGA_USERNAME }}
+      with:
+        args: put -c backup.zip DoujinSoft/backup.zip
