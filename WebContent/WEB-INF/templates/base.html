@@ -32,6 +32,18 @@
   <script src="js/jquery.simplePagination.js"></script>
   <script src="js/init.js"></script>
 
+  {% if singleitem == true %}
+  {% for item in items %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:title" content="{{ item.name }} by {{ item.creator }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:description" content="<p>{{ item.mioDesc1 }}<br/>{{ item.mioDesc2 }}</p>" />
+  {% if item.preview != null %}
+  <meta property="og:image" content="{{ item.preview }}" />
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+
 </head>
 
 <body>
