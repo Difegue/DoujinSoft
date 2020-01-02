@@ -88,7 +88,11 @@ public class CartServlet extends HttpServlet {
 
 		if (request.getParameter("method").equals("savefile")) {
 			//post contains a gameSave
-			gotFileContentType = injectMios(request, response);
+			try {
+				gotFileContentType = injectMios(request, response);
+			} catch (Exception e) {
+				ServletLog.log(Level.SEVERE, e.getMessage());
+			}
 		}
 
 		//Output is CT text/html unless we're sending out a file

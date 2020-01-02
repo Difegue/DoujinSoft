@@ -64,15 +64,12 @@
 {% for collection in collections %}
 
 <div class="col s12 m6 l4">
-    <div class="card selection-card" style="background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('{{collection.background_pic}}') !important;">
+    <a class="card selection-card waves-effect waves-light" href="./collection?id={{collection.id}}" style="width:100%; background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('{{collection.background_pic}}') !important;">
         <div class="card-content white-text">
            <i class="material-icons {{collection.collection_color}}-text" style="font-size: 35px">{{collection.collection_icon}}</i>
             <span class="card-title" style="height:32px">{{collection.collection_name}}</span>
-            <p class=""> 
-				<a href="./collection?id={{collection.id}}" class="waves-effect waves-light btn red">Browse Collection</a>
-            </p>
         </div>
-    </div>
+    </a>
 </div>
 
  {% else %}
