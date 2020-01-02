@@ -12,15 +12,11 @@ jobs:
       uses: LucaFeger/action-maven-cli@1.1.0
       with:
         args: clean package
-    - name: Build Image
-      run: |
-        docker build -t difegue/doujinsoft -f ./Docker/Dockerfile .
-    - name: Login to Docker Hub
-      uses: actions/docker/login@8cdf801b322af5f369e00d85e9cf3a7122f49108
+    - name: Build and push Image
       env:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-    - name: Push Image
-      uses: actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108
-      with:
-        args: push difegue/doujinsoft
+      run: |
+        echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_USERNAME} --password-stdin
+        docker build -t difegue/doujinsoft -f ./Docker/Dockerfile .
+        docker push difegue/doujinsoft
