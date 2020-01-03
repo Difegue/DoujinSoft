@@ -2,6 +2,7 @@
   $(function(){
 	 
 	$('.sidenav').sidenav();
+	$('select').formSelect();
 	$('.tooltipped').tooltip({enterDelay: 50});
 
 	// Due to quirks with libTimidity, the exact location of the folder containing the .wasm must be set here.

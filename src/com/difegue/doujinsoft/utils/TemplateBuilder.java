@@ -110,7 +110,7 @@ public class TemplateBuilder {
 		initializeTemplate(type, false);
 		ResultSet result;
 		if (request.getParameterMap().containsKey("id"))
-			result = statement.executeQuery("select * from "+tableName+" WHERE hash LIKE '"+request.getParameter("id")+"'");
+			result = statement.executeQuery("select * from "+tableName+" WHERE hash == '"+request.getParameter("id")+"'");
 		else
   			result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
   		

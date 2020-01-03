@@ -3,13 +3,38 @@ package com.difegue.doujinsoft.templates;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.difegue.doujinsoft.utils.MioStorage;
 import com.difegue.doujinsoft.utils.MioUtils;
+import com.xperia64.diyedit.metadata.Metadata;
 
 /*
  * Base class used for binding with pebble templates.
  */
-public class BaseMio { 	
-	
+public class BaseMio {
+
+	/**
+	 * Basic constructor from a generic mio Metadata object.
+	 * @param m
+	 */
+	public BaseMio(Metadata m) {
+
+		name = m.getName();
+		hash = MioStorage.computeMioHash(m.file);
+		creator = m.getCreator();
+		brand = m.getBrand();
+
+		int type = m.file.length;
+		switch (type) {
+			case MioUtils.Types.GAME: mioID = "G-"; break;
+			case MioUtils.Types.MANGA: mioID = "M-"; break;
+			case MioUtils.Types.RECORD: mioID = "R-"; break;
+		}
+
+		mioID += MioStorage.computeMioID(m);
+		mioDesc1 = m.getDescription().substring(0,18);
+		mioDesc2 = m.getDescription().substring(18);
+	}
+
 	public BaseMio(ResultSet result) throws SQLException{
 	
 		//Compute timestamp 

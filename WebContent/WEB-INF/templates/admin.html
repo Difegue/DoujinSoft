@@ -1,0 +1,98 @@
+{% extends "./base.html" %}
+
+{% block background %}./img/bg_art.jpg{% endblock %}
+{% block color %}amber{% endblock %}
+{% block type %}Admin{% endblock %}
+{% block desc %}
+Quick 'n dirty admin page powered by fat kongiku tiddies
+<br/><br/>
+Approving content moves it to the mio folder and triggers a server restart! 😛
+Unapproved .mios will be deleted.
+<br/><br/>
+
+{% endblock %}
+
+
+{% block content %}
+
+<script>
+var pendingFiles = {
+	{% for entry in pendingMios %}
+	h{{entry.value.hash}}: "{{entry.key}}",
+	{% endfor %}
+};
+</script>
+
+<form method="post">
+<table style="width:100%">
+	<tr>
+		<th>ID</th>
+		<th>Name</th>
+		<th>Description</th>
+		<th>Creator</th>
+		<th>Approve</th>
+		<th>Add to Collection</th>
+	</tr>
+{% for entry in pendingMios %}
+	<tr>
+		<td>{{entry.value.mioID}}</td>
+		<td>{{entry.value.name}}</td>
+		<td>{{entry.value.mioDesc1}} {{entry.value.mioDesc2}}</td>
+		<td>{{entry.value.creator}}</td>
+		<td>
+			<label>
+				<input type="checkbox" name="approve-{{entry.value.hash}}"/>
+				<span> </span>
+			</label>
+		</td>
+		<td> <select class="browser-default" name="collection">
+			<option value="" selected >None</option>
+			{% for entry in collections %}
+			<option value="{{entry.key}}">{{entry.value.collection_name}}</option>
+			{% endfor %}
+		</select> </td>
+	</tr>
+{% endfor %}
+</table>
+<input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+{% block footdata %}
+
+<h1 class="white-text">Create new collection:</h1>
+<form method="post">
+	<div class="input-field ">
+		<input placeholder="Placeholder" id="collection_name" type="text" class="validate">
+		<label for="collection_name">Name</label>
+	</div>
+
+	<div class="input-field ">
+		<input placeholder="Placeholder" id="collection_color" type="text" class="validate">
+		<label for="collection_color">Color</label>
+	</div>
+
+	<div class="input-field ">
+		<input placeholder="Placeholder" id="collection_icon" type="text" class="validate">
+		<label for="collection_icon">Icon</label>
+	</div>
+
+	<div class="input-field ">
+		<input placeholder="Placeholder" id="background_pic" type="text" class="validate">
+		<label for="background_pic">Background URL</label>
+	</div>
+
+	<div class="input-field ">
+		<input placeholder="Placeholder" id="collection_desc" type="text" class="validate">
+		<label for="collection_desc">Description</label>
+	</div>
+
+	<div class="input-field ">
+		<input placeholder="Placeholder" id="collection_desc2" type="text" class="validate">
+		<label for="collection_desc2">Description 2</label>
+	</div>
+
+	<input type="submit" value="Submit">
+</form>
+
+{% endblock %}

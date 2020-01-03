@@ -189,6 +189,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                         MioStorage.consumeMio(f, hash, type);
                     } catch (SQLException e) {
                         SQLog.log(Level.SEVERE, "Couldn't insert this mio in the database - Likely a duplicate file, moving on.");
+                        f.renameTo(new File(dataDir+"/duplicates/"+f.getName()));
                         SQLog.log(Level.SEVERE, e.getMessage());
                     }
                 }

@@ -37,7 +37,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta property="og:title" content="{{ item.name }} by {{ item.creator }} on the DoujinSoft Store" />
   <meta property="og:type" content="website" />
-  <meta property="og:description" content="<p>{{ item.mioDesc1 }}<br/>{{ item.mioDesc2 }}</p>" />
+  <meta property="og:description" content="{{ item.mioDesc1 }} {{ item.mioDesc2 }}" />
   <meta property="og:image" content="img/bg_misc.jpg" />
   {% if item.preview != null %}
   <!-- <meta property="og:image" content="decodebase64?data={{ item.preview }}" /> -->
