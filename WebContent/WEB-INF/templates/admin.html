@@ -23,6 +23,7 @@ Unapproved .mios will be deleted.
 		<th>Name</th>
 		<th>Description</th>
 		<th>Creator</th>
+		<th>Created on</th>
 		<th>Approve</th>
 		<th>Add to Collection</th>
 	</tr>
@@ -32,6 +33,7 @@ Unapproved .mios will be deleted.
 		<td>{{entry.value.name}}</td>
 		<td>{{entry.value.mioDesc1}} {{entry.value.mioDesc2}}</td>
 		<td>{{entry.value.creator}}</td>
+		<td>{{entry.value.timestamp}}</td>
 		<td>
 			<label>
 				<input type="checkbox" name="approve-{{entry.key}}"/>

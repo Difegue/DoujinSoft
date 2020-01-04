@@ -22,6 +22,7 @@ public class BaseMio {
 		hash = MioStorage.computeMioHash(m.file);
 		creator = m.getCreator();
 		brand = m.getBrand();
+		timestamp = MioUtils.getTimeString(m.getTimestamp());
 
 		int type = m.file.length;
 		switch (type) {
