@@ -1,14 +1,14 @@
 package com.difegue.doujinsoft;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
+import javax.management.InvalidApplicationException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,8 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.templates.BaseMio;
 import com.difegue.doujinsoft.templates.Collection;
+import com.difegue.doujinsoft.utils.MioStorage;
+import com.difegue.doujinsoft.utils.ServerInit;
+import com.difegue.doujinsoft.wc24.MailItem;
+import com.difegue.doujinsoft.wc24.WiiConnect24Api;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
@@ -71,54 +76,103 @@ public class AdminServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		boolean gotFileContentType = false;
-		String output = "Invalid file.";
+
+        ServletContext application = getServletConfig().getServletContext();
+        String dataDir = application.getInitParameter("dataDirectory");
+        String output = "Nothing!";
 
         if (!authenticate(req,res))
             return;
 
-		if (req.getParameter("operation").equals("approvefiles")) {
-			// Content approved
-			try {
-				output = ""; //sendWC24(req, res);
-			} catch (Exception e) {
-				output = e.getMessage();
-			}
-		}
+		if (req.getParameterMap().containsKey("collection_name")) {
+			// New collection
+			Collection c = new Collection();
+			c.collection_type = req.getParameter("collection_type");
+			c.collection_name = req.getParameter("collection_name");
+			c.collection_icon = req.getParameter("collection_icon");
+			c.collection_desc = req.getParameter("collection_desc");
+			c.collection_desc2 = req.getParameter("collection_desc2");
+			c.collection_color = req.getParameter("collection_color");
+			c.background_pic = req.getParameter("background_pic");
 
-		if (req.getParameter("method").equals("rejectfiles")) {
-			// Collection created
-			try {
-				gotFileContentType = true; //injectMios(req, res);
-			} catch (Exception e) {
-				ServletLog.log(Level.SEVERE, e.getMessage());
-			}
-		}
-
-        if (req.getParameter("method").equals("addtocollection")) {
-            // Add ID to collection
+			// Serialize new collection to file
+            Gson gson = new Gson();
+            File collectionFile = new File(dataDir+"/collections/"+req.getParameter("collection_id")+".json");
             try {
-                gotFileContentType = true ;//injectMios(req, res);
+                PrintWriter out1 = new PrintWriter(new FileWriter(collectionFile));
+                String json = gson.toJson(c, Collection.class);
+                out1.write(json);
+                out1.flush();
             } catch (Exception e) {
                 ServletLog.log(Level.SEVERE, e.getMessage());
             }
-        }
+            output = "Collection created at " + collectionFile.getAbsolutePath();
 
-        if (req.getParameter("method").equals("createcollection")) {
-            // Add ID to collection
+		}
+
+		if (req.getParameterMap().containsKey("approvedmios")) {
+			// Approved/denied files w. collections
+            for (String key: req.getParameterMap().keySet()) {
+                var s = key.split("-");
+                // Only take approve-x.mio keys
+                if (!s[0].equals("approve") || s[1].equals("mio")) continue;
+
+                File approvedMio = new File(dataDir+"/pending/"+s[1]);
+                if (approvedMio.exists()) {
+                    // Add to collection
+                    var cKey = "collection-"+s[1];
+                    if (req.getParameterMap().containsKey(cKey) && !req.getParameter(cKey).isEmpty()) {
+                        Gson gson = new Gson();
+                        File collection = new File(dataDir+"/collections/"+req.getParameter(cKey));
+                        // Deserialize collection, add new file hash and reserialize it
+                        Collection c = gson.fromJson(new JsonReader(new FileReader(collection)), Collection.class);
+                        ArrayList<String> mios = new ArrayList<>();
+                        if (c.mios != null) mios.addAll(Arrays.asList(c.mios));
+
+                        mios.add(MioStorage.computeMioHash(FileByteOperations.read(approvedMio.getAbsolutePath())));
+                        c.mios = mios.toArray(new String[0]);
+                        PrintWriter out1 = new PrintWriter(new FileWriter(collection));
+                        out1.write(gson.toJson(c, Collection.class));
+                        out1.flush();
+                    }
+                    approvedMio.renameTo(new File(dataDir+"/mio/"+s[1]));
+                }
+            }
+
+            // Delete all remaining files in the pending directory
+            File[] files = new File(dataDir+"/pending/").listFiles();
+            if (files != null) for (File f: files) {
+                    f.delete();
+            }
+
+            // Parse files in the mio dir
             try {
-                gotFileContentType = true ;//injectMios(req, res);
+                MioStorage.ScanForNewMioFiles(dataDir, ServletLog);
+            } catch (SQLException e) {
+                ServletLog.log(Level.SEVERE, e.getMessage());
+                output = e.getMessage();
+            }
+		}
+
+        if (req.getParameterMap().containsKey("sendmail")) {
+            // Send Wii mail through WC24
+            ArrayList<MailItem> mails = new ArrayList<>();
+            String message = req.getParameter("mail_content");
+            String code = req.getParameter("wii_code");
+
+            try {
+                mails.add(new MailItem(code,message));
+                WiiConnect24Api wc24 = new WiiConnect24Api(application);
+                output = wc24.sendMails(mails);
             } catch (Exception e) {
                 ServletLog.log(Level.SEVERE, e.getMessage());
+                output = e.getMessage();
             }
         }
 
 		//Output is JSON with the result
-		if (!gotFileContentType)
-		{
-			res.setContentType("text/html; charset=UTF-8");
-			res.getWriter().append(output);
-		}
+        res.setContentType("text/html; charset=UTF-8");
+        res.getWriter().append(output);
 	}
 
     //Generates the regular landing page.
@@ -135,7 +189,7 @@ public class AdminServlet extends HttpServlet {
                 byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
                 Metadata metadata = new Metadata(mioData);
                 BaseMio mio = new BaseMio(metadata);
-                pending.put(f.getAbsolutePath(), mio);
+                pending.put(f.getName(), mio);
             }
     }
         context.put("pendingMios", pending);
@@ -150,7 +204,7 @@ public class AdminServlet extends HttpServlet {
                 Gson gson = new Gson();
                 JsonReader jsonReader = new JsonReader(new FileReader(f));
                 //Auto bind the json to a class
-                parsedCollections.put(f.getAbsolutePath(),gson.fromJson(jsonReader, Collection.class));
+                parsedCollections.put(f.getName(),gson.fromJson(jsonReader, Collection.class));
             }
         }
         context.put("collections", parsedCollections);
@@ -170,7 +224,7 @@ public class AdminServlet extends HttpServlet {
         
     }
 
-    private boolean authenticate(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    private boolean authenticate(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         // Get Authorization header
         String auth = req.getHeader("Authorization");
         // Do we allow that user?
@@ -186,7 +240,7 @@ public class AdminServlet extends HttpServlet {
 
     // This method checks the user information sent in the Authorization
     // header against the database of users maintained in the users Hashtable.
-    private boolean allowUser(String auth) throws IOException {
+    private boolean allowUser(String auth) throws ServletException {
 
         if (auth == null) {
             return false;  // no auth
@@ -200,7 +254,12 @@ public class AdminServlet extends HttpServlet {
         String userpassDecoded = new String(Base64.decodeBase64(userpassEncoded));
 
         // Check against the env var to see if we have access
-        if (userpassDecoded.equals("jswan:mypassword")) { //System.getenv("DSOFT_PASS")
+        if (!System.getenv().containsKey("DSOFT_PASS")) {
+            ServletLog.log(Level.SEVERE, "Environment variable DSOFT_PASS not set, Admin Console will be unavailable.");
+            throw new ServletException("Password not set.");
+        }
+
+        if (userpassDecoded.equals(System.getenv("DSOFT_PASS"))) {
             return true;
         } else {
             return false;

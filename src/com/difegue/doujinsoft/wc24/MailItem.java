@@ -89,6 +89,23 @@ public class MailItem {
     }
 
     /**
+     * Create a Wii Mail with the specified message. Uses the blue template for now.
+     * @param wiiCode
+     * @param message 37 columns wide for best display on Wiis.
+     * @throws Exception
+     */
+    public MailItem(String wiiCode, String message) throws Exception {
+        attachmentType = 2; // TODO: Make this configurable if/when we have more templates
+
+        // Encode the message in UTF-16BE as expected by the Wii, then wrap it in base64
+        byte[] utf16 = StandardCharsets.UTF_16BE.encode(message).array();
+        base64EncodedAttachment = Base64.getEncoder().encodeToString(utf16).replaceAll("(.{76})", "$1\n");
+
+        // Pick Wario
+        wiiFace = LETTERHEAD_MIIS[6];
+    }
+
+    /**
      * Create a WC24 friend request mail.
      * @param wiiCode
      */

@@ -6,7 +6,7 @@
 {% block desc %}
 Quick 'n dirty admin page powered by fat kongiku tiddies
 <br/><br/>
-Approving content moves it to the mio folder and triggers a server restart! 😛
+Approving content moves it to the mio folder and triggers a folder scan.
 Unapproved .mios will be deleted.
 <br/><br/>
 
@@ -15,15 +15,8 @@ Unapproved .mios will be deleted.
 
 {% block content %}
 
-<script>
-var pendingFiles = {
-	{% for entry in pendingMios %}
-	h{{entry.value.hash}}: "{{entry.key}}",
-	{% endfor %}
-};
-</script>
-
 <form method="post">
+<input type="checkbox" name="approvedmios" checked/>
 <table style="width:100%">
 	<tr>
 		<th>ID</th>
@@ -35,20 +28,20 @@ var pendingFiles = {
 	</tr>
 {% for entry in pendingMios %}
 	<tr>
-		<td>{{entry.value.mioID}}</td>
+		<td>{{entry.value.mioID}} </td>
 		<td>{{entry.value.name}}</td>
 		<td>{{entry.value.mioDesc1}} {{entry.value.mioDesc2}}</td>
 		<td>{{entry.value.creator}}</td>
 		<td>
 			<label>
-				<input type="checkbox" name="approve-{{entry.value.hash}}"/>
+				<input type="checkbox" name="approve-{{entry.key}}"/>
 				<span> </span>
 			</label>
 		</td>
-		<td> <select class="browser-default" name="collection">
+		<td> <select class="browser-default" name="collection-{{entry.key}}">
 			<option value="" selected >None</option>
-			{% for entry in collections %}
-			<option value="{{entry.key}}">{{entry.value.collection_name}}</option>
+			{% for c in collections %}
+			<option value="{{c.key}}">{{c.value.collection_name}}</option>
 			{% endfor %}
 		</select> </td>
 	</tr>
@@ -62,35 +55,62 @@ var pendingFiles = {
 
 <h1 class="white-text">Create new collection:</h1>
 <form method="post">
-	<div class="input-field ">
-		<input placeholder="Placeholder" id="collection_name" type="text" class="validate">
-		<label for="collection_name">Name</label>
+
+	<div class="input-field">
+		<input placeholder="Placeholder" id="collection_type" name="collection_type" type="text" class="white-text">
+		<label for="collection_type" class="white-text">Type(game,record,manga)</label>
 	</div>
 
-	<div class="input-field ">
-		<input placeholder="Placeholder" id="collection_color" type="text" class="validate">
-		<label for="collection_color">Color</label>
+	<div class="input-field">
+		<input placeholder="Placeholder" id="collection_id" name="collection_id" type="text" class="white-text">
+		<label for="collection_id" class="white-text">ID</label>
 	</div>
 
-	<div class="input-field ">
-		<input placeholder="Placeholder" id="collection_icon" type="text" class="validate">
-		<label for="collection_icon">Icon</label>
+	<div class="input-field">
+		<input placeholder="Placeholder" id="collection_name" name="collection_name" type="text" class="white-text">
+		<label for="collection_name" class="white-text">Name</label>
 	</div>
 
-	<div class="input-field ">
-		<input placeholder="Placeholder" id="background_pic" type="text" class="validate">
-		<label for="background_pic">Background URL</label>
+	<div class="input-field">
+		<input placeholder="Placeholder" id="collection_color" name="collection_color" type="text" class="white-text">
+		<label for="collection_color" class="white-text">Color</label>
 	</div>
 
-	<div class="input-field ">
-		<input placeholder="Placeholder" id="collection_desc" type="text" class="validate">
-		<label for="collection_desc">Description</label>
+	<div class="input-field">
+		<input placeholder="Placeholder" id="collection_icon" name="collection_icon" type="text" class="white-text">
+		<label for="collection_icon" class="white-text">Icon</label>
 	</div>
 
-	<div class="input-field ">
-		<input placeholder="Placeholder" id="collection_desc2" type="text" class="validate">
-		<label for="collection_desc2">Description 2</label>
+	<div class="input-field">
+		<input placeholder="Placeholder" id="background_pic" name="background_pic" type="text" class="white-text">
+		<label for="background_pic" class="white-text">Background URL</label>
 	</div>
+
+	<div class="input-field">
+		<input placeholder="Placeholder" id="collection_desc" name="collection_desc" type="text" class="white-text">
+		<label for="collection_desc" class="white-text">Description</label>
+	</div>
+
+	<div class="input-field">
+		<input placeholder="Placeholder" id="collection_desc2" name="collection_desc2" type="text" class="white-text">
+		<label for="collection_desc2" class="white-text">Description 2</label>
+	</div>
+
+	<input type="submit" value="Submit">
+</form>
+
+<h1 class="white-text">Send mail:</h1>
+<form method="post">
+	<input type="checkbox" name="sendmail" checked/>
+	<div class="input-field">
+		<input placeholder="Placeholder" id="wii_code" name="wii_code" type="text" class="white-text">
+		<label for="wii_code" class="white-text">Wii code(enter 0 to send to everyone)</label>
+	</div>
+
+	<textarea class="white-text" rows="10" cols="37" name="mail_content" style="font-family:monospace; width: 350px !important; height: 350px !important">
+Remember that Wii mails are 37-------
+columns wide!------------------------
+	</textarea>
 
 	<input type="submit" value="Submit">
 </form>

@@ -84,6 +84,13 @@ public class MailItemParser extends WC24Base {
             }
         }
 
+        // Add recovered .mios to the database
+        try {
+            MioStorage.ScanForNewMioFiles(dataDir, log);
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "Couldn't add obtained mios: " + e);
+        }
+
         // Send out reply mails, if there are any.
         try {
             new WiiConnect24Api(application).sendMails(mailsToSend);

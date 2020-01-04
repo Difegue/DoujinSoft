@@ -22,7 +22,6 @@
     <!-- web application will be reloaded.                                   -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
-    <WatchedResource>/home/doujinsoft/mio</WatchedResource>
 
     <Parameter name="dataDirectory" value="/home/doujinsoft" override="false"/>
 </Context>
