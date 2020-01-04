@@ -1,14 +1,13 @@
 package com.difegue.doujinsoft;
 
 import java.io.*;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
-import javax.management.InvalidApplicationException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,12 +19,10 @@ import com.difegue.doujinsoft.templates.BaseMio;
 import com.difegue.doujinsoft.templates.Collection;
 import com.difegue.doujinsoft.utils.CollectionUtils;
 import com.difegue.doujinsoft.utils.MioStorage;
-import com.difegue.doujinsoft.utils.ServerInit;
 import com.difegue.doujinsoft.wc24.MailItem;
 import com.difegue.doujinsoft.wc24.WiiConnect24Api;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
@@ -149,7 +146,21 @@ public class AdminServlet extends HttpServlet {
             String code = req.getParameter("wii_code");
 
             try {
-                mails.add(new MailItem(code,message));
+
+                if (code.equals("0")) {
+                    // Get all wii codes stored in the friends table and send a mail to each one
+                    Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+                    Statement statement = connection.createStatement();
+                    statement.setQueryTimeout(30);  // set timeout to 30 sec.
+                    ResultSet result = statement.executeQuery("select friendcode from Friends");
+
+                    while(result.next())
+                        mails.add(new MailItem(result.getString("friendcode"), message));
+
+                    connection.close();
+                } else {
+                    mails.add(new MailItem(code,message));
+                }
                 WiiConnect24Api wc24 = new WiiConnect24Api(application);
                 output = wc24.sendMails(mails);
             } catch (Exception e) {

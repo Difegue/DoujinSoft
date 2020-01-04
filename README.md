@@ -6,16 +6,24 @@
 
 Java Web Application for managing and distributing WWDIY content.  
 Relies on the original [DIYEdit](https://gbatemp.net/threads/warioware-d-i-y-editor.346953/) by bobmcjr for everything reverse-engineering related.  
-Uses SQLite, materializeCSS and jQuery. 
+Uses SQLite, materializeCSS and jQuery.  
 
 ## Features  
 
 * .mio files dropped into the Webapp's data directory are parsed and added to the archive (on every app restart)
 * Searchable lists with pages for every content (Games/Comics/Records)
 * Comics can be directly read through the user's browser
-* Records can be listened to through the browser (uses MidiJS)
+* Records can be listened to through the browser (uses libTImidity)
 * All the content available on the archive can be automatically inserted into a game save provided by the user.
 
+## Environment variables 
+
+* WII_NUMBER: Wii Friend Code associated to the DoujinSoft WiiConnect24 account.
+* WII_FALLBACK: Wii Friend Code that will receive Wii Mail forwarded from DoujinSoft.
+* WC24_SERVER: WiiConnect24 server URL. Currently, there's only really `rc24.xyz`...
+* WC24_PASSWORD: Password for the DoujinSoft WiiConnect24 account
+* DSOFT_PASS: Password for the Admin console.
+* WEBHOOK_URL: URL for a webhook. This hook is hit whenever new content is uploaded to DoujinSoft.
 
 ## Deploying through Docker 
 
