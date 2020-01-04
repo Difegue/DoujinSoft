@@ -55,7 +55,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Friends "
                 + "(friendcode TEXT, "
-                + "PRIMARY KEY(`timestamp`) )");
+                + "PRIMARY KEY(`friendcode`) )");
     }
 
     @Override
