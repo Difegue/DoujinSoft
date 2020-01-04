@@ -31,6 +31,9 @@ import com.xperia64.diyedit.metadata.GameMetadata;
 import com.xperia64.diyedit.metadata.MangaMetadata;
 import com.xperia64.diyedit.metadata.Metadata;
 import com.xperia64.diyedit.metadata.RecordMetadata;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
 
 
 /**
@@ -115,6 +118,14 @@ public class UploadServlet extends HttpServlet {
                 try (FileOutputStream fos = new FileOutputStream(mio.getAbsolutePath())) {
                     fos.write(mioData);
                 }
+
+                // Trigger a webhook
+                if (System.getenv().containsKey("WEBHOOK_URL")) {
+                    HttpClient httpclient = HttpClients.createDefault();
+                    HttpPost httppost = new HttpPost(System.getenv("WEBHOOK_URL"));
+                    httpclient.execute(httppost);
+                }
+
             }
 
             // Send JSON response

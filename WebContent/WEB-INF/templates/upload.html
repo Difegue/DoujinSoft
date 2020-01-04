@@ -64,10 +64,10 @@ You can either upload .mio files here directly or use <a href="http://rc24.xyz">
                         '	<span class="title">'+escapeHtml(data.result.filename)+' is not a valid .mio file.</span>'+
                         '</li>';
                 else
-                    result = '<li class="collection-item avatar cart-item" type='+data.result.type+'>'+
-                        data.result.type === "game"   ? '<i class="material-icons green-text cart-icon">videogame_asset</i>'
-                      : data.result.type === "record" ? '<i class="material-icons pink-text cart-icon">album</i>'
-                      :                                 '<i class="material-icons blue-text cart-icon">local_library</i>'+
+                    result = '<li class="collection-item avatar cart-item" type='+data.result.type+'>'+ (
+                        (data.result.type === "game")   ? '<i class="material-icons green-text cart-icon">videogame_asset</i>'
+                      : (data.result.type === "record") ? '<i class="material-icons pink-text cart-icon">album</i>'
+                      :                                 '<i class="material-icons blue-text cart-icon">local_library</i>')+
                       '	    <span class="title">'+escapeHtml(data.result.name)+' by '+escapeHtml(data.result.creator)+' uploaded!</span>'+
                       '</li>';
 
