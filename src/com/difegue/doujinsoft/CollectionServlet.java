@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.templates.Collection;
+import com.difegue.doujinsoft.utils.CollectionUtils;
 import com.difegue.doujinsoft.utils.TemplateBuilderCollection;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -49,13 +50,7 @@ public class CollectionServlet extends HttpServlet {
 		String collectionFile = dataDir+"/collections/"+collectionName+".json";
 		
 		if (new File(collectionFile).exists())
-		{
-			//Try opening the matching JSON file 
-			Gson gson = new Gson();
-			JsonReader jsonReader = new JsonReader(new FileReader(collectionFile));
-			//Auto bind the json to a class
-			return gson.fromJson(jsonReader, Collection.class);
-		}
+			return CollectionUtils.GetCollectionFromFile(collectionFile);
 		
 		return null;
 	}

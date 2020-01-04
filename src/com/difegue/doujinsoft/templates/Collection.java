@@ -2,6 +2,8 @@ package com.difegue.doujinsoft.templates;
 
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 
+import java.util.Arrays;
+
 /*
  * Instances of this class are created when gson parses a collection json specifier file.
  */
@@ -43,6 +45,15 @@ public class Collection {
 
 		//Default to games
 		return Types.GAME;
+	  }
+
+	  public void addMioHash(String hash) {
+		  if (mios == null)
+		  	mios = new String[0];
+
+		  String[] newMios = Arrays.copyOf(mios, mios.length + 1);
+		  newMios[mios.length] = hash;
+		  mios = newMios;
 	  }
 
 }

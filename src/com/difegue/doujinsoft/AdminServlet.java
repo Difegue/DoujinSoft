@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.difegue.doujinsoft.templates.BaseMio;
 import com.difegue.doujinsoft.templates.Collection;
+import com.difegue.doujinsoft.utils.CollectionUtils;
 import com.difegue.doujinsoft.utils.MioStorage;
 import com.difegue.doujinsoft.utils.ServerInit;
 import com.difegue.doujinsoft.wc24.MailItem;
@@ -96,16 +97,8 @@ public class AdminServlet extends HttpServlet {
 			c.background_pic = req.getParameter("background_pic");
 
 			// Serialize new collection to file
-            Gson gson = new Gson();
             File collectionFile = new File(dataDir+"/collections/"+req.getParameter("collection_id")+".json");
-            try {
-                PrintWriter out1 = new PrintWriter(new FileWriter(collectionFile));
-                String json = gson.toJson(c, Collection.class);
-                out1.write(json);
-                out1.flush();
-            } catch (Exception e) {
-                ServletLog.log(Level.SEVERE, e.getMessage());
-            }
+            CollectionUtils.SaveCollectionToFile(c, collectionFile.getAbsolutePath());
             output = "Collection created at " + collectionFile.getAbsolutePath();
 
 		}
@@ -122,18 +115,13 @@ public class AdminServlet extends HttpServlet {
                     // Add to collection
                     var cKey = "collection-"+s[1];
                     if (req.getParameterMap().containsKey(cKey) && !req.getParameter(cKey).isEmpty()) {
-                        Gson gson = new Gson();
-                        File collection = new File(dataDir+"/collections/"+req.getParameter(cKey));
-                        // Deserialize collection, add new file hash and reserialize it
-                        Collection c = gson.fromJson(new JsonReader(new FileReader(collection)), Collection.class);
-                        ArrayList<String> mios = new ArrayList<>();
-                        if (c.mios != null) mios.addAll(Arrays.asList(c.mios));
 
-                        mios.add(MioStorage.computeMioHash(FileByteOperations.read(approvedMio.getAbsolutePath())));
-                        c.mios = mios.toArray(new String[0]);
-                        PrintWriter out1 = new PrintWriter(new FileWriter(collection));
-                        out1.write(gson.toJson(c, Collection.class));
-                        out1.flush();
+                        // Deserialize collection, add new file hash and reserialize it
+                        String path = dataDir+"/collections/"+req.getParameter(cKey);
+                        Collection c = CollectionUtils.GetCollectionFromFile(path);
+                        c.addMioHash(MioStorage.computeMioHash(FileByteOperations.read(approvedMio.getAbsolutePath())));
+                        CollectionUtils.SaveCollectionToFile(c, path);
+
                     }
                     approvedMio.renameTo(new File(dataDir+"/mio/"+s[1]));
                 }
