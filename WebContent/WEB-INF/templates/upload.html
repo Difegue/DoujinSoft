@@ -1,0 +1,95 @@
+{% extends "./base.html" %}
+
+{% block background %}./img/bg_send.png{% endblock %}
+{% block color %}amber{% endblock %}
+{% block type %}Upload DIY Content{% endblock %}
+
+
+{% block desc %}
+
+Adding your WarioWare DIY content to DoujinSoft so it can be shared with the world has never been easier!
+<br>
+You can either upload .mio files here directly or use <a href="http://rc24.xyz">RiiConnect24</a> with DIY Showcase to send us content.
+<br>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="white-text">
+
+    <h5 class="amber-text"> <i class="material-icons">store</i> I want to use RiiConnect24!</h5>
+
+    Please make sure you've registered with us in the <a href="./cart">Cart</a> first! <br>
+    If you did so, all you have to do is send your content to DoujinSoft's Wii Friend through WarioWare: DIY Showcase's <b>Distribution Center.</b> <br>
+    Files sent this way will be instantly approved and featured in the <a href="./collection?id=e_rc24_g">RC24 Collections!</a><br>
+    You'll also receive a nice thank-you letter as a bonus. 💌
+
+    <h5 class="amber-text"> <i class="material-icons">save</i> I want to send you .mio files!</h5>
+
+    First off, please make sure the files you want to send aren't already in the archive! It makes for extra busywork otherwise. <br>
+    Drag and drop your .mio files below to get started. Files sent this way will have to be approved manually before landing in the archive.<br><br>
+
+
+    <span style="line-height:20px; margin-left:40%" class="btn-large waves-effect fileinput-button">
+        <i style="padding-top:6px;" class="material-icons medium">cloud_upload</i><br>
+        <span>Upload files</span>
+        <input type="file" name="file" multiple="" id="fileupload">
+    </span>
+
+    <div id="progress" style="padding-top:6px; padding-bottom:6px">
+        <div class="bar" style="width: 0%;"></div>
+    </div>
+    <ul class="collection black-text" style="text-align:left" id="files">
+    </ul>
+
+</div>
+	
+{% endblock %}
+
+{% block footdata %}
+
+<script>
+    function initUpload() {
+
+        //Handler for file uploading.
+        $('#fileupload').fileupload({
+            dataType: 'json',
+            done: function (e, data) {
+
+                if (data.result.success === "false")
+                    result = '<li class="collection-item avatar cart-item" type=data.result.type>'+
+                        '	<i class="material-icons red-text cart-icon">error</i>'+
+                        '	<span class="title">'+escapeHtml(data.result.filename)+' is not a valid .mio file.</span>'+
+                        '</li>';
+                else
+                    result = '<li class="collection-item avatar cart-item" type='+data.result.type+'>'+
+                        data.result.type === "game"   ? '<i class="material-icons green-text cart-icon">videogame_asset</i>'
+                      : data.result.type === "record" ? '<i class="material-icons pink-text cart-icon">album</i>'
+                      :                                 '<i class="material-icons blue-text cart-icon">local_library</i>'+
+                      '	    <span class="title">'+escapeHtml(data.result.name)+' by '+escapeHtml(data.result.creator)+' uploaded!</span>'+
+                      '</li>';
+
+                $('#progress .bar').css('width', '0%');
+                $('#files').append(result);
+            },
+
+            fail: function (e, data) {
+                popToast("Upload failed! Is this file a .mio?");
+                console.log(data.errorThrown);
+                $('#progress .bar').css('width', '0%');
+            },
+
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progress .bar').css('width', progress + '%');
+            }
+
+        });
+    }
+    window.onload = initUpload;
+</script>
+
+
+{% endblock %}

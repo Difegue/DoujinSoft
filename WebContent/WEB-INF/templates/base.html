@@ -15,6 +15,7 @@
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/css?family=Karla|Material+Icons" rel="stylesheet">
   <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="css/jquery.fileupload.css" type="text/css" rel="stylesheet" media="screen,projection" />
   <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
 
   <style>
@@ -26,10 +27,12 @@
   </style>
 
   <!--  Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/jquery-3.4.1.min.js"></script>
   <script src="js/materialize.min.js"></script>
   <script src='js/timidity/timidity.js'></script>
   <script src="js/jquery.simplePagination.js"></script>
+  <script src="js/jquery.ui.widget.js"></script>
+  <script src="js/jquery.fileupload.js"></script>
   <script src="js/init.js"></script>
 
   {% if singleitem == true %}
@@ -71,6 +74,9 @@
           <li class="{% block surveypage %}{% endblock %}">
             <a href="./surveys">Surveys</a>
           </li>
+          <!--<li class="{% block uploadpage %}{% endblock %}">
+            <a href="./upload">Upload</a>
+          </li>-->
           <li class="{% block cartpage %}{% endblock %}">
             <a href="./cart">Cart</a>
           </li>
@@ -89,6 +95,9 @@
           <li class="{% block surveypage %}{% endblock %}">
             <a class=" white-text" href="./surveys">Surveys</a>
           </li>
+          <!--<li class="{% block uploadpage %}{% endblock %}">
+            <a class=" white-text" href="./upload">Upload your DIY Content</a>
+          </li>-->
           <li class="{% block cartpage %}{% endblock %}">
             <a class=" white-text" href="./cart">Cart</a>
           </li>

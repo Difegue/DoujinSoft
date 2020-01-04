@@ -14,6 +14,7 @@ import java.sql.Statement;
 
 import javax.servlet.ServletContext;
 
+import com.difegue.doujinsoft.utils.CollectionUtils;
 import com.difegue.doujinsoft.utils.MioStorage;
 import com.xperia64.diyedit.metadata.*;
 
@@ -115,6 +116,7 @@ public class MailItemParser extends WC24Base {
             log.log(Level.INFO, "Mail doesn't come from a Wii - Skipping.");
             return null;
         }
+        saveFriendCode(wiiCode);
 
         String subject = message.getSubject();
 
@@ -229,6 +231,25 @@ public class MailItemParser extends WC24Base {
             ret.setInt(5, comment & 0xFF);
 
             ret.executeUpdate();
+            connection.close();
+            return true;
+
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    private boolean saveFriendCode(String code) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);
+
+            PreparedStatement ret = connection.prepareStatement("INSERT INTO Friends VALUES (?)");
+            ret.setString(1, code);
+
+            ret.executeUpdate();
+            connection.close();
             return true;
 
         } catch (SQLException e) {
@@ -255,17 +276,9 @@ public class MailItemParser extends WC24Base {
         collectionFile += ".json";
 		
         //Try opening the matching JSON file 
-        Gson gson = new Gson();
-        JsonReader jsonReader = new JsonReader(new FileReader(collectionFile));
-        //Auto bind the json to a class
-        Collection c = gson.fromJson(jsonReader, Collection.class);
-        String[] newMios = Arrays.copyOf(c.mios, c.mios.length + 1);
-        newMios[c.mios.length] = hash;
-        c.mios = newMios;
-
+        Collection c = CollectionUtils.GetCollectionFromFile(collectionFile);
+        c.addMioHash(hash);
         // Overwrite the collectionfile
-        try (Writer writer = new FileWriter(collectionFile)) {
-            gson.toJson(c, writer);
-        }
+        CollectionUtils.SaveCollectionToFile(c,collectionFile);
     }
 }

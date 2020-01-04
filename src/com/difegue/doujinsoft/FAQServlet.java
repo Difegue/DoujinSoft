@@ -72,7 +72,7 @@ public class FAQServlet extends HttpServlet {
     }
    
     
-    //Generates the regular landing page for games.
+    //Generates the regular landing page for the FAQ.
     private String doStandardPage(ServletContext application) throws PebbleException, SQLException, IOException {
 
     	Map<String, Object> context = new HashMap<>();
