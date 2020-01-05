@@ -179,7 +179,7 @@ function playMidi(id) {
 
 function copyShareLink(type, id) {
 
-	str = window.location.hostname+"/"+type+"?id="+id;
+	str = "https://"+window.location.hostname+"/"+type+"?id="+id;
 
 	// A minimal polyfill for `navigator.clipboard.writeText()` that works most of the time in most modern browsers.
 	return new Promise(function(resolve, reject) {

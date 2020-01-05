@@ -57,7 +57,7 @@ You can either upload .mio files here directly or use <a href="http://rc24.xyz">
             dataType: 'json',
             done: function (e, data) {
 
-                if (data.result.success === "false")
+                if (!data.result.success)
                     result = '<li class="collection-item avatar cart-item" type=data.result.type>'+
                         '	<i class="material-icons red-text cart-icon">error</i>'+
                         '	<span class="title">'+escapeHtml(data.result.filename)+' is not a valid .mio file.</span>'+

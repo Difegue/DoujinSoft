@@ -96,6 +96,7 @@ public class MailItem {
      */
     public MailItem(String wiiCode, String message) throws Exception {
         attachmentType = 2; // TODO: Make this configurable if/when we have more templates
+        initializeFromEnvironment(wiiCode);
 
         // Encode the message in UTF-16BE as expected by the Wii, then wrap it in base64
         byte[] utf16 = StandardCharsets.UTF_16BE.encode(message).array();
