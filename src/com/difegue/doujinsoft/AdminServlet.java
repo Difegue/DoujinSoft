@@ -92,6 +92,7 @@ public class AdminServlet extends HttpServlet {
 			c.collection_desc2 = req.getParameter("collection_desc2");
 			c.collection_color = req.getParameter("collection_color");
 			c.background_pic = req.getParameter("background_pic");
+            c.mios = new String[0];
 
 			// Serialize new collection to file
             File collectionFile = new File(dataDir+"/collections/"+req.getParameter("collection_id")+".json");
@@ -103,14 +104,15 @@ public class AdminServlet extends HttpServlet {
 		if (req.getParameterMap().containsKey("approvedmios")) {
 			// Approved/denied files w. collections
             for (String key: req.getParameterMap().keySet()) {
-                var s = key.split("-");
-                // Only take approve-x.mio keys
-                if (!s[0].equals("approve") || s[1].equals("mio")) continue;
 
-                File approvedMio = new File(dataDir+"/pending/"+s[1]);
+                // Only take approve-x.mio keys
+                if (!key.startsWith("approve-")) continue;
+
+                var s = key.replace("approve-","");
+                File approvedMio = new File(dataDir+"/pending/"+s);
                 if (approvedMio.exists()) {
                     // Add to collection
-                    var cKey = "collection-"+s[1];
+                    var cKey = "collection-"+s;
                     if (req.getParameterMap().containsKey(cKey) && !req.getParameter(cKey).isEmpty()) {
 
                         // Deserialize collection, add new file hash and reserialize it
@@ -120,7 +122,7 @@ public class AdminServlet extends HttpServlet {
                         CollectionUtils.SaveCollectionToFile(c, path);
 
                     }
-                    approvedMio.renameTo(new File(dataDir+"/mio/"+s[1]));
+                    approvedMio.renameTo(new File(dataDir+"/mio/"+s));
                 }
             }
 

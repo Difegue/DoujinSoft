@@ -24,9 +24,15 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 	public String doStandardPageCollection(Collection c) throws Exception {
 		
 		initializeTemplate(c.getType(), false);
-	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));	    
+	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));
+
+	    if (c.getMioSQL().equals(")")) {
+			context.put("totalitems", 0);
+			context.put("collection", c);
+			return writeToTemplate();
+		}
+
   		ResultSet result = statement.executeQuery("select * from "+tableName+" WHERE hash IN "+c.getMioSQL()+" ORDER BY normalizedName ASC LIMIT 15");
-  		
   		while(result.next()) 
 		  	items.add(classConstructor.newInstance(result));
   		

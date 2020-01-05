@@ -113,7 +113,9 @@ public class MioStorage {
                 } catch (SQLException e) {
                     logger.log(Level.SEVERE, "Couldn't insert this mio in the database - Likely a duplicate file, moving on.");
                     new File(dataDir+"/duplicates").mkdirs();
-                    f.renameTo(new File(dataDir+"/duplicates/"+f.getName()));
+                    File target = new File(dataDir+"/duplicates/"+f.getName());
+                    if (target.exists()) target.delete();
+                    f.renameTo(target);
                     logger.log(Level.SEVERE, e.getMessage());
                 }
             }

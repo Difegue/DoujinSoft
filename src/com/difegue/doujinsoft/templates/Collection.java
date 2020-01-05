@@ -23,7 +23,9 @@ public class Collection {
 	  public String getMioSQL() {
 		  
 		  String query = "(";
-				    
+
+		if (mios == null)
+			mios = new String[0];
 	    //ID lookup is done here
 	    for(String mio : mios)
 	    	query+="\""+mio+"\",";
