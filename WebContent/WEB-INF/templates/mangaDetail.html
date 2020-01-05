@@ -1,9 +1,11 @@
 {% for item in items %}
 	
   {% if singleitem != true %}
-  <div class="col s12 m6 l4">
+    <div class="col s12 m6 l4">
   {% else %}
-  <div class="col s12 m12 l12"></div>
+      This is a WarioWare: DIY Comic! <br/>
+      Click on the comic's large icon on the right to read it in your browser!<br/>
+    <div class="col s12 m12 l12"></div>
   {% endif %}
 
           <div class="card {{ item.colorCart }} darken-2">
@@ -73,3 +75,7 @@ Sad.
 {% endfor %}
 	
 <span id="total_items" style="display:none">{{ totalitems }}</span>
+
+<img class="materialboxed" height="513">
+
+<canvas id="canvas_manga" width="193" height="513" style="background-color:black; display:none"></canvas>
