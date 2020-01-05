@@ -1,8 +1,9 @@
 {% extends "./base.html" %}
 
+{% block uploadpage %}active{% endblock %}
 {% block background %}./img/bg_send.png{% endblock %}
 {% block color %}amber{% endblock %}
-{% block type %}Upload DIY Content{% endblock %}
+{% block title %}Upload DIY Content{% endblock %}
 
 
 {% block desc %}
@@ -38,9 +39,7 @@ You can either upload .mio files here directly or use <a href="http://rc24.xyz">
         <input type="file" name="file" multiple="" id="fileupload">
     </span>
 
-    <div id="progress" style="padding-top:6px; padding-bottom:6px">
-        <div class="bar" style="width: 0%;"></div>
-    </div>
+    <div class="progress" style="display:none"><div class="indeterminate amber"></div></div>
     <ul class="collection black-text" style="text-align:left" id="files">
     </ul>
 
@@ -71,19 +70,24 @@ You can either upload .mio files here directly or use <a href="http://rc24.xyz">
                       '	    <span class="title">'+escapeHtml(data.result.name)+' by '+escapeHtml(data.result.creator)+' uploaded!</span>'+
                       '</li>';
 
-                $('#progress .bar').css('width', '0%');
                 $('#files').append(result);
             },
 
             fail: function (e, data) {
                 popToast("Upload failed! Is this file a .mio?");
                 console.log(data.errorThrown);
-                $('#progress .bar').css('width', '0%');
+                $(".progress").hide();
+                $(".fileinput-button").show();
             },
 
-            progressall: function (e, data) {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                $('#progress .bar').css('width', progress + '%');
+            start: function (e, data) {
+                $(".progress").show();
+                $(".fileinput-button").hide();
+            },
+
+            stop: function (e, data) {
+                $(".progress").hide();
+                $(".fileinput-button").show();
             }
 
         });

@@ -1,12 +1,15 @@
 package com.difegue.doujinsoft;
 
 import com.difegue.doujinsoft.utils.MioCompress;
+import com.difegue.doujinsoft.utils.MioUtils;
+import com.xperia64.diyedit.FileByteOperations;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.Base64;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -39,12 +42,12 @@ public class DownloadServlet extends HttpServlet {
 		ServletContext application = getServletConfig().getServletContext();	
 		String dataDir = application.getInitParameter("dataDirectory");
 		
-		
-		if (request.getParameterMap().containsKey("type") && request.getParameterMap().containsKey("id")) 
+		if (request.getParameterMap().containsKey("type") && request.getParameterMap().containsKey("id"))
 		{
 			
 			String id = request.getParameter("id");
 			String type = request.getParameter("type");
+			boolean isImageOnly = request.getParameterMap().containsKey("preview");
 			
 			String filePath = "";
 			
@@ -67,7 +70,32 @@ public class DownloadServlet extends HttpServlet {
 
 				File downloadFile = MioCompress.uncompressMio(new File(filePath));
 				FileInputStream inStream = new FileInputStream(downloadFile);
-				
+
+				// Only serve an image if that's what's asked
+				if (isImageOnly) {
+
+					byte[] mioData = inStream.readAllBytes();
+					String base64ImageData = "";
+
+					if (type.equals("game"))
+						base64ImageData = MioUtils.getBase64GamePreview(mioData);
+
+					if (type.equals("manga"))
+						base64ImageData = MioUtils.getBase64Manga(mioData,0);
+
+					if (type.equals("record"))
+						base64ImageData = "";
+
+					response.setContentType("image/png");
+					response.setCharacterEncoding("UTF-8");
+
+					OutputStream outStream = response.getOutputStream();
+					outStream.write(Base64.getDecoder().decode(base64ImageData));
+					outStream.flush();
+					outStream.close();
+					return;
+				}
+
 				// gets MIME type of the file
 				String mimeType = "application/octet-stream";
 				// Set response

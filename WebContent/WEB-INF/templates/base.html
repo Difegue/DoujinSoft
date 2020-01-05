@@ -41,11 +41,14 @@
   <meta property="og:title" content="{{ item.name }} by {{ item.creator }} on the DoujinSoft Store" />
   <meta property="og:type" content="website" />
   <meta property="og:description" content="{{ item.mioDesc1 }} {{ item.mioDesc2 }}" />
-  <meta property="og:image" content="img/bg_misc.jpg" />
-  {% if item.preview != null %}
-  <!-- <meta property="og:image" content="decodebase64?data={{ item.preview }}" /> -->
-  {% endif %}
+  <meta property="og:image" content="http://diy.tvc-16.science/download?preview&id={{ item.hash }}&type={% block type %}{% endblock %}" /> <!-- Hardcoding the URL kinda sucks here -->
   {% endfor %}
+  {% else %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:title" content="DoujinSoft Store" />
+  <meta property="og:type" content="website" />
+  <meta property="og:description" content="The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available for reading, listening, and transferring to your own copies of the game." />
+  <meta property="og:image" content="http://diy.tvc-16.science/img/android-chrome-512x512.png" /> <!-- Hardcoding the URL kinda sucks here -->
   {% endif %}
 
 </head>
@@ -112,7 +115,7 @@
     <div class="container">
       <br>
       <br>
-      <h1 class="header center {% block color %}green{% endblock %}-text" style="font-family: warioware">{% block type %}Generic title here{% endblock %}</h1>
+      <h1 class="header center {% block color %}green{% endblock %}-text" style="font-family: warioware">{% block title %}Generic title here{% endblock %}</h1>
       <div class="row center">
         {% if singleitem != true %}
         <h5 class="header col s12 light white-text">{% block desc %}Generic description here{% endblock %}</h5>
