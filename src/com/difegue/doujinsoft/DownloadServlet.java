@@ -78,10 +78,10 @@ public class DownloadServlet extends HttpServlet {
 					String base64ImageData = "";
 
 					if (type.equals("game"))
-						base64ImageData = MioUtils.getBase64GamePreview(mioData);
+						base64ImageData = MioUtils.getBase64GamePreview(mioData).replace("data:image/png;base64,","");
 
 					if (type.equals("manga"))
-						base64ImageData = MioUtils.getBase64Manga(mioData,0);
+						base64ImageData = MioUtils.getBase64Manga(mioData,0).replace("data:image/png;base64,","");
 
 					if (type.equals("record"))
 						base64ImageData = "";
