@@ -89,21 +89,20 @@ public class MailItem {
     }
 
     /**
-     * Create a Wii Mail with the specified message. Uses the blue template for now.
+     * Create a Wii Mail with the specified message. Uses the custom DoujinSoft mail template.
      * @param wiiCode
-     * @param message 37 columns wide for best display on Wiis.
+     * @param message 35 columns wide for best display on Wiis.
      * @throws Exception
      */
     public MailItem(String wiiCode, String message) throws Exception {
-        attachmentType = 2; // TODO: Make this configurable if/when we have more templates
+        
+        attachmentType = 3; 
         initializeFromEnvironment(wiiCode);
 
         // Encode the message in UTF-16BE as expected by the Wii, then wrap it in base64
         byte[] utf16 = StandardCharsets.UTF_16BE.encode(message).array();
         base64EncodedAttachment = Base64.getEncoder().encodeToString(utf16).replaceAll("(.{76})", "$1\n");
 
-        // Pick Wario
-        wiiFace = LETTERHEAD_MIIS[6];
     }
 
     /**
@@ -132,7 +131,9 @@ public class MailItem {
             case 1:          template = engine.getTemplate(templatePath + ("/recap_mail.eml"));
                              break;
             case 2:          template = engine.getTemplate(templatePath + ("/recap_mail_blue.eml"));
-                             break;                 
+                             break;         
+            case 3:          template = engine.getTemplate(templatePath + ("/doujinsoft_mail.eml"));
+                             break;         
             case MioUtils.Types
                     .GAME:   template = engine.getTemplate(templatePath + ("/game_mail.eml"));
                              break;

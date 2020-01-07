@@ -171,7 +171,7 @@ public class AdminServlet extends HttpServlet {
             }
         }
 
-		//Output is JSON with the result
+		//Output is dumb HTML
         res.setContentType("text/html; charset=UTF-8");
         res.getWriter().append(output);
 	}
