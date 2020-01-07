@@ -3,10 +3,12 @@ package com.difegue.doujinsoft;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -164,7 +166,18 @@ public class AdminServlet extends HttpServlet {
                     mails.add(new MailItem(code,message));
                 }
                 WiiConnect24Api wc24 = new WiiConnect24Api(application);
-                output = wc24.sendMails(mails);
+
+                // If the mail list is too long it'll likely overload the WC24 endpoint
+                // Split the list into 10s and perform an equal number of requests
+                final AtomicInteger counter = new AtomicInteger();
+                final java.util.Collection<List<MailItem>> chunkedMails = mails.stream()
+                        .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / 10))
+                        .values();
+
+                for(List<MailItem> chunk : chunkedMails) {
+                    output += wc24.sendMails(chunk);
+                }
+
             } catch (Exception e) {
                 ServletLog.log(Level.SEVERE, e.getMessage());
                 output = e.getMessage();
