@@ -33,7 +33,7 @@ public class BaseMio {
 
 		mioID += MioStorage.computeMioID(m);
 
-		if (m.getDescription().length > 19) {
+		if (m.getDescription().length() > 19) {
 			mioDesc1 = m.getDescription().substring(0,18);
 			mioDesc2 = m.getDescription().substring(18);
 		} else {
