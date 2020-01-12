@@ -218,8 +218,7 @@ public class MailItemParser extends WC24Base {
 
     private boolean saveSurveyAnswer(byte type, String title, byte stars, byte comment) {
 
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
 
@@ -240,8 +239,7 @@ public class MailItemParser extends WC24Base {
     }
 
     private boolean saveFriendCode(String code) {
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
 

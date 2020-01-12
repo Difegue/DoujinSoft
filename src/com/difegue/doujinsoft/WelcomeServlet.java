@@ -148,7 +148,8 @@ public class WelcomeServlet extends HttpServlet {
 		Writer writer = new StringWriter();
 		compiledTemplate.evaluate(writer, context);
 		String output = writer.toString();
-		
+
+		connection.close();
 		return output;
     	
     }

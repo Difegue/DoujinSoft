@@ -54,60 +54,57 @@ public class MioStorage {
 
     public static void ScanForNewMioFiles(String dataDir, Logger logger) throws SQLException {
         File[] files = new File(dataDir+"/mio/").listFiles();
-        Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
 
         for (File f: files) {
             if (!f.isDirectory()) {
+                try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
+                    byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
+                    Metadata metadata = new Metadata(mioData);
+                    String hash = MioStorage.computeMioHash(mioData);
+                    String ID = MioStorage.computeMioID(metadata);
+                    int type = mioData.length;
+                    PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, connection, type);
 
-                byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
-                Metadata metadata = new Metadata(mioData);
-                String hash = MioStorage.computeMioHash(mioData);
-                String ID = MioStorage.computeMioID(metadata);
-                int type = mioData.length;
+                    //The file is game, manga or record, depending on its size.
+                    if (mioData.length == MioUtils.Types.GAME) {
+                        GameEdit game = new GameEdit(mioData);
 
-                PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, connection, type);
+                        //Game-specific: add the preview picture
+                        insertQuery.setString(9, MioUtils.mapColorByte(game.getCartColor()));
+                        insertQuery.setString(10, MioUtils.mapColorByte(game.getLogoColor()));
+                        insertQuery.setInt(11, game.getLogo());
+                        insertQuery.setString(12, MioUtils.getBase64GamePreview(mioData));
 
-                //The file is game, manga or record, depending on its size.
-                if (mioData.length == MioUtils.Types.GAME) {
-                    GameEdit game = new GameEdit(mioData);
+                        logger.log(Level.INFO, "Game;"+hash+";"+ID+";"+game.getName()+"\n");
+                    }
 
-                    //Game-specific: add the preview picture
-                    insertQuery.setString(9, MioUtils.mapColorByte(game.getCartColor()));
-                    insertQuery.setString(10, MioUtils.mapColorByte(game.getLogoColor()));
-                    insertQuery.setInt(11, game.getLogo());
-                    insertQuery.setString(12, MioUtils.getBase64GamePreview(mioData));
+                    if (mioData.length == MioUtils.Types.MANGA) {
+                        MangaEdit manga = new MangaEdit(mioData);
 
-                    logger.log(Level.INFO, "Game;"+hash+";"+ID+";"+game.getName()+"\n");
-                }
+                        //Manga-specific: add the panels
+                        insertQuery.setString(9, MioUtils.mapColorByte(manga.getMangaColor()));
+                        insertQuery.setString(10, MioUtils.mapColorByte(manga.getLogoColor()));
+                        insertQuery.setInt(11, manga.getLogo());
+                        insertQuery.setString(12, MioUtils.getBase64Manga(mioData, 0));
+                        insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 1));
+                        insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 2));
+                        insertQuery.setString(15, MioUtils.getBase64Manga(mioData, 3));
 
-                if (mioData.length == MioUtils.Types.MANGA) {
-                    MangaEdit manga = new MangaEdit(mioData);
+                        logger.log(Level.INFO, "Manga;"+hash+";"+ID+";"+manga.getName()+"\n");
+                    }
 
-                    //Manga-specific: add the panels
-                    insertQuery.setString(9, MioUtils.mapColorByte(manga.getMangaColor()));
-                    insertQuery.setString(10, MioUtils.mapColorByte(manga.getLogoColor()));
-                    insertQuery.setInt(11, manga.getLogo());
-                    insertQuery.setString(12, MioUtils.getBase64Manga(mioData, 0));
-                    insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 1));
-                    insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 2));
-                    insertQuery.setString(15, MioUtils.getBase64Manga(mioData, 3));
+                    if (mioData.length == MioUtils.Types.RECORD) {
+                        RecordEdit record = new RecordEdit(mioData);
 
-                    logger.log(Level.INFO, "Manga;"+hash+";"+ID+";"+manga.getName()+"\n");
-                }
+                        insertQuery.setString(9, MioUtils.mapColorByte(record.getRecordColor()));
+                        insertQuery.setString(10, MioUtils.mapColorByte(record.getLogoColor()));
+                        insertQuery.setInt(11, record.getLogo());
 
-                if (mioData.length == MioUtils.Types.RECORD) {
-                    RecordEdit record = new RecordEdit(mioData);
+                        logger.log(Level.INFO, "Record;"+hash+";"+ID+";"+record.getName()+"\n");
+                    }
 
-                    insertQuery.setString(9, MioUtils.mapColorByte(record.getRecordColor()));
-                    insertQuery.setString(10, MioUtils.mapColorByte(record.getLogoColor()));
-                    insertQuery.setInt(11, record.getLogo());
+                    logger.log(Level.INFO, "Inserting into DB");
 
-                    logger.log(Level.INFO, "Record;"+hash+";"+ID+";"+record.getName()+"\n");
-                }
-
-                logger.log(Level.INFO, "Inserting into DB");
-
-                try {
                     insertQuery.executeUpdate();
                     consumeMio(f, hash, type);
                 } catch (SQLException e) {

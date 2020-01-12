@@ -73,14 +73,11 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         SQLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
         ServletContext application = arg0.getServletContext();
         String dataDir = application.getInitParameter("dataDirectory");
-       
-        Connection connection = null;
 
-        try {
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
             // Create database if nonexistent
-            SQLog.log(Level.INFO, "Connecting to database at "+dataDir+"/mioDatabase.sqlite");
+            SQLog.log(Level.INFO, "Connected to database at "+dataDir+"/mioDatabase.sqlite");
 
-            connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
@@ -131,16 +128,8 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         catch(Exception e){
             // if the error message is "out of memory",
             // it probably means no database file is found
+            e.printStackTrace();
             SQLog.log(Level.SEVERE, e.getMessage());
-        }
-        finally {
-            try {
-                if(connection != null)
-                    connection.close();
-            }
-            catch(SQLException e) {
-                SQLog.log(Level.SEVERE, "connection close failed: " + e.getMessage());
-            }
         }
         
         scheduler = Executors.newSingleThreadScheduledExecutor();

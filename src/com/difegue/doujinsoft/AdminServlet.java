@@ -149,11 +149,9 @@ public class AdminServlet extends HttpServlet {
             String message = req.getParameter("mail_content");
             String code = req.getParameter("wii_code");
 
-            try {
-
+            try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
                 if (code.equals("0")) {
                     // Get all wii codes stored in the friends table and send a mail to each one
-                    Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
                     Statement statement = connection.createStatement();
                     statement.setQueryTimeout(30);  // set timeout to 30 sec.
                     ResultSet result = statement.executeQuery("select friendcode from Friends");
