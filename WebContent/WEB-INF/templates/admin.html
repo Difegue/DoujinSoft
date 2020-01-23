@@ -10,10 +10,34 @@ Approving content moves it to the mio folder and triggers a folder scan.
 Unapproved .mios will be deleted.
 <br/><br/>
 
+<script>
+
+function approveAllAndAddTo(collection) {
+	var checkboxes = new Array(); 
+	checkboxes = document.getElementsByTagName('input');
+
+	for (var i=0; i<checkboxes.length; i++)  {
+		if (checkboxes[i].type == 'checkbox')   {
+		checkboxes[i].checked = true;
+		}
+	}
+
+	checkboxes = document.getElementsByTagName('select');
+
+	for (var i=0; i<checkboxes.length; i++)  {
+		checkboxes[i].value = collection;
+	}
+}
+
+</script>
+
 {% endblock %}
 
 
 {% block content %}
+
+<input type="button" name="Approve All" onclick="approveAllAndAddTo($('#cname').val)"/>
+<input type="text" id="cname" />
 
 <form method="post">
 <input type="checkbox" name="approvedmios" checked/>

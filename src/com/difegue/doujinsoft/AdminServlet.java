@@ -80,6 +80,8 @@ public class AdminServlet extends HttpServlet {
         ServletContext application = getServletConfig().getServletContext();
         String dataDir = application.getInitParameter("dataDirectory");
         String output = "Nothing!";
+        // Needed for mio filenames with non-standard characters
+        req.setCharacterEncoding( "UTF-8" );
 
         if (!authenticate(req,res))
             return;
@@ -104,6 +106,7 @@ public class AdminServlet extends HttpServlet {
 		}
 
 		if (req.getParameterMap().containsKey("approvedmios")) {
+		    output = "";
 			// Approved/denied files w. collections
             for (String key: req.getParameterMap().keySet()) {
 
@@ -111,12 +114,16 @@ public class AdminServlet extends HttpServlet {
                 if (!key.startsWith("approve-")) continue;
 
                 var s = key.replace("approve-","");
+                output +="Looking for approved file "+s+"...\n";
                 File approvedMio = new File(dataDir+"/pending/"+s);
                 if (approvedMio.exists()) {
+                    output +="Found! Adding to mio folder.\n";
                     // Add to collection
                     var cKey = "collection-"+s;
                     if (req.getParameterMap().containsKey(cKey) && !req.getParameter(cKey).isEmpty()) {
 
+                        output+="Added to collection "+req.getParameter(cKey)+"\n";
+                        
                         // Deserialize collection, add new file hash and reserialize it
                         String path = dataDir+"/collections/"+req.getParameter(cKey);
                         Collection c = CollectionUtils.GetCollectionFromFile(path);
@@ -131,6 +138,7 @@ public class AdminServlet extends HttpServlet {
             // Delete all remaining files in the pending directory
             File[] files = new File(dataDir+"/pending/").listFiles();
             if (files != null) for (File f: files) {
+                    output +="File "+f.getName()+" not approved -- deleting.\n";
                     f.delete();
             }
 
