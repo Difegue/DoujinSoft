@@ -178,7 +178,7 @@ public class MailItemParser extends WC24Base {
 	    
 	// Add the original sender's Wii code as an AltName so it appears on the message board
 	// This is easier than messing with the message content, and shouldn't fuck up invisible mails (i.e Miis)
-	String b64WiiCode = Base64.getEncoder().encodeToString((wiiCode).getBytes());
+	String b64WiiCode = Base64.getEncoder().encodeToString((wiiCode).getBytes("UTF-16BE"));
 	message.addHeader("X-Wii-AltName", b64WiiCode);
 	    
         // Output a string and pipe that into a RawMailItem
