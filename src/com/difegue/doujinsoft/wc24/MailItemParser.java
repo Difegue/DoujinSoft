@@ -113,12 +113,12 @@ public class MailItemParser extends WC24Base {
         MimeMessage message = new MimeMessage(s, is);
 
         // Reject mails that don't come from a Wii
+	log.log(Level.INFO, "Analyzing mail received from "+message.getFrom()[0].toString());
         String wiiCode = getWiiCode(message.getFrom()[0].toString());
         if (wiiCode == null) {
             log.log(Level.INFO, "Mail doesn't come from a Wii - Skipping.");
             return null;
         }
-	log.log(Level.INFO, "Analyzing mail received from "+wiiCode);
         saveFriendCode(wiiCode);
 
         String subject = message.getSubject();
