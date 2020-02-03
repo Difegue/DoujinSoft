@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.regex.*;
 import java.util.List;
+import java.util.Base64;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.*;
@@ -174,6 +175,12 @@ public class MailItemParser extends WC24Base {
         message.addHeader("MAIL FROM", "w"+sender+"@"+wc24Server);
         message.setRecipients(RecipientType.TO, new Address[]{new InternetAddress("w"+mailFallbackCode+"@"+wc24Server)});
         message.addHeader("RCPT TO", "w"+mailFallbackCode+"@"+wc24Server);
+	    
+	// Add the original sender's Wii code as an AltName so it appears on the message board
+	// This is easier than messing with the message content, and shouldn't fuck up invisible mails (i.e Miis)
+	String b64WiiCode = Base64.getEncoder().encodeToString((wiiCode).getBytes());
+	message.addHeader("X-Wii-AltName", b64WiiCode);
+	    
         // Output a string and pipe that into a RawMailItem
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         message.writeTo(os);
