@@ -118,6 +118,7 @@ public class MailItemParser extends WC24Base {
             log.log(Level.INFO, "Mail doesn't come from a Wii - Skipping.");
             return null;
         }
+	log.log(Level.INFO, "Analyzing mail received from "+wiiCode);
         saveFriendCode(wiiCode);
 
         String subject = message.getSubject();
