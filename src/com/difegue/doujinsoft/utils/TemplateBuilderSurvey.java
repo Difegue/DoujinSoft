@@ -1,5 +1,6 @@
 package com.difegue.doujinsoft.utils;
 
+import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,15 +22,21 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
     public String doGetSurveys() throws Exception {
 
         initializeTemplate(Types.SURVEY, false);
+        Statement statement = connection.createStatement();
         ResultSet result = statement.executeQuery("select * from "+tableName+" ORDER BY timestamp DESC LIMIT 50");
         
         while(result.next()) 
             items.add(classConstructor.newInstance(result));
-        
+
+        result.close();
+
         result = statement.executeQuery("select COUNT(timestamp) from "+tableName);
         context.put("items", items);
         context.put("totalitems", result.getInt(1));
         
+        result.close();
+        statement.close();
+        connection.close();
         //Output to client
         return writeToTemplate();
     }
@@ -54,9 +61,14 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
         while(result.next()) 
             items.add(classConstructor.newInstance(result));
         
+        result.close();
+        ret.close();
+
         context.put("items", items);
         context.put("totalitems", retCount.executeQuery().getInt(1));
         
+        retCount.close();
+        connection.close();
         return writeToTemplate();
     }
 }

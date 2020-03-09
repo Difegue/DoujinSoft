@@ -35,7 +35,6 @@ public class TemplateBuilder {
 
 	protected Map<String, Object> context = new HashMap<>();
 	protected Connection connection;
-	protected Statement statement;
 	protected ServletContext application;
 	protected HttpServletRequest request;
 
@@ -53,8 +52,6 @@ public class TemplateBuilder {
 
 	    // create a database connection
 	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-	    statement = connection.createStatement();
-		statement.setQueryTimeout(30);  // set timeout to 30 sec.
 	}
 
 	protected void initializeTemplate(int type, boolean isDetail) throws NoSuchMethodException, PebbleException {
@@ -108,6 +105,8 @@ public class TemplateBuilder {
 	public String doStandardPageGeneric(int type) throws Exception {
 
 		initializeTemplate(type, false);
+		Statement statement = connection.createStatement();
+
 		ResultSet result;
 		if (request.getParameterMap().containsKey("id"))
 			result = statement.executeQuery("select * from "+tableName+" WHERE hash == '"+request.getParameter("id")+"'");
@@ -116,7 +115,8 @@ public class TemplateBuilder {
   		
   		while(result.next()) 
 	    		items.add(classConstructor.newInstance(result));
-  		
+		  
+		result.close();
 		context.put("items", items);
 		
 		// If the request is for a specific hash, disable search by setting totalitems to -1
@@ -126,6 +126,7 @@ public class TemplateBuilder {
 		} else {	
 			result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%them%'");
 			context.put("totalitems", result.getInt(1));
+			result.close();
 		}
 
 		// JSON hijack if specified in the parameters
@@ -134,6 +135,8 @@ public class TemplateBuilder {
 			return gson.toJson(context);
 		}
 
+		statement.close();
+		connection.close();
 		//Output to client
 		return writeToTemplate();
 	}
@@ -178,6 +181,9 @@ public class TemplateBuilder {
 	    while(result.next()) 
 	    	items.add(classConstructor.newInstance(result));
 
+		result.close();
+		ret.close();
+
 		context.put("items", items);
 		context.put("totalitems", retCount.executeQuery().getInt(1));
 
@@ -187,6 +193,8 @@ public class TemplateBuilder {
 			return gson.toJson(context);
 		}
 
+		retCount.close();
+		connection.close();
 		return writeToTemplate();
     }
 	

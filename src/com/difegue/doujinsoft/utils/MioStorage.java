@@ -106,6 +106,7 @@ public class MioStorage {
                     logger.log(Level.INFO, "Inserting into DB");
 
                     insertQuery.executeUpdate();
+                    insertQuery.close();
                     consumeMio(f, hash, type);
                 } catch (SQLException e) {
                     logger.log(Level.SEVERE, "Couldn't insert this mio in the database - Likely a duplicate file, moving on.");

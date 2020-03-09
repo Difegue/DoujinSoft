@@ -103,6 +103,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             SQLog.log(Level.INFO, "Looking for new .mio files...");
             MioStorage.ScanForNewMioFiles(dataDir, SQLog);
             
+            statement.executeUpdate("PRAGMA journal_mode=WAL;");
             statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");   
@@ -124,6 +125,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Manga_search_idx2 ON Manga (creator COLLATE NOCASE);");
             statement.executeUpdate("CREATE INDEX Record_search_idx2 ON Records (creator COLLATE NOCASE);");
             
+            statement.close();
         }
         catch(Exception e){
             // if the error message is "out of memory",

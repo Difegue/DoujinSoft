@@ -149,6 +149,8 @@ public class WelcomeServlet extends HttpServlet {
 		compiledTemplate.evaluate(writer, context);
 		String output = writer.toString();
 
+		result.close();
+		statement.close();
 		connection.close();
 		return output;
     	

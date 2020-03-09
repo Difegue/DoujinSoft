@@ -5,6 +5,8 @@
 	$('select').formSelect();
 	$('.tooltipped').tooltip({enterDelay: 50});
 
+	updateCartCount();
+
 	// Due to quirks with libTimidity, the exact location of the folder containing the .wasm must be set here.
 	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/js/timidity".
 	player = window.timidity("js/timidity");
@@ -211,7 +213,6 @@ function addToCart(type, id) {
 		var items = [item];
 		localStorage.setItem(type, JSON.stringify(items));
 		popToast("Item added to cart successfully.");
-		updateCartCount();
 	}
 	else {
 		var items = JSON.parse(localStorage.getItem(type));
@@ -230,7 +231,7 @@ function addToCart(type, id) {
 			popToast("Item already in cart.");
 		
 	}
-	
+	updateCartCount();
 }
 
 function deleteFromCart(item) {

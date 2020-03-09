@@ -167,7 +167,8 @@ public class AdminServlet extends HttpServlet {
                     while(result.next())
                         mails.add(new MailItem(result.getString("friendcode"), message));
 
-                    connection.close();
+                    result.close();
+                    statement.close();
                 } else {
                     mails.add(new MailItem(code,message));
                 }

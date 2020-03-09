@@ -1,5 +1,6 @@
 package com.difegue.doujinsoft.utils;
 
+import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +25,8 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 	public String doStandardPageCollection(Collection c) throws Exception {
 		
 		initializeTemplate(c.getType(), false);
+
+		Statement statement = connection.createStatement();
 	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));
 
 	    if (c.getMioSQL().equals(")")) {
@@ -40,6 +43,9 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 		context.put("totalitems", c.mios.length);
 		context.put("collection", c);
 		
+		result.close();
+		statement.close();
+		connection.close();
 		return writeToTemplate();
     }
     
@@ -81,9 +87,14 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 	    while(result.next()) 
 			items.add(classConstructor.newInstance(result));
 		
+		result.close();
+		ret.close();
+
 		context.put("items", items);
 		context.put("totalitems", retCount.executeQuery().getInt(1));
 		
+		retCount.close();
+		connection.close();
 		return writeToTemplate();
 	}
 

@@ -228,8 +228,6 @@ public class MailItemParser extends WC24Base {
     private boolean saveSurveyAnswer(byte type, String title, byte stars, byte comment) {
 
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(30);
 
             PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?)");
             ret.setLong(1, System.currentTimeMillis());
@@ -239,6 +237,8 @@ public class MailItemParser extends WC24Base {
             ret.setInt(5, comment & 0xFF);
 
             ret.executeUpdate();
+
+            ret.close();
             connection.close();
             return true;
 
@@ -249,13 +249,12 @@ public class MailItemParser extends WC24Base {
 
     private boolean saveFriendCode(String code) {
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
-            Statement statement = connection.createStatement();
-            statement.setQueryTimeout(30);
 
             PreparedStatement ret = connection.prepareStatement("INSERT INTO Friends VALUES (?)");
             ret.setString(1, code);
-
             ret.executeUpdate();
+            ret.close();
+            
             connection.close();
             return true;
 
