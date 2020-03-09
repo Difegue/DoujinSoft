@@ -211,6 +211,7 @@ function addToCart(type, id) {
 		var items = [item];
 		localStorage.setItem(type, JSON.stringify(items));
 		popToast("Item added to cart successfully.");
+		updateCartCount();
 	}
 	else {
 		var items = JSON.parse(localStorage.getItem(type));
@@ -262,7 +263,20 @@ function deleteFromCart(item) {
 	
 	if (games === null && manga === null && record === null) 
 		$("#cart-content").html('<h5 class="white-text center">...But your cart seems to be empty right now.</h5> <br/> <br/>  <span class="white-text" style="font-size:10vw">¯\\_(ツ)_/¯</span>   ');
+		
+	updateCartCount();
+}
 
+function updateCartCount() {
+
+	var count = 0;
+
+	["game", "manga", "record"].forEach(function(entry) {
+		if (localStorage.getItem(entry) !== null) 
+		count += JSON.parse(localStorage.getItem(entry)).length;
+	});
+
+	$(".cart-header").each(function(){ this.innerHTML = "Cart (<b>"+count+"</b>)"});
 }
 
 function clearCart() {
