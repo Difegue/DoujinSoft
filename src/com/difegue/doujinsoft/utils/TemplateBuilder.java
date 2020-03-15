@@ -105,13 +105,17 @@ public class TemplateBuilder {
 	public String doStandardPageGeneric(int type) throws Exception {
 
 		initializeTemplate(type, false);
-		Statement statement = connection.createStatement();
+		PreparedStatement statement; 
 
 		ResultSet result;
-		if (request.getParameterMap().containsKey("id"))
-			result = statement.executeQuery("select * from "+tableName+" WHERE hash == '"+request.getParameter("id")+"'");
-		else
-  			result = statement.executeQuery("select * from "+tableName+" WHERE id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
+		if (request.getParameterMap().containsKey("id")) {
+			statement = connection.prepareStatement("select * from "+tableName+" WHERE hash == ?");
+			statement.setString(1, request.getParameter("id"));
+		}
+		else {
+			statement = connection.prepareStatement("select * from "+tableName+" WHERE id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
+		}
+		result = statement.executeQuery();	
   		
   		while(result.next()) 
 	    		items.add(classConstructor.newInstance(result));
@@ -124,7 +128,9 @@ public class TemplateBuilder {
 			context.put("totalitems", -1);	
 			context.put("singleitem", true);
 		} else {	
-			result = statement.executeQuery("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%them%'");
+			statement.close();
+			statement = connection.prepareStatement("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%them%'");
+			result = statement.executeQuery();
 			context.put("totalitems", result.getInt(1));
 			result.close();
 		}
