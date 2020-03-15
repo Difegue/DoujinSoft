@@ -171,6 +171,10 @@ public class MioStorage {
         File f2 = new File(baseDir + hash + ".miozip");
 
         try {
+
+            if (f2.exists()) 
+                throw new Exception("Destination miozip already exists! How could this happen?");
+
             MioCompress.compressMio(f, f2, f.getName());
             // Only delete the initial .mio if the zipped variant has been properly processed
             if (f2.exists())
