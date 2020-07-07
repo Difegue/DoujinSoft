@@ -113,6 +113,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx2;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx2;");
             statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx2;");  
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx3;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx3;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx3;"); 
 
             // Rebuild indexes
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
@@ -124,6 +127,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Games_search_idx2 ON Games (creator COLLATE NOCASE);");
             statement.executeUpdate("CREATE INDEX Manga_search_idx2 ON Manga (creator COLLATE NOCASE);");
             statement.executeUpdate("CREATE INDEX Record_search_idx2 ON Records (creator COLLATE NOCASE);");
+            statement.executeUpdate("CREATE INDEX Games_search_idx3 ON Games (timeStamp);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx3 ON Manga (timeStamp);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx3 ON Records (timeStamp);");
             
             statement.close();
         }

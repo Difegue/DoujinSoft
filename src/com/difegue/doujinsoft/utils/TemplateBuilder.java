@@ -39,7 +39,7 @@ public class TemplateBuilder {
 	protected HttpServletRequest request;
 
 	protected String tableName, dataDir;
-	protected boolean isNameSearch, isCreatorSearch;
+	protected boolean isNameSearch, isCreatorSearch, isSortedBy;
 	
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
@@ -85,6 +85,7 @@ public class TemplateBuilder {
 			templatePath   += "Detail";	
 			isNameSearch    = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
 			isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
+			isSortedBy      = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
 		}
 			
 		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath+".html"));
@@ -103,6 +104,8 @@ public class TemplateBuilder {
 	 * For GET requests. Grab the standard template, and add the first page of items.
 	 */
 	public String doStandardPageGeneric(int type) throws Exception {
+
+		// TODO: allow searches 
 
 		initializeTemplate(type, false);
 		PreparedStatement statement; 
@@ -159,7 +162,15 @@ public class TemplateBuilder {
 	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
 	    queryBase += "id NOT LIKE '%them%'";
 		
-	    String query = "SELECT * " + queryBase + " ORDER BY normalizedName ASC LIMIT 15 OFFSET ?";
+		// Default orderBy
+		String orderBy = "normalizedName ASC";
+
+		// Order by Date if the parameter was given
+		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
+			orderBy = "timeStamp ASC";
+		}
+
+	    String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
 	    String queryCount = "SELECT COUNT(id) " + queryBase;
 		
 		PreparedStatement ret = connection.prepareStatement(query);	

@@ -15,8 +15,13 @@ Uses SQLite, materializeCSS and jQuery.
 * Comics can be directly read through the user's browser
 * Records can be listened to through the browser (uses libTImidity)
 * All the content available on the archive can be automatically inserted into a game save provided by the user.
+* Basic JSON API.
 
-## Environment variables 
+## Using the API
+
+Adding `&format=json` to most search pages in the webapp will give you a JSON equivalent. Use at will! 🙋‍♂️  
+
+## Environment variables
 
 * WII_NUMBER: Wii Friend Code associated to the DoujinSoft WiiConnect24 account.
 * WII_FALLBACK: Wii Friend Code that will receive Wii Mail forwarded from DoujinSoft.
@@ -25,7 +30,7 @@ Uses SQLite, materializeCSS and jQuery.
 * DSOFT_PASS: Password for the Admin console.
 * WEBHOOK_URL: URL for a webhook. This hook is hit whenever new content is uploaded to DoujinSoft.
 
-## Deploying through Docker 
+## Deploying through Docker
 
 You can deploy the provided [Docker image](https://hub.docker.com/r/difegue/doujinsoft) by mapping a volume to /home/doujinsoft:
 ```
@@ -34,7 +39,7 @@ docker run --mount type=bind,src=/my/data/directory,dst=/home/doujinsoft -p 8080
 
 If you want to use WC24 interop, the environment variables WII_NUMBER, WII_FALLBACK, WC24_SERVER and WC24_PASSWORD must be defined.  
 
-## Deploying manually 
+## Deploying manually
 
 Get the [release WAR](https://github.com/Difegue/DoujinSoft/releases) (or just build it with maven from the sources)  
 Edit your tomcat context to specify your data directory:  

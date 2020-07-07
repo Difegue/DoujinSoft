@@ -78,7 +78,10 @@ function loadItems(pageNumber) {
 	window.scrollTo(0,0);  
 
 	//Posts to itself -> one function for all three pages
-	$.post( window.location.href, { page: pageNumber, name: $("#item_name").val(), creator: $("#maker_name").val() } )
+	$.post( window.location.href, { page: pageNumber, 
+									name: $("#item_name").val(), 
+									creator: $("#maker_name").val(),
+									sort_by: $("#sort_by").val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
 			$('.tooltipped').tooltip({enterDelay: 50});

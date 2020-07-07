@@ -36,7 +36,13 @@ You can listen to the records in your browser! Just click on the vinyls to get l
   		<i class="material-icons left">clear</i>Clear
   	</a>
   	
-
+	<div class="input-field col s12">
+		<select id="sort_by">
+			<option value="name" selected onclick="loadItems(1)">Name</option>
+			<option value="date" onclick="loadItems(1)">Date</option>
+		</select>
+		<label>Sort By</label>
+	</div>
 </div>
 <br/>
 <div id="pagination-top" class="pagination-wrapper chip">
