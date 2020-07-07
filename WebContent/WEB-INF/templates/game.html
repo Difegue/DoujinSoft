@@ -27,7 +27,16 @@ You can download .mio files directly or make a selection to import into a save l
             <input id="item_name" type="text" style="margin-top:-5px">
             <label class="" for="item_name" style="margin-top:-5px">Game Name</label>
           </div>
-      </div>
+	  </div>
+	  
+	<div class="input-field col s2 white-text">
+		<select id="sort_by">
+			<option value="name" selected onclick="loadItems(1)">Name</option>
+			<option value="date" onclick="loadItems(1)">Most Recent</option>
+		</select>
+		<label>Sort By</label>
+	</div>
+
     <br/>  <br/>   
   	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
   		<i class="material-icons left">search</i>Search
@@ -35,14 +44,6 @@ You can download .mio files directly or make a selection to import into a save l
   	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
   		<i class="material-icons left">clear</i>Clear
 	</a>
-	
-	<div class="input-field col s12">
-		<select id="sort_by">
-			<option value="name" selected onclick="loadItems(1)">Name</option>
-			<option value="date" onclick="loadItems(1)">Date</option>
-		</select>
-		<label>Sort By</label>
-	</div>
 </div>
 <br/>
 <div id="pagination-top" class="pagination-wrapper chip">

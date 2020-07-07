@@ -64,7 +64,7 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 
 		// Order by Date if the parameter was given
 		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
-			orderBy = "timeStamp ASC";
+			orderBy = "timeStamp DESC";
 		}
 
 		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
