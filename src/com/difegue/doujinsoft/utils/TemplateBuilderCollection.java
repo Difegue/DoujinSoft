@@ -35,7 +35,8 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 			return writeToTemplate();
 		}
 
-  		ResultSet result = statement.executeQuery("select * from "+tableName+" WHERE hash IN "+c.getMioSQL()+" ORDER BY normalizedName ASC LIMIT 15");
+		// Unlike the regular pages, ordering by timestamp is the default for collections
+  		ResultSet result = statement.executeQuery("select * from "+tableName+" WHERE hash IN "+c.getMioSQL()+" ORDER BY timeStamp DESC LIMIT 15");
   		while(result.next()) 
 		  	items.add(classConstructor.newInstance(result));
   		
@@ -59,12 +60,13 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 	    String queryBase = "FROM "+tableName+" WHERE hash IN "+c.getMioSQL();
 	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
 		
-		// Default orderBy
-		String orderBy = "normalizedName ASC";
+		// Default orderBy - 
+		// Unlike the regular pages, ordering by timestamp is the default for collections
+		String orderBy = "timeStamp DESC";
 
 		// Order by Date if the parameter was given
-		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
-			orderBy = "timeStamp DESC";
+		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
+			orderBy = "normalizedName ASC";
 		}
 
 		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
