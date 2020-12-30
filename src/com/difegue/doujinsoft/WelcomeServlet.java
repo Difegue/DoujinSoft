@@ -92,6 +92,9 @@ public class WelcomeServlet extends HttpServlet {
     	
     	File[] files = new File(dataDir+"/collections/").listFiles();
         
+	// Sort collections by filename
+    	Arrays.sort(files);
+	    
         for (File f: files) {
     	
         	//Try opening the matching JSON file 
