@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -124,11 +125,11 @@ public class WelcomeServlet extends HttpServlet {
 		String dataDir = application.getInitParameter("dataDirectory");
 
 		// create a database connection
-	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
-	    Statement statement = connection.createStatement();
-	    statement.setQueryTimeout(30);  // set timeout to 30 sec.
-		
-	    ResultSet result = statement.executeQuery("select COUNT(id) from Games");
+		connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+		Statement statement = connection.createStatement();
+	 	statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+		ResultSet result = statement.executeQuery("select COUNT(id) from Games");
 		context.put("totalGames", result.getInt(1));
 		
 		result = statement.executeQuery("select COUNT(id) from Records");
