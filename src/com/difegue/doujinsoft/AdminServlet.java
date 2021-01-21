@@ -183,6 +183,8 @@ public class AdminServlet extends HttpServlet {
 
                 for(List<MailItem> chunk : chunkedMails) {
                     output += wc24.sendMails(chunk);
+		    // Sleep between chunks to avoid murdering the RC24 server :|
+		    Thread.sleep(10000);
                 }
 
             } catch (Exception e) {
