@@ -37,6 +37,7 @@ import com.difegue.doujinsoft.templates.Collection;
 
 public class MailItemParser extends WC24Base {
 
+    private final Pattern pattern = Pattern.compile("w([0-9]*)@"+ Pattern.quote(wc24Server));
     private String dataDir;
     private String mailFallbackCode;
 	
@@ -193,7 +194,6 @@ public class MailItemParser extends WC24Base {
     private String getWiiCode(String address) {
 
         // Get wii code by stripping "w" and "@wii.com" from the sender's address
-        Pattern pattern = Pattern.compile("w([0-9]*)@"+ Pattern.quote(wc24Server));
         Matcher matcher = pattern.matcher(address);
         while (matcher.find()) {
             return matcher.group(1);
