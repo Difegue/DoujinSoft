@@ -4,3 +4,5 @@ DoujinSoft.iml
 node_modules
 package-lock.json
 .settings/org.eclipse.m2e.core.prefs
+DoujinSoft.ipr
+DoujinSoft.iws
