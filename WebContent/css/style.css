@@ -19,7 +19,7 @@
 
 @font-face {
     font-family: 'warioware';
-    src: url('WarioWareMPG.ttf') format('ttf');
+    src: url('WarioWareMPG.ttf');
     font-weight: normal;
     font-style: normal;
 }
