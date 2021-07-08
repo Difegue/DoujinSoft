@@ -19,8 +19,7 @@
 
 @font-face {
     font-family: 'warioware';
-    src: url('warioware_inc.-webfont.woff2') format('woff2'),
-         url('warioware_inc.-webfont.woff') format('woff');
+    src: url('WarioWareMPG.ttf') format('ttf');
     font-weight: normal;
     font-style: normal;
 }
