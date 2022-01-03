@@ -6,168 +6,178 @@
 {% block title %}Cart{% endblock %}
 
 {% block desc %}
-	Ship out content to your game, (nearly) all handled by us.
-	<br><br>
-	You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
-	<br>
-	Alternatively, if your Wii console is using <a href="http://rc24.xyz">RiiConnect24</a>, we can send stuff directly to it. No save export/import needed! <br>
+Ship out content to your game, (nearly) all handled by us.
+<br><br>
+You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
+<br>
+Alternatively, if your Wii console is using <a href="http://rc24.xyz">RiiConnect24</a>, we can send stuff directly to
+it. No save export/import needed! <br>
 {% endblock %}
 
 {% block content %}
 
 <div id="cart-content">
-	<h5 class="amber-text"> <i class="material-icons">filter_1</i> Check your Cart</h5> 
+	<h5 class="amber-text"> <i class="material-icons">filter_1</i> Check your Cart</h5>
 	<ul class="collection black-text" style="text-align:left" id="cart-main">
-	
+
 	</ul>
-	<br/>
+	<br />
 	<form id="checkout-form" class="col l6 m12" action="" method="post" enctype='multipart/form-data'>
 		<h5 class="amber-text "> <i class="material-icons">filter_2</i> Shipping Method
 
 			<label>
-				<input class="with-gap" name="method" type="radio" id="wc24-radio" value="wc24" checked onclick="updateShipping('wc24')">
+				<input class="with-gap" name="method" type="radio" id="wc24-radio" value="wc24" checked
+					onclick="updateShipping('wc24')">
 				<span>RiiConnect24</span>
 			</label>
 
 			<label>
-				<input class="with-gap" name="method" type="radio" id="save-radio" value="savefile" onclick="updateShipping('save')">
+				<input class="with-gap" name="method" type="radio" id="save-radio" value="savefile"
+					onclick="updateShipping('save')">
 				<span>Save Import</span>
 			</label>
 
 		</h5>
 
-	    <div class="file-field input-field" id="save-ship" style="display:none">
-	      <div class="btn">
-	        <span>Select file </span>
-	        <input type="file" name="save" required>
-	      </div>
-	      <div class="file-path-wrapper white-text">
-	        <input class="file-path validate white-text" type="text" id="filename">
-	        Wii 6MB data.bin and NDS 32MB save files are supported. <br/> If there's no more space in the save, the remaining items will not be imported.
-		  </div>
-	    </div>
+		<div class="file-field input-field" id="save-ship" style="display:none">
+			<div class="btn">
+				<span>Select file </span>
+				<input type="file" name="save" required>
+			</div>
+			<div class="file-path-wrapper white-text">
+				<input class="file-path validate white-text" type="text" id="filename">
+				Wii 6MB data.bin and NDS 32MB save files are supported. <br /> If there's no more space in the save, the
+				remaining items will not be imported.
+			</div>
+		</div>
 
 		<div class="input-field white-text" id="wc24-ship">
 			<i class="material-icons prefix">contact_mail</i>
 			<input id="recipient" name="recipient" type="text" class="validate white-text" data-length="16">
 			<label for="recipient" class="">Wii Friend Code</label>
-			This will send the content to your Wii through RiiConnect24. <br/> Make sure you're <a href="#regmodal" class="modal-trigger">friends</a> with us before using this!
+			This will send the content to your Wii through RiiConnect24. <br /> Make sure you're <a href="#regmodal"
+				class="modal-trigger">friends</a> with us before using this!
 		</div>
 
-	    <input id="cartg" name="games" type="text" style="display:none">
-	    <input id="cartm" name="manga" type="text" style="display:none">
-	    <input id="cartr" name="records" type="text" style="display:none">
-	  </form>
-	<br/>
+		<input id="cartg" name="games" type="text" style="display:none">
+		<input id="cartm" name="manga" type="text" style="display:none">
+		<input id="cartr" name="records" type="text" style="display:none">
+	</form>
+	<br />
 
 	<div class="col l6 m12 white-text" style="margin-top:-25px">
-	  <h5 class="amber-text"> <i class="material-icons">filter_3</i> Let's get it on</h5>
+		<h5 class="amber-text"> <i class="material-icons">filter_3</i> Let's get it on</h5>
 		If you're all set, press this big button to start shipping!
-		<br/><br/>
-	  <center class="white-text" id="checkout-confirm">
+		<br /><br />
+		<center class="white-text" id="checkout-confirm">
 			<a class="btn-large" style="width:300px" onclick="checkoutSave()"> Checkout </a>
-	  </center>
+		</center>
 	</div>
- 
-        
+
+
 </div>
 
 <!-- Modal Structure -->
 <div id="regmodal" class="modal">
-    <div class="modal-content black-text">
-        <h4>Register your Wii with DoujinSoft</h4>
-        <p>
-            In order to use RiiConnect24 to receive games from DoujinSoft, you must first register your Wii Friend Code.
-            <br>
-            Add our <b>Friend Code</b> to your Wii first:
-        </p>
-        <center><h2 id="wii-number">{{wiiNumber}}</h2></center>
-        <p>
-            Then give us your own Friend Code here :
+	<div class="modal-content black-text">
+		<h4>Register your Wii with DoujinSoft</h4>
+		<p>
+			In order to use RiiConnect24 to receive games from DoujinSoft, you must first register your Wii Friend Code.
+			<br>
+			Add our <b>Friend Code</b> to your Wii first:
+		</p>
+		<center>
+			<h2 id="wii-number">{{wiiNumber}}</h2>
+		</center>
+		<p>
+			Then give us your own Friend Code here :
 
-            <input id="friendreg" type="text" class="validate" data-length="16">
-            <label for="friendreg" class="">Wii Friend Code</label>
-            <br>
-            <a class="waves-effect waves-light btn" onclick="registerFriendCode()">Add me!</a> <span id="regresult" style="margin-left:10px"> </span>
-            <br><br><br>
-            If you don't want to use RiiConnect24, just close this popup and we won't ask again! 🙏
+			<input id="friendreg" type="text" class="validate" data-length="16">
+			<label for="friendreg" class="">Wii Friend Code</label>
+			<br>
+			<a class="waves-effect waves-light btn" onclick="registerFriendCode()">Add me!</a> <span id="regresult"
+				style="margin-left:10px"> </span>
+			<br><br><br>
+			If you don't want to use RiiConnect24, just close this popup and we won't ask again! 🙏
 
-        </p>
-    </div>
-    <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-    </div>
+		</p>
+	</div>
+	<div class="modal-footer">
+		<a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+	</div>
 </div>
 
 
 <script>
 
-//Populate cart with localStorage
+	//Populate cart with localStorage
 
-var games = JSON.parse(localStorage.getItem("game"));
-var manga = JSON.parse(localStorage.getItem("manga"));
-var record = JSON.parse(localStorage.getItem("record"));
+	var games = JSON.parse(localStorage.getItem("game"));
+	var manga = JSON.parse(localStorage.getItem("manga"));
+	var record = JSON.parse(localStorage.getItem("record"));
 
-if (games === null && manga === null && record === null) 
-	$("#cart-content").html('<h5 class="white-text center">...But your cart seems to be empty right now.</h5> <br/> <br/>  <span class="white-text" style="font-size:10vw">¯\\_(ツ)_/¯</span>   ');
+	if (games === null && manga === null && record === null)
+		$("#cart-content").html('<h5 class="white-text center">...But your cart seems to be empty right now.</h5> <br/> <br/>  <span class="white-text" style="font-size:10vw">¯\\_(ツ)_/¯</span>   ');
 
-if (games != null)
-for (i=0; i< games.length; i++)
-	$("#cart-main").append([
-		  '<li class="collection-item avatar cart-item" id="'+games[i].id+'" type="game" >',
-		  '		<i class="material-icons green-text cart-icon">videogame_asset</i>',
-		  '		<span class="title">'+escapeHtml(games[i].name.trim())+'</span>',
-		  '		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
-		  '			<i class="material-icons">delete</i>',
-		  '		</a>',
-		  '</li>'
-		].join("\n"));
+	if (games != null)
+		for (i = 0; i < games.length; i++)
+			$("#cart-main").append([
+				'<li class="collection-item avatar cart-item" id="' + games[i].id + '" type="game" >',
+				'		<i class="material-icons green-text cart-icon">videogame_asset</i>',
+				'		<span class="title">' + escapeHtml(games[i].name.trim()) + '</span>',
+				'		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
+				'			<i class="material-icons">delete</i>',
+				'		</a>',
+				'</li>'
+			].join("\n"));
 
-if (manga != null)
-for (i=0; i< manga.length; i++)
-	$("#cart-main").append([
-		  '<li class="collection-item avatar cart-item" id="'+manga[i].id+'" type="manga">',
-		  '		<i class="material-icons blue-text cart-icon">local_library</i>',
-		  '		<span class="title">'+escapeHtml(manga[i].name.trim())+'</span>',
-		  '		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
-		  '			<i class="material-icons">delete</i>',
-		  '		</a>',
-		  '</li>'
-		].join("\n"));
-		
-if (record != null)
-for (i=0; i< record.length; i++)
-	$("#cart-main").append([
-		  '<li class="collection-item avatar cart-item" id="'+record[i].id+'" type="record">',
-		  '		<i class="material-icons pink-text cart-icon">album</i>',
-		  '		<span class="title">'+escapeHtml(record[i].name.trim())+'</span>',
-		  '		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
-		  '			<i class="material-icons">delete</i>',
-		  '		</a>',
-		  '</li>'
-		].join("\n"));
+	if (manga != null)
+		for (i = 0; i < manga.length; i++)
+			$("#cart-main").append([
+				'<li class="collection-item avatar cart-item" id="' + manga[i].id + '" type="manga">',
+				'		<i class="material-icons blue-text cart-icon">local_library</i>',
+				'		<span class="title">' + escapeHtml(manga[i].name.trim()) + '</span>',
+				'		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
+				'			<i class="material-icons">delete</i>',
+				'		</a>',
+				'</li>'
+			].join("\n"));
 
-$('input#recipient').characterCounter();
-$('#regmodal').modal();
+	if (record != null)
+		for (i = 0; i < record.length; i++)
+			$("#cart-main").append([
+				'<li class="collection-item avatar cart-item" id="' + record[i].id + '" type="record">',
+				'		<i class="material-icons pink-text cart-icon">album</i>',
+				'		<span class="title">' + escapeHtml(record[i].name.trim()) + '</span>',
+				'		<a class="secondary-content cart-del" onclick="deleteFromCart($(this).parent())">',
+				'			<i class="material-icons">delete</i>',
+				'		</a>',
+				'</li>'
+			].join("\n"));
 
-formattedFC = $("#wii-number").html().replace(/(\d{4}\s*)/g, function(match){
-            //Strip spaces
-            if(match.match(/\s/)){return match;}
-            return match + " ";
-    });
+	$('input#recipient').characterCounter();
+	$('#regmodal').modal();
 
-$("#wii-number").html(formattedFC);
+	formattedFC = $("#wii-number").html().replace(/(\d{4}\s*)/g, function (match) {
+		//Strip spaces
+		if (match.match(/\s/)) { return match; }
+		return match + " ";
+	});
 
-// Check if user has registered his FC (it's all localStorage based I am a horrible person)
-if (!localStorage.hasOwnProperty("sawFCDialog")) {
+	$("#wii-number").html(formattedFC);
 
-    localStorage.sawFCDialog = true;
-    M.Modal.getInstance($('#regmodal')[0]).open();
-}
+	// Check if user has registered his FC (it's all localStorage based I am a horrible person)
+	if (!localStorage.hasOwnProperty("sawFCDialog")) {
 
-if (!localStorage.hasOwnProperty("userWiiCode")) {
-	$("#recipient").val(localStorage.userWiiCode);
-}
+		localStorage.sawFCDialog = true;
+		M.Modal.getInstance($('#regmodal')[0]).open();
+	}
+
+	// Prefill friendcode if it's in localStorage
+	if (localStorage.hasOwnProperty("userWiiCode")) {
+		$("#recipient").val(localStorage.userWiiCode);
+		$("#recipient").focus();
+	}
 
 </script>
 

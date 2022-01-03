@@ -13,7 +13,7 @@ Uses SQLite, materializeCSS and jQuery.
 * .mio files dropped into the Webapp's data directory are parsed and added to the archive (on every app restart)
 * Searchable lists with pages for every content (Games/Comics/Records)
 * Comics can be directly read through the user's browser
-* Records can be listened to through the browser (uses libTImidity)
+* Records can be listened to through the browser (uses [libTimidity](https://www.npmjs.com/package/timidity))
 * All the content available on the archive can be automatically inserted into a game save provided by the user.
 * Basic JSON API.
 
