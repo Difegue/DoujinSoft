@@ -9,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,7 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
  */
 public class TemplateBuilder {
 
-	protected ArrayList items = new ArrayList();
+	protected ArrayList<Object> items = new ArrayList<Object>();
 	protected Constructor classConstructor;
 
 	protected Map<String, Object> context = new HashMap<>();
@@ -40,7 +39,7 @@ public class TemplateBuilder {
 
 	protected String tableName, dataDir;
 	protected boolean isNameSearch, isCreatorSearch, isSortedBy;
-	
+
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
 
@@ -50,15 +49,16 @@ public class TemplateBuilder {
 		this.request = request;
 		dataDir = application.getInitParameter("dataDirectory");
 
-	    // create a database connection
-	    connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite");
+		// create a database connection
+		connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite");
 	}
 
 	protected void initializeTemplate(int type, boolean isDetail) throws NoSuchMethodException, PebbleException {
 
 		String templatePath = "/WEB-INF/templates/";
-		//Getting base template and other type dependant data
-		//If in search mode, we only use the part of the template containing the item cards 
+		// Getting base template and other type dependant data
+		// If in search mode, we only use the part of the template containing the item
+		// cards
 		switch (type) {
 			case Types.GAME:
 				templatePath += "game";
@@ -79,16 +79,17 @@ public class TemplateBuilder {
 				templatePath += "surveys";
 				tableName = "Surveys";
 				classConstructor = Survey.class.getConstructor(ResultSet.class);
-			}
+		}
 
 		if (isDetail) {
-			templatePath   += "Detail";	
-			isNameSearch    = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
-			isCreatorSearch = request.getParameterMap().containsKey("creator") && !request.getParameter("creator").isEmpty();
-			isSortedBy      = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
+			templatePath += "Detail";
+			isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+			isCreatorSearch = request.getParameterMap().containsKey("creator")
+					&& !request.getParameter("creator").isEmpty();
+			isSortedBy = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
 		}
-			
-		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath+".html"));
+
+		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath + ".html"));
 	}
 
 	protected String writeToTemplate() throws PebbleException, IOException {
@@ -96,43 +97,46 @@ public class TemplateBuilder {
 		Writer writer = new StringWriter();
 		compiledTemplate.evaluate(writer, context);
 		String output = writer.toString();
-		
+
 		return output;
 	}
 
 	/*
-	 * For GET requests. Grab the standard template, and add the first page of items.
+	 * For GET requests. Grab the standard template, and add the first page of
+	 * items.
 	 */
 	public String doStandardPageGeneric(int type) throws Exception {
 
-		// TODO: allow searches 
+		// TODO: allow searches
 
 		initializeTemplate(type, false);
-		PreparedStatement statement; 
+		PreparedStatement statement;
 
 		ResultSet result;
 		if (request.getParameterMap().containsKey("id")) {
-			statement = connection.prepareStatement("select * from "+tableName+" WHERE hash == ?");
+			statement = connection.prepareStatement("select * from " + tableName + " WHERE hash == ?");
 			statement.setString(1, request.getParameter("id"));
+		} else {
+			statement = connection.prepareStatement(
+					"select * from " + tableName + " WHERE id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
 		}
-		else {
-			statement = connection.prepareStatement("select * from "+tableName+" WHERE id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
-		}
-		result = statement.executeQuery();	
-  		
-  		while(result.next()) 
-	    		items.add(classConstructor.newInstance(result));
-		  
+		result = statement.executeQuery();
+
+		while (result.next())
+			items.add(classConstructor.newInstance(result));
+
 		result.close();
 		context.put("items", items);
-		
-		// If the request is for a specific hash, disable search by setting totalitems to -1
+
+		// If the request is for a specific hash, disable search by setting totalitems
+		// to -1
 		if (request.getParameterMap().containsKey("id")) {
-			context.put("totalitems", -1);	
+			context.put("totalitems", -1);
 			context.put("singleitem", true);
-		} else {	
+		} else {
 			statement.close();
-			statement = connection.prepareStatement("select COUNT(id) from "+tableName+" WHERE id NOT LIKE '%them%'");
+			statement = connection
+					.prepareStatement("select COUNT(id) from " + tableName + " WHERE id NOT LIKE '%them%'");
 			result = statement.executeQuery();
 			context.put("totalitems", result.getInt(1));
 			result.close();
@@ -146,22 +150,23 @@ public class TemplateBuilder {
 
 		statement.close();
 		connection.close();
-		//Output to client
+		// Output to client
 		return writeToTemplate();
 	}
 
 	/*
-	 * For POST requests. Perform a request based on the parameters given (search and/or pages) and return the matching subtemplate.
+	 * For POST requests. Perform a request based on the parameters given (search
+	 * and/or pages) and return the matching subtemplate.
 	 */
 	public String doSearchGeneric(int type) throws Exception {
 
 		initializeTemplate(type, true);
-		
+
 		// Build both data and count queries
-	    String queryBase = "FROM "+tableName+" WHERE ";
-	    queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND ": "";
-	    queryBase += "id NOT LIKE '%them%'";
-		
+		String queryBase = "FROM " + tableName + " WHERE ";
+		queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
+		queryBase += "id NOT LIKE '%them%'";
+
 		// Default orderBy
 		String orderBy = "normalizedName ASC";
 
@@ -170,33 +175,33 @@ public class TemplateBuilder {
 			orderBy = "timeStamp DESC";
 		}
 
-	    String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
-	    String queryCount = "SELECT COUNT(id) " + queryBase;
-		
-		PreparedStatement ret = connection.prepareStatement(query);	
+		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
+		String queryCount = "SELECT COUNT(id) " + queryBase;
+
+		PreparedStatement ret = connection.prepareStatement(query);
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
-		//Those filters go in the LIKE parts of the query
-		String name    = isNameSearch ? request.getParameter("name")+"%" : "%";
-		String creator = isCreatorSearch ? request.getParameter("creator")+"%" : "%";
+		// Those filters go in the LIKE parts of the query
+		String name = isNameSearch ? request.getParameter("name") + "%" : "%";
+		String creator = isCreatorSearch ? request.getParameter("creator") + "%" : "%";
 
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
-		
+
 		if (isNameSearch || isCreatorSearch) {
 			ret.setString(1, name);
 			ret.setString(2, creator);
 			retCount.setString(1, name);
-		    retCount.setString(2, creator);
-			ret.setInt(3, page*15-15);
-		} else 
-			ret.setInt(1, page*15-15);
-    	
+			retCount.setString(2, creator);
+			ret.setInt(3, page * 15 - 15);
+		} else
+			ret.setInt(1, page * 15 - 15);
+
 		ResultSet result = ret.executeQuery();
-	    
-	    while(result.next()) 
-	    	items.add(classConstructor.newInstance(result));
+
+		while (result.next())
+			items.add(classConstructor.newInstance(result));
 
 		result.close();
 		ret.close();
@@ -213,6 +218,6 @@ public class TemplateBuilder {
 		retCount.close();
 		connection.close();
 		return writeToTemplate();
-    }
-	
+	}
+
 }

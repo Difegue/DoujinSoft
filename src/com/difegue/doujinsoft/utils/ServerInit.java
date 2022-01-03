@@ -3,7 +3,6 @@ package com.difegue.doujinsoft.utils;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -18,14 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.difegue.doujinsoft.wc24.MailItemParser;
 import com.difegue.doujinsoft.wc24.WiiConnect24Api;
-import com.xperia64.diyedit.FileByteOperations;
-import com.xperia64.diyedit.editors.GameEdit;
-import com.xperia64.diyedit.editors.MangaEdit;
-import com.xperia64.diyedit.editors.RecordEdit;
-import com.xperia64.diyedit.metadata.Metadata;
 
 /*
  * Ran on each server startup - Handles database updating.
@@ -33,10 +26,9 @@ import com.xperia64.diyedit.metadata.Metadata;
 public class ServerInit implements javax.servlet.ServletContextListener {
 
     private ScheduledExecutorService scheduler;
-    
-    //Database structure, straightforward stuff
-    private void databaseDefinition(Statement statement) throws SQLException
-    {
+
+    // Database structure, straightforward stuff
+    private void databaseDefinition(Statement statement) throws SQLException {
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Games "
                 + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
                 + "previewPic TEXT, PRIMARY KEY(`hash`) )");
@@ -74,19 +66,19 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         ServletContext application = arg0.getServletContext();
         String dataDir = application.getInitParameter("dataDirectory");
 
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
             // Create database if nonexistent
-            SQLog.log(Level.INFO, "Connected to database at "+dataDir+"/mioDatabase.sqlite");
+            SQLog.log(Level.INFO, "Connected to database at " + dataDir + "/mioDatabase.sqlite");
 
             Statement statement = connection.createStatement();
-            statement.setQueryTimeout(30);  // set timeout to 30 sec.
+            statement.setQueryTimeout(30); // set timeout to 30 sec.
 
             databaseDefinition(statement);
 
             // Look for a WC24 mail dump file and parse it if it exists
             SQLog.log(Level.INFO, "Looking for mails.wc24 file...");
-            File wc24Mails = new File(dataDir+"/mails.wc24");
-            
+            File wc24Mails = new File(dataDir + "/mails.wc24");
+
             if (wc24Mails.exists()) {
                 try (Scanner s = new Scanner(wc24Mails)) {
                     String emailData = s.useDelimiter("\\Z").next();
@@ -95,27 +87,28 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                 wc24Mails.delete();
             }
 
-            //Create the mio directory if it doesn't exist - although that means we probably won't find any games to parse...
-            if (!new File (dataDir+"/mio/").exists())
-                new File(dataDir+"/mio/").mkdirs();
+            // Create the mio directory if it doesn't exist - although that means we
+            // probably won't find any games to parse...
+            if (!new File(dataDir + "/mio/").exists())
+                new File(dataDir + "/mio/").mkdirs();
 
             // Parse .mios in "new" folder before renaming+moving them
             SQLog.log(Level.INFO, "Looking for new .mio files...");
             MioStorage.ScanForNewMioFiles(dataDir, SQLog);
-            
+
             statement.executeUpdate("PRAGMA journal_mode=WAL;");
             statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");
-            statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");   
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx;");
-            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx;");  
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx2;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx2;");
-            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx2;");  
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx2;");
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx3;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx3;");
-            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx3;"); 
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx3;");
 
             // Rebuild indexes
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
@@ -130,16 +123,15 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Games_search_idx3 ON Games (timeStamp);");
             statement.executeUpdate("CREATE INDEX Manga_search_idx3 ON Manga (timeStamp);");
             statement.executeUpdate("CREATE INDEX Record_search_idx3 ON Records (timeStamp);");
-            
+
             statement.close();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             // if the error message is "out of memory",
             // it probably means no database file is found
             e.printStackTrace();
             SQLog.log(Level.SEVERE, e.getMessage());
         }
-        
+
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(new WiiConnect24MailCollection(application), 0, 1, TimeUnit.HOURS);
     }
@@ -152,11 +144,11 @@ public class ServerInit implements javax.servlet.ServletContextListener {
     public class WiiConnect24MailCollection implements Runnable {
 
         private ServletContext application;
-        
+
         public WiiConnect24MailCollection(ServletContext a) {
-            application = a;   
+            application = a;
         }
-        
+
         @Override
         public void run() {
             // Receive mails once per hour.
@@ -166,8 +158,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-          }
+        }
     }
-    
-    
+
 }

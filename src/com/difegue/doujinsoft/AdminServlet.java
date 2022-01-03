@@ -34,113 +34,114 @@ import com.xperia64.diyedit.metadata.Metadata;
 import org.apache.commons.codec.binary.Base64;
 
 @WebServlet("/manage")
-public class AdminServlet extends HttpServlet { 
+public class AdminServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private Logger ServletLog;
-
-    HashMap validUsers = new HashMap();
 
     /**
      * @see HttpServlet#HttpServlet()
      */
     public AdminServlet() {
-        super(); 
+        super();
         ServletLog = Logger.getLogger("AdminServlet");
-        ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));    
+        ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
-                    throws ServletException, IOException {
-        
+            throws ServletException, IOException {
+
         res.setContentType("text/html");
 
-        if (!authenticate(req,res))
+        if (!authenticate(req, res))
             return;
 
         // Allowed
         res.setContentType("text/html; charset=UTF-8");
         ServletContext application = getServletConfig().getServletContext();
         String output = "";
-        
+
         try {
             output = doStandardPage(application);
             res.getWriter().append(output);
-                
+
         } catch (PebbleException e) {
             ServletLog.log(Level.SEVERE, e.getMessage());
         }
     }
 
     /**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
         ServletContext application = getServletConfig().getServletContext();
         String dataDir = application.getInitParameter("dataDirectory");
         String output = "Nothing!";
         // Needed for mio filenames with non-standard characters
-        req.setCharacterEncoding( "UTF-8" );
+        req.setCharacterEncoding("UTF-8");
 
-        if (!authenticate(req,res))
+        if (!authenticate(req, res))
             return;
 
-		if (req.getParameterMap().containsKey("collection_name")) {
-			// New collection
-			Collection c = new Collection();
-			c.collection_type = req.getParameter("collection_type");
-			c.collection_name = req.getParameter("collection_name");
-			c.collection_icon = req.getParameter("collection_icon");
-			c.collection_desc = req.getParameter("collection_desc");
-			c.collection_desc2 = req.getParameter("collection_desc2");
-			c.collection_color = req.getParameter("collection_color");
-			c.background_pic = req.getParameter("background_pic");
+        if (req.getParameterMap().containsKey("collection_name")) {
+            // New collection
+            Collection c = new Collection();
+            c.collection_type = req.getParameter("collection_type");
+            c.collection_name = req.getParameter("collection_name");
+            c.collection_icon = req.getParameter("collection_icon");
+            c.collection_desc = req.getParameter("collection_desc");
+            c.collection_desc2 = req.getParameter("collection_desc2");
+            c.collection_color = req.getParameter("collection_color");
+            c.background_pic = req.getParameter("background_pic");
             c.mios = new String[0];
 
-			// Serialize new collection to file
-            File collectionFile = new File(dataDir+"/collections/"+req.getParameter("collection_id")+".json");
+            // Serialize new collection to file
+            File collectionFile = new File(dataDir + "/collections/" + req.getParameter("collection_id") + ".json");
             CollectionUtils.SaveCollectionToFile(c, collectionFile.getAbsolutePath());
             output = "Collection created at " + collectionFile.getAbsolutePath();
 
-		}
+        }
 
-		if (req.getParameterMap().containsKey("approvedmios")) {
-		    output = "";
-			// Approved/denied files w. collections
-            for (String key: req.getParameterMap().keySet()) {
+        if (req.getParameterMap().containsKey("approvedmios")) {
+            output = "";
+            // Approved/denied files w. collections
+            for (String key : req.getParameterMap().keySet()) {
 
                 // Only take approve-x.mio keys
-                if (!key.startsWith("approve-")) continue;
+                if (!key.startsWith("approve-"))
+                    continue;
 
-                var s = key.replace("approve-","");
-                output +="Looking for approved file "+s+"...\n";
-                File approvedMio = new File(dataDir+"/pending/"+s);
+                var s = key.replace("approve-", "");
+                output += "Looking for approved file " + s + "...\n";
+                File approvedMio = new File(dataDir + "/pending/" + s);
                 if (approvedMio.exists()) {
-                    output +="Found! Adding to mio folder.\n";
+                    output += "Found! Adding to mio folder.\n";
                     // Add to collection
-                    var cKey = "collection-"+s;
+                    var cKey = "collection-" + s;
                     if (req.getParameterMap().containsKey(cKey) && !req.getParameter(cKey).isEmpty()) {
 
-                        output+="Added to collection "+req.getParameter(cKey)+"\n";
-                        
+                        output += "Added to collection " + req.getParameter(cKey) + "\n";
+
                         // Deserialize collection, add new file hash and reserialize it
-                        String path = dataDir+"/collections/"+req.getParameter(cKey);
+                        String path = dataDir + "/collections/" + req.getParameter(cKey);
                         Collection c = CollectionUtils.GetCollectionFromFile(path);
                         c.addMioHash(MioStorage.computeMioHash(FileByteOperations.read(approvedMio.getAbsolutePath())));
                         CollectionUtils.SaveCollectionToFile(c, path);
 
                     }
-                    approvedMio.renameTo(new File(dataDir+"/mio/"+s));
+                    approvedMio.renameTo(new File(dataDir + "/mio/" + s));
                 }
             }
 
             // Delete all remaining files in the pending directory
-            File[] files = new File(dataDir+"/pending/").listFiles();
-            if (files != null) for (File f: files) {
-                    output +="File "+f.getName()+" not approved -- deleting.\n";
+            File[] files = new File(dataDir + "/pending/").listFiles();
+            if (files != null)
+                for (File f : files) {
+                    output += "File " + f.getName() + " not approved -- deleting.\n";
                     f.delete();
-            }
+                }
 
             // Parse files in the mio dir
             try {
@@ -149,7 +150,7 @@ public class AdminServlet extends HttpServlet {
                 ServletLog.log(Level.SEVERE, e.getMessage());
                 output = e.getMessage();
             }
-		}
+        }
 
         if (req.getParameterMap().containsKey("sendmail")) {
             // Send Wii mail through WC24
@@ -157,20 +158,21 @@ public class AdminServlet extends HttpServlet {
             String message = req.getParameter("mail_content");
             String code = req.getParameter("wii_code");
 
-            try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
+            try (Connection connection = DriverManager
+                    .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
                 if (code.equals("0")) {
                     // Get all wii codes stored in the friends table and send a mail to each one
                     Statement statement = connection.createStatement();
-                    statement.setQueryTimeout(30);  // set timeout to 30 sec.
+                    statement.setQueryTimeout(30); // set timeout to 30 sec.
                     ResultSet result = statement.executeQuery("select friendcode from Friends");
 
-                    while(result.next())
+                    while (result.next())
                         mails.add(new MailItem(result.getString("friendcode"), message));
 
                     result.close();
                     statement.close();
                 } else {
-                    mails.add(new MailItem(code,message));
+                    mails.add(new MailItem(code, message));
                 }
                 WiiConnect24Api wc24 = new WiiConnect24Api(application);
 
@@ -181,10 +183,10 @@ public class AdminServlet extends HttpServlet {
                         .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / 10))
                         .values();
 
-                for(List<MailItem> chunk : chunkedMails) {
+                for (List<MailItem> chunk : chunkedMails) {
                     output += wc24.sendMails(chunk);
-		    // Sleep between chunks to avoid murdering the RC24 server :|
-		    Thread.sleep(10000);
+                    // Sleep between chunks to avoid murdering the RC24 server :|
+                    Thread.sleep(10000);
                 }
 
             } catch (Exception e) {
@@ -193,58 +195,60 @@ public class AdminServlet extends HttpServlet {
             }
         }
 
-		//Output is dumb HTML
+        // Output is dumb HTML
         res.setContentType("text/html; charset=UTF-8");
         res.getWriter().append(output);
-	}
+    }
 
-    //Generates the regular landing page.
+    // Generates the regular landing page.
     private String doStandardPage(ServletContext application) throws PebbleException, IOException {
 
         String dataDir = application.getInitParameter("dataDirectory");
         Map<String, Object> context = new HashMap<>();
 
         // Parse pending .mios and add them to the context
-        File[] files = new File(dataDir+"/pending/").listFiles();
+        File[] files = new File(dataDir + "/pending/").listFiles();
         HashMap<String, BaseMio> pending = new HashMap<>();
-        if (files != null) for (File f: files) {
-            if (!f.isDirectory()) {
-                byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
-                Metadata metadata = new Metadata(mioData);
-                BaseMio mio = new BaseMio(metadata);
-                pending.put(f.getName(), mio);
+        if (files != null)
+            for (File f : files) {
+                if (!f.isDirectory()) {
+                    byte[] mioData = FileByteOperations.read(f.getAbsolutePath());
+                    Metadata metadata = new Metadata(mioData);
+                    BaseMio mio = new BaseMio(metadata);
+                    pending.put(f.getName(), mio);
+                }
             }
-    }
         context.put("pendingMios", pending);
 
         // Parse collections and add them to the context
-        File[] collections = new File(dataDir+"/collections/").listFiles();
-        HashMap<String,Collection> parsedCollections = new HashMap<>();
+        File[] collections = new File(dataDir + "/collections/").listFiles();
+        HashMap<String, Collection> parsedCollections = new HashMap<>();
 
-        if (collections != null) for (File f: collections) {
-            if (!f.isDirectory()) {
-                //Try opening the matching JSON file 
-                Gson gson = new Gson();
-                JsonReader jsonReader = new JsonReader(new FileReader(f));
-                //Auto bind the json to a class
-                parsedCollections.put(f.getName(),gson.fromJson(jsonReader, Collection.class));
+        if (collections != null)
+            for (File f : collections) {
+                if (!f.isDirectory()) {
+                    // Try opening the matching JSON file
+                    Gson gson = new Gson();
+                    JsonReader jsonReader = new JsonReader(new FileReader(f));
+                    // Auto bind the json to a class
+                    parsedCollections.put(f.getName(), gson.fromJson(jsonReader, Collection.class));
+                }
             }
-        }
         context.put("collections", parsedCollections);
 
         PebbleEngine engine = new PebbleEngine.Builder().build();
         PebbleTemplate compiledTemplate;
 
-        //Getting base template
+        // Getting base template
         compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/admin.html"));
-        
-        //Output to client
+
+        // Output to client
         Writer writer = new StringWriter();
         compiledTemplate.evaluate(writer, context);
         String output = writer.toString();
-        
+
         return output;
-        
+
     }
 
     private boolean authenticate(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -254,7 +258,7 @@ public class AdminServlet extends HttpServlet {
         if (!allowUser(auth)) {
             // Not allowed, so report he's unauthorized
             res.setHeader("WWW-Authenticate", "BASIC realm=\"DoujinSoft Authentication\"");
-            res.sendError(res.SC_UNAUTHORIZED);
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } else {
             return true;
@@ -266,10 +270,10 @@ public class AdminServlet extends HttpServlet {
     private boolean allowUser(String auth) throws ServletException {
 
         if (auth == null) {
-            return false;  // no auth
+            return false; // no auth
         }
         if (!auth.toUpperCase().startsWith("BASIC ")) {
-            return false;  // we only do BASIC
+            return false; // we only do BASIC
         }
         // Get encoded user and password, comes after "BASIC "
         String userpassEncoded = auth.substring(6);

@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import com.difegue.doujinsoft.utils.ExportMidi;
 import com.difegue.doujinsoft.utils.MioUtils;
 import com.google.gson.JsonObject;
 import com.mitchellbosecke.pebble.PebbleEngine;
@@ -27,32 +26,32 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;
 import com.xperia64.diyedit.editors.RecordEdit;
-import com.xperia64.diyedit.metadata.GameMetadata;
-import com.xperia64.diyedit.metadata.MangaMetadata;
 import com.xperia64.diyedit.metadata.Metadata;
-import com.xperia64.diyedit.metadata.RecordMetadata;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 
-
 /**
  * Servlet implementation class for Uploads.
- * Uploaded .mio files are checked through DIYEdit and then dropped in the "pending" directory.
- * If enabled by the matching environment variable, a webhook is triggered to warn of the newly-uploaded file(s).
+ * Uploaded .mio files are checked through DIYEdit and then dropped in the
+ * "pending" directory.
+ * If enabled by the matching environment variable, a webhook is triggered to
+ * warn of the newly-uploaded file(s).
  */
 @WebServlet("/upload")
-@MultipartConfig(fileSizeThreshold=1024*8,	// 8KB - smallest .mio filetype, records
-        maxFileSize=1024*64,		        // 64KB - .mio files can't go past that size
-        maxRequestSize=1024*1024*5)	        // 5MB - About 80 games, which is more than enough for a single request.
+@MultipartConfig(fileSizeThreshold = 1024 * 8, // 8KB - smallest .mio filetype, records
+        maxFileSize = 1024 * 64, // 64KB - .mio files can't go past that size
+        maxRequestSize = 1024 * 1024 * 5) // 5MB - About 80 games, which is more than enough for a single request.
 public class UploadServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Logger ServletLog;
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
         response.setContentType("text/html; charset=UTF-8");
         ServletContext application = getServletConfig().getServletContext();
@@ -70,16 +69,17 @@ public class UploadServlet extends HttpServlet {
     }
 
     /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
     protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
+            HttpServletResponse response) throws ServletException, IOException {
         // gets absolute path of the web application
         ServletContext application = getServletConfig().getServletContext();
         String dataDir = application.getInitParameter("dataDirectory");
 
         // Uploaded .mios land in the "pending" directory
-        String savePath = dataDir +"/pending";
+        String savePath = dataDir + "/pending";
 
         // creates the save directory if it does not exists
         File fileSaveDir = new File(savePath);
@@ -91,16 +91,29 @@ public class UploadServlet extends HttpServlet {
             String fileName = extractFileName(part);
 
             // Check if this is a proper .mio through DIYEdit
-            String type = "",name = "",creator = "";
+            String type = "", name = "", creator = "";
             byte[] mioData = part.getInputStream().readAllBytes();
             boolean valid = true;
             try {
                 Metadata m = null;
                 switch (mioData.length) { // Do some tests
-                    case MioUtils.Types.GAME: m = new GameEdit(mioData); type ="game"; MioUtils.getBase64GamePreview(mioData); break;
-                    case MioUtils.Types.MANGA: m = new MangaEdit(mioData); type="manga"; MioUtils.getBase64Manga(mioData,0); break;
-                    case MioUtils.Types.RECORD: m = new RecordEdit(mioData); type="record"; break;
-                    default: valid = false; break;
+                    case MioUtils.Types.GAME:
+                        m = new GameEdit(mioData);
+                        type = "game";
+                        MioUtils.getBase64GamePreview(mioData);
+                        break;
+                    case MioUtils.Types.MANGA:
+                        m = new MangaEdit(mioData);
+                        type = "manga";
+                        MioUtils.getBase64Manga(mioData, 0);
+                        break;
+                    case MioUtils.Types.RECORD:
+                        m = new RecordEdit(mioData);
+                        type = "record";
+                        break;
+                    default:
+                        valid = false;
+                        break;
                 }
                 name = m.getName();
                 creator = m.getCreator();
@@ -114,7 +127,7 @@ public class UploadServlet extends HttpServlet {
                 // Refine the fileName in case it is an absolute path
                 fileName = new File(fileName).getName();
                 // Save it to the pending directory
-                File mio = new File (savePath + File.separator + fileName);
+                File mio = new File(savePath + File.separator + fileName);
                 try (FileOutputStream fos = new FileOutputStream(mio.getAbsolutePath())) {
                     fos.write(mioData);
                 }
@@ -133,7 +146,7 @@ public class UploadServlet extends HttpServlet {
             response.setCharacterEncoding("utf-8");
             PrintWriter out = response.getWriter();
 
-            //create Json Object
+            // create Json Object
             JsonObject json = new JsonObject();
 
             // put some value pairs into the JSON object
@@ -158,17 +171,17 @@ public class UploadServlet extends HttpServlet {
         ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
     }
 
-    //Generates the regular landing page for the Uploader.
+    // Generates the regular landing page for the Uploader.
     private String doStandardPage(ServletContext application) throws PebbleException, SQLException, IOException {
 
         Map<String, Object> context = new HashMap<>();
         PebbleEngine engine = new PebbleEngine.Builder().build();
         PebbleTemplate compiledTemplate;
 
-        //Getting base template
+        // Getting base template
         compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/upload.html"));
 
-        //Output to client
+        // Output to client
         Writer writer = new StringWriter();
         compiledTemplate.evaluate(writer, context);
         String output = writer.toString();
@@ -184,7 +197,7 @@ public class UploadServlet extends HttpServlet {
         String[] items = contentDisp.split(";");
         for (String s : items) {
             if (s.trim().startsWith("filename")) {
-                return s.substring(s.indexOf("=") + 2, s.length()-1);
+                return s.substring(s.indexOf("=") + 2, s.length() - 1);
             }
         }
         return "";

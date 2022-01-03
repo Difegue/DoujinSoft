@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.servlet.ServletContext;
 
@@ -31,34 +30,36 @@ import java.util.regex.*;
 import java.util.List;
 import java.util.Base64;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.*;
 import com.difegue.doujinsoft.templates.Collection;
 
 public class MailItemParser extends WC24Base {
 
-    private final Pattern pattern = Pattern.compile("w([0-9]*)@"+ Pattern.quote(wc24Server));
+    private final Pattern pattern = Pattern.compile("w([0-9]*)@" + Pattern.quote(wc24Server));
     private String dataDir;
     private String mailFallbackCode;
-	
-    public MailItemParser(ServletContext application) throws Exception{
+
+    public MailItemParser(ServletContext application) throws Exception {
         super(application);
         dataDir = application.getInitParameter("dataDirectory");
-	    
+
         if (!System.getenv().containsKey("WII_FALLBACK"))
-        throw new Exception(
-	    "Fallback Wii number not specified. Please set the WII_FALLBACK environment variable.");
-	
-	mailFallbackCode = System.getenv("WII_FALLBACK");
+            throw new Exception(
+                    "Fallback Wii number not specified. Please set the WII_FALLBACK environment variable.");
+
+        mailFallbackCode = System.getenv("WII_FALLBACK");
     }
 
     /***
-     * Handles emails received from a WC24 server or a data file. </br> 
+     * Handles emails received from a WC24 server or a data file. </br>
      * </br>
-     * - "WC24 Cmd Message" emails (Friend requests) are replied to using WiiConnect24Api </br>
-     * - "QUESTION" emails (DIY Showcase survey box) are added to the matching SQLite table </br>
-     * - "G"/"RR"/"MMM" (DIY Showcase content) are converted to .mio and added to the database </br>
-     * - Other emails are sent to a backup address belonging to a real Wii for safekeeping. </br>
+     * - "WC24 Cmd Message" emails (Friend requests) are replied to using
+     * WiiConnect24Api </br>
+     * - "QUESTION" emails (DIY Showcase survey box) are added to the matching
+     * SQLite table </br>
+     * - "G"/"RR"/"MMM" (DIY Showcase content) are converted to .mio and added to
+     * the database </br>
+     * - Other emails are sent to a backup address belonging to a real Wii for
+     * safekeeping. </br>
      * 
      * @param emailData emails recovered from a WC24 server
      */
@@ -75,7 +76,7 @@ public class MailItemParser extends WC24Base {
 
         for (String content : mailItems) {
             try {
-                
+
                 // Strip "Content-Type: text/plain" at the beginning of the item
                 content = content.substring(30);
                 MailItem toSend = analyzeMail(content);
@@ -114,7 +115,7 @@ public class MailItemParser extends WC24Base {
         MimeMessage message = new MimeMessage(s, is);
 
         // Reject mails that don't come from a Wii
-	log.log(Level.INFO, "Analyzing mail received from "+message.getFrom()[0].toString());
+        log.log(Level.INFO, "Analyzing mail received from " + message.getFrom()[0].toString());
         String wiiCode = getWiiCode(message.getFrom()[0].toString());
         if (wiiCode == null) {
             log.log(Level.INFO, "Mail doesn't come from a Wii - Skipping.");
@@ -127,9 +128,9 @@ public class MailItemParser extends WC24Base {
         if (subject == null) // The Wii doesn't care about the subject field
             subject = "";
 
-        // Friend request 
+        // Friend request
         if (subject.equals("WC24 Cmd Message")) {
-            log.log(Level.INFO, "Friend request from "+ wiiCode);
+            log.log(Level.INFO, "Friend request from " + wiiCode);
             return new MailItem(wiiCode);
         }
 
@@ -137,10 +138,11 @@ public class MailItemParser extends WC24Base {
         if (subject.equals("QUESTION")) {
 
             // Get survey answer (2nd bodypart) as a byte array
-            InputStream attachmentData = ((Multipart)message.getContent()).getBodyPart(1).getInputStream();
+            InputStream attachmentData = ((Multipart) message.getContent()).getBodyPart(1).getInputStream();
             byte[] survey = attachmentData.readAllBytes();
 
-            // 0x19 (25 bytes) for the title, a byte for the type, a byte for how many stars, and a byte for the comment
+            // 0x19 (25 bytes) for the title, a byte for the type, a byte for how many
+            // stars, and a byte for the comment
             String title = new String(Arrays.copyOfRange(survey, 0, 24));
             saveSurveyAnswer(survey[25], title, survey[26], survey[27]);
 
@@ -158,7 +160,7 @@ public class MailItemParser extends WC24Base {
 
             // Store data in a .mio file; Server will pick it up later
             String hash = MioStorage.computeMioHash(data);
-            File mio = new File (dataDir+"/mio/"+hash+".mio");
+            File mio = new File(dataDir + "/mio/" + hash + ".mio");
             try (FileOutputStream fos = new FileOutputStream(mio.getAbsolutePath())) {
                 fos.write(data);
             }
@@ -173,22 +175,26 @@ public class MailItemParser extends WC24Base {
         }
 
         // Other emails...
-        // Change From: and To: to the server's wii address and the backup wii address respectively
-        message.setFrom(new InternetAddress("w"+sender+"@"+wc24Server));
-        message.addHeader("MAIL FROM", "w"+sender+"@"+wc24Server);
-        message.setRecipients(RecipientType.TO, new Address[]{new InternetAddress("w"+mailFallbackCode+"@"+wc24Server)});
-        message.addHeader("RCPT TO", "w"+mailFallbackCode+"@"+wc24Server);
-	    
-	// Add the original sender's Wii code as an AltName so it appears on the message board
-	// This is easier than messing with the message content, and shouldn't fuck up invisible mails (i.e Miis)
-	String b64WiiCode = Base64.getEncoder().encodeToString(wiiCode.getBytes(StandardCharsets.UTF_16BE));
-	message.addHeader("X-Wii-AltName", b64WiiCode);
-	    
+        // Change From: and To: to the server's wii address and the backup wii address
+        // respectively
+        message.setFrom(new InternetAddress("w" + sender + "@" + wc24Server));
+        message.addHeader("MAIL FROM", "w" + sender + "@" + wc24Server);
+        message.setRecipients(RecipientType.TO,
+                new Address[] { new InternetAddress("w" + mailFallbackCode + "@" + wc24Server) });
+        message.addHeader("RCPT TO", "w" + mailFallbackCode + "@" + wc24Server);
+
+        // Add the original sender's Wii code as an AltName so it appears on the message
+        // board
+        // This is easier than messing with the message content, and shouldn't fuck up
+        // invisible mails (i.e Miis)
+        String b64WiiCode = Base64.getEncoder().encodeToString(wiiCode.getBytes(StandardCharsets.UTF_16BE));
+        message.addHeader("X-Wii-AltName", b64WiiCode);
+
         // Output a string and pipe that into a RawMailItem
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         message.writeTo(os);
-        log.log(Level.INFO, "Unknown mail with subject " + message.getSubject() + " Forwarding to "+ mailFallbackCode);
-        return new RawMailItem(mailFallbackCode,new String(os.toByteArray(), StandardCharsets.UTF_8));
+        log.log(Level.INFO, "Unknown mail with subject " + message.getSubject() + " Forwarding to " + mailFallbackCode);
+        return new RawMailItem(mailFallbackCode, new String(os.toByteArray(), StandardCharsets.UTF_8));
     }
 
     private String getWiiCode(String address) {
@@ -204,6 +210,7 @@ public class MailItemParser extends WC24Base {
 
     /**
      * Recover the attachment from a DIY Showcase Message and decode it to a file.
+     * 
      * @param m the message to recover the attachment from
      * @return LZ10-decompressed data
      * @throws IOException
@@ -212,22 +219,22 @@ public class MailItemParser extends WC24Base {
     private byte[] getLZ10BodyPart(Message m) throws Exception {
 
         // Get the second bodypart of the message
-        Multipart content = (Multipart)m.getContent();
-        
+        Multipart content = (Multipart) m.getContent();
+
         // Write bodypart to a file
-        Path compressedMio = Files.createTempFile("mio",".lz10");
+        Path compressedMio = Files.createTempFile("mio", ".lz10");
         Files.copy(content.getBodyPart(1).getInputStream(), compressedMio, StandardCopyOption.REPLACE_EXISTING);
 
         // LZSS-decode it
         String filePath = compressedMio.toFile().getAbsolutePath();
-        new LZSS(application).LZS_Decode(filePath, filePath+"d");
-        
-        return Files.readAllBytes(new File(filePath+"d").toPath());
+        new LZSS(application).LZS_Decode(filePath, filePath + "d");
+
+        return Files.readAllBytes(new File(filePath + "d").toPath());
     }
 
     private boolean saveSurveyAnswer(byte type, String title, byte stars, byte comment) {
 
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
             PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?)");
             ret.setLong(1, System.currentTimeMillis());
@@ -248,13 +255,13 @@ public class MailItemParser extends WC24Base {
     }
 
     private boolean saveFriendCode(String code) {
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dataDir+"/mioDatabase.sqlite")) {
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
             PreparedStatement ret = connection.prepareStatement("INSERT INTO Friends VALUES (?)");
             ret.setString(1, code);
             ret.executeUpdate();
             ret.close();
-            
+
             connection.close();
             return true;
 
@@ -264,7 +271,9 @@ public class MailItemParser extends WC24Base {
     }
 
     /**
-     * Update pre-set WC24 collections with the newly added hash. A bit hacky but it'll do for now...
+     * Update pre-set WC24 collections with the newly added hash. A bit hacky but
+     * it'll do for now...
+     * 
      * @param type type (G/RR/MMM)
      * @param hash mio data MD5 hash
      * @throws FileNotFoundException
@@ -272,19 +281,25 @@ public class MailItemParser extends WC24Base {
      */
     private void addToWC24Collection(String type, String hash) throws FileNotFoundException, IOException {
 
-        String collectionFile = dataDir+"/collections/";
+        String collectionFile = dataDir + "/collections/";
         switch (type) {
-            case "G": collectionFile += "e_rc24_g"; break;
-            case "RR": collectionFile += "e_rc24_r"; break;
-            case "MMM": collectionFile += "e_rc24_m"; break;
+            case "G":
+                collectionFile += "e_rc24_g";
+                break;
+            case "RR":
+                collectionFile += "e_rc24_r";
+                break;
+            case "MMM":
+                collectionFile += "e_rc24_m";
+                break;
         }
 
         collectionFile += ".json";
-		
-        //Try opening the matching JSON file 
+
+        // Try opening the matching JSON file
         Collection c = CollectionUtils.GetCollectionFromFile(collectionFile);
         c.addMioHash(hash);
         // Overwrite the collectionfile
-        CollectionUtils.SaveCollectionToFile(c,collectionFile);
+        CollectionUtils.SaveCollectionToFile(c, collectionFile);
     }
 }
