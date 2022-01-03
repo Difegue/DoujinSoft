@@ -27,13 +27,13 @@ public class Cart {
 
         if (request.getParameterMap().containsKey("save")) {
 
-            //Get byte[] save from request parameters
+            // Get byte[] save from request parameters
             Part filePart = request.getPart("save");
             String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
             InputStream fileContent = filePart.getInputStream();
 
-            //Drop the file in a temp file
-            saveFile = File.createTempFile(fileName+System.currentTimeMillis(), "bin");
+            // Drop the file in a temp file
+            saveFile = File.createTempFile(fileName + System.currentTimeMillis(), "bin");
 
             Files.copy(
                     fileContent,
@@ -43,16 +43,16 @@ public class Cart {
             recipientFriendCode = request.getParameter("recipient");
         }
 
-        //Get the cart data and deserialize it.
-        JsonElement a = new JsonParser().parse(request.getParameter("games"));
+        // Get the cart data and deserialize it.
+        JsonElement a = JsonParser.parseString(request.getParameter("games"));
         if (a.isJsonArray())
             games = a.getAsJsonArray();
 
-        a = new JsonParser().parse(request.getParameter("manga"));
+        a = JsonParser.parseString(request.getParameter("manga"));
         if (a.isJsonArray())
             manga = a.getAsJsonArray();
 
-        a = new JsonParser().parse(request.getParameter("records"));
+        a = JsonParser.parseString(request.getParameter("records"));
         if (a.isJsonArray())
             records = a.getAsJsonArray();
     }
@@ -72,7 +72,7 @@ public class Cart {
     public File getSaveFile() {
         return saveFile;
     }
-    
+
     public String getRecipientCode() {
         return recipientFriendCode;
     }
