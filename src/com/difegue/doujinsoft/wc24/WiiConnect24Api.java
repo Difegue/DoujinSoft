@@ -27,7 +27,8 @@ public class WiiConnect24Api extends WC24Base {
     }
 
     /**
-     * Craft a request with all the mails we have to send, and fire it over to the WC24 server.
+     * Craft a request with all the mails we have to send, and fire it over to the
+     * WC24 server.
      *
      * @param mails
      * @return
@@ -38,11 +39,14 @@ public class WiiConnect24Api extends WC24Base {
         Logger log = Logger.getLogger("WC24");
 
         HttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost("https://mtw." + wc24Server + "/cgi-bin/send.cgi?mlid=w" + sender + "&passwd=" + wc24Pass);
+        HttpPost httppost = new HttpPost("https://mtw." + wc24Server + "/cgi-bin/send.cgi");
 
         // Request parameters and other properties.
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         String templatePath = application.getRealPath("/WEB-INF/wiiconnect24");
+
+        builder.addTextBody("mlid", "w" + sender);
+        builder.addTextBody("passwd", wc24Pass);
 
         int count = 1;
         for (MailItem mail : mails) {
@@ -61,7 +65,7 @@ public class WiiConnect24Api extends WC24Base {
         HttpEntity formDataEntity = builder.build();
         httppost.setEntity(formDataEntity);
 
-        //Execute and get the response.
+        // Execute and get the response.
         HttpResponse response = httpclient.execute(httppost);
         HttpEntity entity = response.getEntity();
 
@@ -78,23 +82,34 @@ public class WiiConnect24Api extends WC24Base {
     }
 
     /***
-     * Phones up the WC24 server to grab mails, and consume them. See MailItemParser.
+     * Phones up the WC24 server to grab mails, and consume them. See
+     * MailItemParser.
+     * 
      * @throws Exception
      */
-    public void receiveMails() throws Exception{
+    public void receiveMails() throws Exception {
 
         HttpClient httpclient = HttpClients.createDefault();
-        HttpGet request = new HttpGet("https://mtw." + wc24Server + "/cgi-bin/receive.cgi?mlid=w" + sender + "&passwd=" + wc24Pass +"&maxsize=2000000");
+        HttpPost request = new HttpPost("https://mtw." + wc24Server + "/cgi-bin/receive.cgi");
 
-        //Execute and get the response.
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addTextBody("mlid", "w" + sender);
+        builder.addTextBody("passwd", wc24Pass);
+        builder.addTextBody("maxsize", "2000000");
+
+        HttpEntity formDataEntity = builder.build();
+        request.setEntity(formDataEntity);
+
+        // Execute and get the response.
         HttpResponse response = httpclient.execute(request);
         HttpEntity entity = response.getEntity();
 
         if (entity != null)
-        try (InputStream inStream = entity.getContent()) {
+            try (InputStream inStream = entity.getContent()) {
 
-           String responseText = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
-           new MailItemParser(application).consumeEmails(responseText);
-        }
+                String responseText = new BufferedReader(new InputStreamReader(inStream)).lines()
+                        .collect(Collectors.joining("\n"));
+                new MailItemParser(application).consumeEmails(responseText);
+            }
     }
 }
