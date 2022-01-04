@@ -38,6 +38,7 @@ public class TemplateBuilder {
 	protected HttpServletRequest request;
 
 	protected String tableName, dataDir;
+	protected boolean isNameSearch, isCreatorSearch, isSortedBy;
 
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
@@ -84,7 +85,21 @@ public class TemplateBuilder {
 			templatePath += "Detail";
 		}
 
+		isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+		isCreatorSearch = request.getParameterMap().containsKey("creator")
+				&& !request.getParameter("creator").isEmpty();
+		isSortedBy = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
+
 		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath + ".html"));
+	}
+
+	protected String writeToTemplate() throws PebbleException, IOException {
+
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+
+		return output;
 	}
 
 	/*
@@ -149,22 +164,7 @@ public class TemplateBuilder {
 		return writeToTemplate();
 	}
 
-	protected String writeToTemplate() throws PebbleException, IOException {
-
-		Writer writer = new StringWriter();
-		compiledTemplate.evaluate(writer, context);
-		String output = writer.toString();
-
-		return output;
-	}
-
 	private void performSearchQuery() throws Exception {
-
-		boolean isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
-		boolean isCreatorSearch = request.getParameterMap().containsKey("creator")
-				&& !request.getParameter("creator").isEmpty();
-		boolean isSortedBy = request.getParameterMap().containsKey("sort_by")
-				&& !request.getParameter("sort_by").isEmpty();
 
 		// Build both data and count queries
 		String queryBase = "FROM " + tableName + " WHERE ";
