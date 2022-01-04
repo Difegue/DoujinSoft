@@ -38,7 +38,6 @@ public class TemplateBuilder {
 	protected HttpServletRequest request;
 
 	protected String tableName, dataDir;
-	protected boolean isNameSearch, isCreatorSearch, isSortedBy;
 
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
@@ -83,22 +82,9 @@ public class TemplateBuilder {
 
 		if (isDetail) {
 			templatePath += "Detail";
-			isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
-			isCreatorSearch = request.getParameterMap().containsKey("creator")
-					&& !request.getParameter("creator").isEmpty();
-			isSortedBy = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
 		}
 
 		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath + ".html"));
-	}
-
-	protected String writeToTemplate() throws PebbleException, IOException {
-
-		Writer writer = new StringWriter();
-		compiledTemplate.evaluate(writer, context);
-		String output = writer.toString();
-
-		return output;
 	}
 
 	/*
@@ -107,39 +93,29 @@ public class TemplateBuilder {
 	 */
 	public String doStandardPageGeneric(int type) throws Exception {
 
-		// TODO: allow searches
-
 		initializeTemplate(type, false);
-		PreparedStatement statement;
 
-		ResultSet result;
+		// Specific hash request
 		if (request.getParameterMap().containsKey("id")) {
-			statement = connection.prepareStatement("select * from " + tableName + " WHERE hash == ?");
+
+			PreparedStatement statement = connection
+					.prepareStatement("select * from " + tableName + " WHERE hash == ?");
 			statement.setString(1, request.getParameter("id"));
-		} else {
-			statement = connection.prepareStatement(
-					"select * from " + tableName + " WHERE id NOT LIKE '%them%' ORDER BY normalizedName ASC LIMIT 15");
-		}
-		result = statement.executeQuery();
 
-		while (result.next())
-			items.add(classConstructor.newInstance(result));
-
-		result.close();
-		context.put("items", items);
-
-		// If the request is for a specific hash, disable search by setting totalitems
-		// to -1
-		if (request.getParameterMap().containsKey("id")) {
+			// disable search by setting totalitems to -1
 			context.put("totalitems", -1);
 			context.put("singleitem", true);
-		} else {
-			statement.close();
-			statement = connection
-					.prepareStatement("select COUNT(id) from " + tableName + " WHERE id NOT LIKE '%them%'");
-			result = statement.executeQuery();
-			context.put("totalitems", result.getInt(1));
+
+			ResultSet result = statement.executeQuery();
+
+			while (result.next())
+				items.add(classConstructor.newInstance(result));
+
 			result.close();
+			context.put("items", items);
+			statement.close();
+		} else {
+			performSearchQuery();
 		}
 
 		// JSON hijack if specified in the parameters
@@ -148,7 +124,6 @@ public class TemplateBuilder {
 			return gson.toJson(context);
 		}
 
-		statement.close();
 		connection.close();
 		// Output to client
 		return writeToTemplate();
@@ -161,6 +136,35 @@ public class TemplateBuilder {
 	public String doSearchGeneric(int type) throws Exception {
 
 		initializeTemplate(type, true);
+
+		performSearchQuery();
+
+		// JSON hijack if specified in the parameters
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
+			Gson gson = new Gson();
+			return gson.toJson(context);
+		}
+
+		connection.close();
+		return writeToTemplate();
+	}
+
+	protected String writeToTemplate() throws PebbleException, IOException {
+
+		Writer writer = new StringWriter();
+		compiledTemplate.evaluate(writer, context);
+		String output = writer.toString();
+
+		return output;
+	}
+
+	private void performSearchQuery() throws Exception {
+
+		boolean isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+		boolean isCreatorSearch = request.getParameterMap().containsKey("creator")
+				&& !request.getParameter("creator").isEmpty();
+		boolean isSortedBy = request.getParameterMap().containsKey("sort_by")
+				&& !request.getParameter("sort_by").isEmpty();
 
 		// Build both data and count queries
 		String queryBase = "FROM " + tableName + " WHERE ";
@@ -208,16 +212,7 @@ public class TemplateBuilder {
 
 		context.put("items", items);
 		context.put("totalitems", retCount.executeQuery().getInt(1));
-
-		// JSON hijack if specified in the parameters
-		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
-			Gson gson = new Gson();
-			return gson.toJson(context);
-		}
-
 		retCount.close();
-		connection.close();
-		return writeToTemplate();
 	}
 
 }

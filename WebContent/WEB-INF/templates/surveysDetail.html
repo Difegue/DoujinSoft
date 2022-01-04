@@ -1,33 +1,33 @@
 {% for item in items %}
-	
-	<div>
 
-          <div class="card {{ item.color }} darken-2">
-            <div class="game-header accent-4">
-                <div class="chip game-title" >
-                  {{ item.name }}
-                </div>
-                <div class="game-metadata note-{{ item.starCount }}">
-                    <i class="material-icons star-1">star</i>
-                    <i class="material-icons star-2">star</i>
-                    <i class="material-icons star-3">star</i>
-                    <i class="material-icons star-4">star</i>
-                    <i class="material-icons star-5">star</i>
-                </div>
-            </div>
+<div>
 
-            <div class="card-content white-text">
-                {{ item.comment }}
-						</div>
-					</div>
+  <div class="card {{ item.color }} darken-2">
+    <div class="game-header accent-4">
+      <div class="chip game-title">
+        <a href="./{{item.category}}?name={{item.name}}">{{ item.name }}</a>
+      </div>
+      <div class="game-metadata note-{{ item.starCount }}">
+        <i class="material-icons star-1">star</i>
+        <i class="material-icons star-2">star</i>
+        <i class="material-icons star-3">star</i>
+        <i class="material-icons star-4">star</i>
+        <i class="material-icons star-5">star</i>
+      </div>
+    </div>
 
-        </div>
-        
-   {% else %}
-   
-No more opinions. <br/>
+    <div class="card-content white-text">
+      {{ item.comment }}
+    </div>
+  </div>
+
+</div>
+
+{% else %}
+
+No more opinions. <br />
 Sad.
-       
+
 {% endfor %}
-	
+
 <span id="total_items" style="display:none">{{ totalitems }}</span>
