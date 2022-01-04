@@ -34,6 +34,9 @@ public class Survey {
 		}
 
 		name = result.getString("name");
+		// remove invalid unicode characters
+		name = name.replaceAll("[^\\u0009\\u000a\\u000d\\u0020-\\uD7FF\\uE000-\\uFFFD]", "");
+
 		starCount = result.getInt("stars");
 
 		comment = getComment(type, commentId);

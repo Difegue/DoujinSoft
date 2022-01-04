@@ -5,7 +5,7 @@
   <div class="card {{ item.color }} darken-2">
     <div class="game-header accent-4">
       <div class="chip game-title">
-        <a href="./{{item.category}}?name={{item.name}}">{{ item.name }}</a>
+        {{ item.name }}
       </div>
       <div class="game-metadata note-{{ item.starCount }}">
         <i class="material-icons star-1">star</i>
@@ -18,6 +18,11 @@
 
     <div class="card-content white-text">
       {{ item.comment }}
+
+      <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Search for this on the Store!"
+        href="./{{item.category}}?name={{item.name}}" style="float: right;">
+        <i class="material-icons">search</i>
+      </a>
     </div>
   </div>
 
