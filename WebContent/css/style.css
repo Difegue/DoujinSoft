@@ -35,6 +35,15 @@ body {
     background-attachment: fixed;
     background-size: cover;
     height: 100%;
+
+    /* sticky footer fix */
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
 }
 
 .sidenav-overlay {
