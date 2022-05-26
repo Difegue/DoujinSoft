@@ -10,91 +10,140 @@
 
 Adding your WarioWare DIY content to DoujinSoft so it can be shared with the world has never been easier!
 <br>
-You can either upload .mio files here directly or use <a href="http://rc24.xyz">RiiConnect24</a> with DIY Showcase to send us content.
+There are several ways to share your content:
 <br>
+<h5 class="white-text"><i class="material-icons">filter_1</i>(3)DS + GodMode9i</h5>
 
-{% endblock %}
+If you have a flash cart or a modded DSi or 3DS, and you're playing the game using a cartridge, you can use <a
+    href="https://github.com/DS-Homebrew/GodMode9i">GodMode9i</a> to extract the savefile. Use <a
+    href="https://www.romhacking.net/utilities/1008/">WarioWare DIY Editor</a>, a program written in Java, to dump the
+.mio files from the savefile.
 
+<h5 class="white-text"><i class="material-icons">filter_2</i>(3)DS + Wiimmfi</h5>
 
-{% block content %}
+If you have Wiimmfi set up, you can upload your content using the Warehouse feature of the game. All content uploaded to
+Wiimmfi is grabbed periodically and added to the site. Note that you can only have 2 games, 2 records, and 2 comics
+uploaded at a time.
 
-<div class="white-text">
+<h5 class="white-text"><i class="material-icons">filter_3</i>Wii + RiiConnect24</h5>
 
-    <h5 class="amber-text"> <i class="material-icons">store</i> I want to use RiiConnect24!</h5>
+If you have <a href="https://wii.guide/riiconnect24">RiiConnect24</a> set up with DoujinSoft, you can simply send your
+games with DoujinSoft as the recipient. Once we receive it, you will get a message sent to your Wii within an hour
+confirming it's been added.
 
-    Please make sure you've registered with us in the <a href="./cart">Cart</a> first! <br>
-    If you did so, all you have to do is send your content to DoujinSoft's Wii Friend through WarioWare: DIY Showcase's <b>Distribution Center.</b> <br>
-    Files sent this way will be instantly approved and featured in the <a href="./collection?id=e_rc24_g">RC24 Collections!</a><br>
-    You'll also receive a nice thank-you letter as a bonus. 💌
+<h5 class="white-text"><i class="material-icons">filter_4</i>Wii + Save File</h5>
 
-    <h5 class="amber-text"> <i class="material-icons">save</i> I want to send you .mio files!</h5>
+If your Wii's modded, you can use <a href="https://oscwii.org/library/app/savegame_manager_gx">SaveGame Manager GX to
+    copy your savefile to your SD Card or USB drive. Use <a href="https://www.romhacking.net/utilities/1008/">WarioWare
+        DIY Editor</a>, a program written in Java, to dump the .mio files from the savefile.
 
-    First off, please make sure the files you want to send aren't already in the archive! It makes for extra busywork otherwise. <br>
-    Drag and drop your .mio files below to get started. Files sent this way will have to be approved manually before landing in the archive.<br><br>
+    <h5 class="white-text"><i class="material-icons">filter_5</i>melonDS</h5>
 
+    If you use melonDS, a DS emulator, the savefile for the game will be in the same folder as the ROM. Save it as a Raw
+    Save File. You will need to expand the savefile to be twice the size (33554432 bytes), which can be done with a hex
+    editor or maybe a text editor. Use <a href="https://www.romhacking.net/utilities/1008/">WarioWare DIY Editor</a>, a
+    program written in Java, to dump the .mio files from the savefile.
 
-    <span style="line-height:20px; margin-left:40%" class="btn-large waves-effect fileinput-button">
-        <i style="padding-top:6px;" class="material-icons medium">cloud_upload</i><br>
-        <span>Upload files</span>
-        <input type="file" name="file" multiple="" id="fileupload">
-    </span>
+    <h5 class="white-text"><i class="material-icons">filter_6</i>DeSmuME</h5>
 
-    <div class="progress" style="display:none"><div class="indeterminate amber"></div></div>
-    <ul class="collection black-text" style="text-align:left" id="files">
-    </ul>
+    If you use DeSmuME, you can go to File > Export ROM Save File... to extract the savefile. Save it as a Raw Save
+    File. You will need to expand the savefile to be twice the size (33554432 bytes), which can be done with a hex
+    editor or maybe a text editor. Use <a href="https://www.romhacking.net/utilities/1008/">WarioWare DIY Editor</a>, a
+    program written in Java, to dump the .mio files from the savefile.
+    <br>
 
-</div>
-	
-{% endblock %}
+    <br>
+    You can upload .mio files here directly.
+    <br>
 
-{% block footdata %}
-
-<script>
-    function initUpload() {
-
-        //Handler for file uploading.
-        $('#fileupload').fileupload({
-            dataType: 'json',
-            done: function (e, data) {
-
-                if (!data.result.success)
-                    result = '<li class="collection-item avatar cart-item" type=data.result.type>'+
-                        '	<i class="material-icons red-text cart-icon">error</i>'+
-                        '	<span class="title">'+escapeHtml(data.result.filename)+' is not a valid .mio file.</span>'+
-                        '</li>';
-                else
-                    result = '<li class="collection-item avatar cart-item" type='+data.result.type+'>'+ (
-                        (data.result.type === "game")   ? '<i class="material-icons green-text cart-icon">videogame_asset</i>'
-                      : (data.result.type === "record") ? '<i class="material-icons pink-text cart-icon">album</i>'
-                      :                                 '<i class="material-icons blue-text cart-icon">local_library</i>')+
-                      '	    <span class="title">'+escapeHtml(data.result.name)+' by '+escapeHtml(data.result.creator)+' uploaded!</span>'+
-                      '</li>';
-
-                $('#files').append(result);
-            },
-
-            fail: function (e, data) {
-                popToast("Upload failed! Is this file a .mio?");
-                console.log(data.errorThrown);
-                $(".progress").hide();
-                $(".fileinput-button").show();
-            },
-
-            start: function (e, data) {
-                $(".progress").show();
-                $(".fileinput-button").hide();
-            },
-
-            stop: function (e, data) {
-                popToast("Upload complete. Thank you for contributing to DoujinSoft!");
-                $(".progress").hide();
-                $(".fileinput-button").show();
-            }
-
-        });
-    }
-    window.onload = initUpload;
-</script>
+    {% endblock %}
 
 
-{% endblock %}
+    {% block content %}
+
+    <div class="white-text">
+
+        <h5 class="amber-text"> <i class="material-icons">store</i> I want to use RiiConnect24!</h5>
+
+        Please make sure you've registered with us in the <a href="./cart">Cart</a> first! <br>
+        If you did so, all you have to do is send your content to DoujinSoft's Wii Friend through WarioWare: DIY
+        Showcase's <b>Distribution Center.</b> <br>
+        Files sent this way will be instantly approved and featured in the <a href="./collection?id=e_rc24_g">RC24
+            Collections!</a><br>
+        You'll also receive a nice thank-you letter as a bonus. 💌
+
+        <h5 class="amber-text"> <i class="material-icons">save</i> I want to send you .mio files!</h5>
+
+        First off, please make sure the files you want to send aren't already in the archive! It makes for extra
+        busywork otherwise. <br>
+        Drag and drop your .mio files below to get started. Files sent this way will have to be approved manually before
+        landing in the archive.<br><br>
+
+
+        <span style="line-height:20px; margin-left:40%" class="btn-large waves-effect fileinput-button">
+            <i style="padding-top:6px;" class="material-icons medium">cloud_upload</i><br>
+            <span>Upload files</span>
+            <input type="file" name="file" multiple="" id="fileupload">
+        </span>
+
+        <div class="progress" style="display:none">
+            <div class="indeterminate amber"></div>
+        </div>
+        <ul class="collection black-text" style="text-align:left" id="files">
+        </ul>
+
+    </div>
+
+    {% endblock %}
+
+    {% block footdata %}
+
+    <script>
+        function initUpload() {
+
+            //Handler for file uploading.
+            $('#fileupload').fileupload({
+                dataType: 'json',
+                done: function (e, data) {
+
+                    if (!data.result.success)
+                        result = '<li class="collection-item avatar cart-item" type=data.result.type>' +
+                            '	<i class="material-icons red-text cart-icon">error</i>' +
+                            '	<span class="title">' + escapeHtml(data.result.filename) + ' is not a valid .mio file.</span>' +
+                            '</li>';
+                    else
+                        result = '<li class="collection-item avatar cart-item" type=' + data.result.type + '>' + (
+                            (data.result.type === "game") ? '<i class="material-icons green-text cart-icon">videogame_asset</i>'
+                                : (data.result.type === "record") ? '<i class="material-icons pink-text cart-icon">album</i>'
+                                    : '<i class="material-icons blue-text cart-icon">local_library</i>') +
+                            '	    <span class="title">' + escapeHtml(data.result.name) + ' by ' + escapeHtml(data.result.creator) + ' uploaded!</span>' +
+                            '</li>';
+
+                    $('#files').append(result);
+                },
+
+                fail: function (e, data) {
+                    popToast("Upload failed! Is this file a .mio?");
+                    console.log(data.errorThrown);
+                    $(".progress").hide();
+                    $(".fileinput-button").show();
+                },
+
+                start: function (e, data) {
+                    $(".progress").show();
+                    $(".fileinput-button").hide();
+                },
+
+                stop: function (e, data) {
+                    popToast("Upload complete. Thank you for contributing to DoujinSoft!");
+                    $(".progress").hide();
+                    $(".fileinput-button").show();
+                }
+
+            });
+        }
+        window.onload = initUpload;
+    </script>
+
+
+    {% endblock %}
