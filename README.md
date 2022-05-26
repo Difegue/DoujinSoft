@@ -30,6 +30,11 @@ Adding `&format=json` to most search pages in the webapp will give you a JSON eq
 * DSOFT_PASS: Password for the Admin console.
 * WEBHOOK_URL: URL for a webhook. This hook is hit whenever new content is uploaded to DoujinSoft.
 
+## Deploy/develop on Codespaces
+
+You can use GH Codespaces to develop on the app using the provided configuration.  
+Once in the codespace, you should be able to execute the `dev-server.sh` script to immediately build/start a DoujinSoft instance.
+
 ## Deploying through Docker
 
 You can deploy the provided [Docker image](https://hub.docker.com/r/difegue/doujinsoft) by mapping a volume to /home/doujinsoft:
@@ -56,7 +61,10 @@ mkdir DoujinSoft-data
 chown tomcat8 DoujinSoft-data/
 chmod -R 755 DoujinSoft-data/
 ```
-Drop the WAR into your tomcat webapps directory to start deployment.  
+Drop the WAR into your tomcat webapps directory to start deployment. 
+
+If you have a tomcat installed to `/usr/local/tomcat`, you can use the provided `dev-server.sh` script to start a DoujinSoft instance.  
+Keep in mind said script will overwrite your ROOT.war, and requires the `/home/doujinsoft` directory to exist.  
 
 ## Adding .mio files
 
