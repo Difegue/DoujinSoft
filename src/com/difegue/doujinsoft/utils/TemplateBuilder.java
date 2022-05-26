@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.gson.Gson;
 
 import com.difegue.doujinsoft.templates.*;
+import com.difegue.doujinsoft.templates.Record;
 import com.difegue.doujinsoft.utils.MioUtils.Types;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;

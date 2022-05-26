@@ -25,7 +25,7 @@ public class Cart {
 
     public Cart(HttpServletRequest request) throws IOException, ServletException {
 
-        if (request.getParameterMap().containsKey("save")) {
+        if (request.getPart("save") != null) {
 
             // Get byte[] save from request parameters
             Part filePart = request.getPart("save");
