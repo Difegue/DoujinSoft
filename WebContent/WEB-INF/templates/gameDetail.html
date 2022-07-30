@@ -39,14 +39,16 @@
 
                   </div>
 
-                    <img class ="game-preview z-depth-1" src="{{ game.preview }}"/>
-
+                  <button class ="game-preview z-depth-1 waves-effect tooltipped" data-tooltip="Play" onclick="createModal('{{ game.hash }}')" src="{{ game.preview }}">
+                    <img style="overflow:hidden; width:100%; height:100%" data-tooltip="Play" src="{{ game.preview }}"/>
+                  </button>
                   </div>
 
               <span class="game-text card-title white-text" style=""><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
             </div>
 
             <div class="card-action center">
+
               <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=game&id={{ game.hash }}" style="width:31%" >
                 <i class="material-icons">file_download</i>
               </a>
@@ -69,3 +71,52 @@ Sad.
 {% endfor %}
 	
 <span id="total_items" style="display:none">{{ totalitems }}</span>
+
+<a class="waves-effect waves-light btn modal-trigger" href="#game-modal">Play</a>
+
+<div id="game-modal" class="modal" style="background-color:black; display:none;">
+  <div class="modal-content" style="position: unset;">
+    <canvas id="canvas_game" width="192" height="128" style="background-color:white; display: block; margin: 0 auto;" style="position: unset;"></canvas> <!--border: 2px solid black;-->
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+  </div>
+</div>
+
+<script src="js/mio-micro/midi-bundle.js"></script>
+<script src="js/mio-micro/loader.js"></script>
+<script src="js/mio-micro/player.js"></script>
+
+<script>
+
+const musicPlayer = window.timidity('js/timidity');
+
+let mioData = null;
+
+function createModal(gameHash) {
+  $('.modal').modal({
+    dismissible: true,
+    onCloseEnd: function() {
+      gameId++;
+      musicPlayer.pause();
+    }
+  });
+  $('#game-modal').modal('open');
+  playGame('./download?type=game&id=' + gameHash);
+}
+
+async function playGame(url) {
+  mioData = await _fetch(url);
+
+  let midiData = window.buildMidiFile(mioData);
+
+  musicPlayer.load(midiData)
+
+  // TODO: This is supposed to loop the music but it's not working
+  musicPlayer.on('ended', () => { console.debug('music ended'); musicPlayer.play() })
+
+  musicPlayer.play();
+
+  loadAndStartGame(mioData);
+}
+</script>
