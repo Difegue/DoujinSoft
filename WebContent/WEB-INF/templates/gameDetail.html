@@ -93,6 +93,23 @@ const musicPlayer = window.timidity('js/timidity');
 
 let mioData = null;
 
+var idealCanvasWidth = 192;
+var idealCanvasHeight = 128;
+var canvas = document.getElementById('canvas_game');
+var context = canvas.getContext('2d');
+
+let scale = 3;
+scaleCanvas(scale);
+
+function modalSize() {
+	return [$('#modal1').width(), $('#modal1').height()];
+}
+
+function windowScale() {
+	let [width, height] = modalSize();
+	return Math.min(width / idealCanvasWidth, height / idealCanvasHeight);
+}
+
 function createModal(gameHash) {
   $('.modal').modal({
     dismissible: true,
@@ -119,4 +136,6 @@ async function playGame(url) {
 
   loadAndStartGame(mioData);
 }
+
+
 </script>

@@ -1,16 +1,6 @@
-const idealCanvasWidth = 192;
-const idealCanvasHeight = 128;
-let canvas = document.getElementById('canvas_game');
-let context = canvas.getContext('2d');
 
-function modalSize() {
-	//return [window.innerWidth, window.innerHeight];
-	return [$('#modal1').width(), $('#modal1').height()];
-}
-
-function windowScale() {
-	let [width, height] = modalSize();
-	return Math.min(width / idealCanvasWidth, height / idealCanvasHeight);
+function windowSize(window) {
+	return [window.innerWidth, window.innerHeight];
 }
 
 function scaleCanvas(scale) {
@@ -22,6 +12,8 @@ function scaleCanvas(scale) {
 
 let gameId = 0;
 let shouldShowCommand = true;
+let isInfiniteMode = true;
+let isPaused = false;
 
 // _fetch function taken from timidity by Feross Aboukhadijeh
 // https://github.com/feross/timidity
@@ -46,35 +38,71 @@ const COLOUR_BYTES_COUNT = 4;
 const MAX_BEFORE_GAME_JUMP_ATTEMPTS = 18;
 const MAX_DURING_GAME_JUMP_ATTEMPTS = 6;
 
-// TODO:
-//let scale = windowScale(window);
-//scaleCanvas(scale);
-let scale = 3;
-scaleCanvas(scale);
-
 let collisionCanvas = document.createElement('canvas');
 let collisionContext = collisionCanvas.getContext('2d');
-
 
 // TODO: Move all stray variables into either state, gameData or assets
 let collisionPixels = [];
 let commandFont = new FontFace('warioware-diy-ds-microgame-font', 'url(fonts/warioware-diy-ds-microgame-font.ttf)');
 
+let fontBitmap = new Image();
+fontBitmap.src = 'img/miofont.png';
+
+fontBitmap.onload = () => {
+	console.debug('font bitmap loaded')
+}
+
 let drawText = (text, size = 16) => {
 	let gradient = context.createLinearGradient(0, 0, 1, 100);
 	gradient.addColorStop(0, 'white');
-	gradient.addColorStop(0.6, 'white');
-	gradient.addColorStop(0.675, 'gray');
+	gradient.addColorStop(0.638, 'white');
+	gradient.addColorStop(0.638, '#D6D6D6');
+	gradient.addColorStop(0.65, '#D6D6D6');
+	gradient.addColorStop(0.65, '#B5B5B5');
 
-	context.font = size + 'px warioware-diy-ds-microgame-font';
-	context.lineWidth = 2;
-	context.textAlign = "center";
-	//text = text.split("").join(String.fromCharCode(0x200A))
-	context.strokeText(text, BACKGROUND_WIDTH / 2, BACKGROUND_HEIGHT / 2);
+	let w = 18;
+	let h = 18;
 
-	context.fillStyle = gradient;
-	context.textAlign = "center";
-	context.fillText(text, BACKGROUND_WIDTH / 2, BACKGROUND_HEIGHT / 2);
+	let widthInPixels = 0;
+
+	let firstChar = new TextEncoder().encode(text)[0];
+	if ((firstChar & 0xE0) !== 0xE0) {
+
+		for (let i = 0; i < text.length; i++) {
+			let letter = text[i];
+			let letterWidth = letterSpacing[letter] || w;
+
+			widthInPixels += letterWidth;
+		}
+
+		let startOffset = BACKGROUND_WIDTH / 2 - widthInPixels / 2;
+
+		let offsetSoFar = startOffset;
+
+		for (let i = 0; i < text.length; i++) {
+			let letterIndex = indexInFontBitmap(text[i]);
+			let bitmapIndex = letterIndex < 256 ? letterIndex : 32;
+			let bitmapX = bitmapIndex % 16 * w;
+			let bitmapY = Math.floor(bitmapIndex / 16) * h;
+
+			let args = [fontBitmap, bitmapX, bitmapY, w - 1, h - 1, offsetSoFar, BACKGROUND_HEIGHT / 2 - h + 5, w, h];
+
+			context.drawImage(...args);
+
+			let letterWidth = letterSpacing[text[i]] || w;
+			offsetSoFar += letterWidth;
+		}
+	} else {
+		context.font = size + 'px warioware-diy-ds-microgame-font';
+		context.lineWidth = 2;
+		context.textAlign = "center";
+		//text = text.split("").join(String.fromCharCode(0x200A))
+		context.strokeText(text, BACKGROUND_WIDTH / 2, BACKGROUND_HEIGHT / 2);
+
+		context.fillStyle = gradient;
+		context.textAlign = "center";
+		context.fillText(text, BACKGROUND_WIDTH / 2, BACKGROUND_HEIGHT / 2);
+	}
 }
 
 commandFont.load().then(function (font) {
@@ -235,7 +263,7 @@ const BounceDirection = {
 	None: 'None'
 };
 
-let colourFromPixelValue = pixel => {
+function colourFromPixelValue(pixel) {
 	switch (pixel) {
 		case 0x00: {
 			return [0, 0, 0, 0];
@@ -712,7 +740,9 @@ function loadAndStartGame(data) {
 	console.log(properties);
 
 	requestAnimationFrame(() => {
-		drawText(command);
+		if (shouldShowCommand) {
+			drawText(command);
+		}
 
 		runFrame(
 			{ id: gameId, length, objects, winConditions, layers, collisionData, command },
@@ -766,6 +796,10 @@ window.addEventListener('keydown', event => {
 
 	if (event.code === 'KeyC') {
 		shouldShowCommand = !shouldShowCommand;
+	}
+
+	if (event.code === 'KeyI' || event.code === 'KeyL') {
+		isInfiniteMode = !isInfiniteMode;
 	}
 }, true);
 
@@ -822,7 +856,7 @@ class CollisionObject {
 
 		let alpha = this.data[index * COLOUR_BYTES_COUNT + 3];
 		console.assert(alpha !== undefined);
-		return alpha != 0;
+		return alpha !== 0;
 	}
 
 	isTouching(other) {
@@ -844,7 +878,14 @@ class CollisionObject {
 
 class CollisionArea {
 	constructor(area) {
-		this.area = area;
+		this.area = cloneArea(area);
+		// TODO: ?
+		if (this.area.min.x == this.area.max.x) {
+			this.area.max.x++;
+		}
+		if (this.area.min.y == this.area.max.y) {
+			this.area.max.y++;
+		}
 	}
 
 	isPixelVisible() {
@@ -965,13 +1006,14 @@ function hasHitTime(state, gameLength, trigger) {
 }
 
 function hasHitRandomTime(state, gameLength, trigger) {
-	let isQuarter = (state.frame % 8 === 0 && state.frame % 16 !== 0) || state.frame % 15 === 0;
+	let fifteenth = state.frame % 15;
+	let isQuarter = fifteenth === 0 || (fifteenth % 8 === 0);
 	if (trigger.hasBeenTriggered) {
 		return false;
 	} else if (isQuarter) {
 		let start = trigger.start;
 		let end = timeWithEnd(gameLength, trigger.end);
-		let quarter = state.frame % 15 === 0 ? Math.floor(state.frame / 15) * 2 : Math.floor(state.frame / 8);
+		let quarter = fifteenth === 0 ? Math.floor(state.frame / 15) * 2 : Math.floor((state.frame - 1) / 15) * 2 + 1;
 		let r = randomIntInRange(Math.max(start, quarter), end + 1);
 		let triggered = r === quarter;
 		if (triggered) {
@@ -1164,7 +1206,7 @@ function jumpToAreaTravel(action, props, collisionArea) {
 	return { tag: ActiveTravel.JumpToArea, area, overlap: action.overlap };
 }
 
-function roamTravel(action, props, collisionArea) {
+function roamTravel(action, state, props, collisionArea) {
 	let speed = valueFromSpeed(action.speed);
 	let direction = randomInArray(possibleDirections);
 	let velocity = velocityFromDirection(direction, speed);
@@ -1193,13 +1235,14 @@ function roamTravel(action, props, collisionArea) {
 		travel = { tag, roam, area, speed, overlap, velocity };
 	} else if (roam === Roam.Reflect) {
 
+		let initialSpeed = randomInRange(0, 1) >= 0.5 ? speed : -speed;
 		if (area.min.x < area.max.x && area.min.y < area.max.y) {
 			let angle = randomInRange(0, Math.PI * 2);
 			velocity = { x: speed * Math.cos(angle), y: speed * Math.sin(angle) };
 		} else if (area.min.x > area.max.x) {
-			velocity = { x: 0, y: speed };
+			velocity = { x: 0, y: initialSpeed };
 		} else {
-			velocity = { x: speed, y: 0 };
+			velocity = { x: initialSpeed, y: 0 };
 		}
 		/*if (lastTravel.tag === ActiveTravel.GoStraight) {
 			// TODO: Adjust for speed
@@ -1282,7 +1325,7 @@ function pushToTravelQueue(action, state, props, collisionArea) {
 			return;
 		}
 		case Travel.Roam: {
-			let travel = roamTravel(action, props, collisionArea);
+			let travel = roamTravel(action, state, props, collisionArea);
 			props.travel.push(travel);
 			return;
 		}
@@ -1371,23 +1414,48 @@ function applyAction(state, i, action, gameData) {
 }
 
 function runFrame(gameData, state, assets) {
+	// TODO: Code reuse
+	let end;
+	if (gameData.length === Length.Short) {
+		end = 32;
+	} else if (gameData.length === Length.Long) {
+		end = 64;
+	}
+	// TODO: Check if multiplying by 8 is correct move
 	if (gameData.id !== gameId) {
 		return;
 	}
 
+	if (state.frame > end * 8 && !isInfiniteMode) {
+		isPaused = true;
+	} else {
+		isPaused = false;
+	}
+
 	let frameDelay = 1000 / 60;
-	if (state.time > state.frame * frameDelay) {
-		updateGame(gameData, state, assets);
+	if (isPaused) {
+		drawGame(state, gameData, assets);
+		context.fillStyle = "#88888844";
+		context.fillRect(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
+		//drawText('GAME COMPLETE');
+	} else {
+		if (state.time > state.frame * frameDelay) {
+			updateGame(gameData, state, assets);
+		}
 	}
 
 	requestAnimationFrame(time => {
-		if (state.lastTimestamp === null) {
+		if (isPaused) {
+			state.lastTimestamp = null;
+		} else {
+			if (state.lastTimestamp === null) {
+				state.lastTimestamp = time;
+			}
+
+			const MAX_PLAUSIBLE_DELTA = 50;
+			state.time += Math.min(time - state.lastTimestamp, MAX_PLAUSIBLE_DELTA);
 			state.lastTimestamp = time;
 		}
-
-		// TODO: Math.min this with the biggest plausible frame delta?
-		state.time += (time - state.lastTimestamp);
-		state.lastTimestamp = time;
 		runFrame(gameData, state, assets);
 	})
 }
@@ -1485,11 +1553,11 @@ function moveObjects(state, gameData) {
 
 			if (t < props.travel.length - 1
 				&& (travel.tag === ActiveTravel.GoStraight
-				|| travel.tag === ActiveTravel.GoStraight
-				|| travel.tag === ActiveTravel.GoToPoint
-				|| travel.tag === ActiveTravel.GoToObject
-				|| travel.tag === ActiveTravel.Roam
-				|| travel.tag === ActiveTravel.Stop)) {
+					|| travel.tag === ActiveTravel.GoStraight
+					|| travel.tag === ActiveTravel.GoToPoint
+					|| travel.tag === ActiveTravel.GoToObject
+					|| travel.tag === ActiveTravel.Roam
+					|| travel.tag === ActiveTravel.Stop)) {
 				continue;
 			}
 
@@ -1859,8 +1927,7 @@ function drawGame(state, gameData, assets) {
 		}
 	}
 
-	// TODO: Used to be 30
-	if (state.frame < 45 && shouldShowCommand) {
+	if (state.frame < 30 && shouldShowCommand) {
 		drawText(gameData.command);
 	}
 }
@@ -1891,4 +1958,247 @@ function updateGame(gameData, state, assets) {
 	collisionPixels = collisionContext.getImageData(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT).data;
 
 	state.frame++;
+}
+
+const letterSpacing = {
+	[' ']: 4,
+	['!']: 4,
+	['"']: 8,
+	["#"]: 15,
+	['$']: 15,
+	['%']: 15,
+	['\'']: 5,
+	['(']: 8,
+	[')']: 8,
+	['*']: 13,
+	['+']: 13,
+	[',']: 5,
+	['-']: 13,
+	['.']: 5,
+	['/']: 15,
+	['0']: 15,
+	['1']: 10,
+	['2']: 14,
+	['3']: 14,
+	['4']: 14,
+	['5']: 14,
+	['6']: 14,
+	['7']: 14,
+	['8']: 14,
+	['9']: 14,
+	[':']: 5,
+	[';']: 5,
+	['<']: 14,
+	['=']: 13,
+	['>']: 14,
+	['?']: 13,
+	['@']: 16,
+	['A']: 15,
+	['B']: 15,
+	['C']: 15,
+	['D']: 14,
+	['E']: 15,
+	['F']: 14,
+	['G']: 15,
+	['H']: 15,
+	['I']: 13,
+	['J']: 15,
+	['K']: 14,
+	['L']: 14,
+	['M']: 17,
+	['N']: 15,
+	['O']: 15,
+	['P']: 15,
+	['Q']: 15,
+	['R']: 14,
+	['S']: 14,
+	['T']: 15,
+	['U']: 14,
+	['V']: 15,
+	['W']: 16,
+	['X']: 16,
+	['Y']: 15,
+	['Z']: 14,
+	['[']: 8,
+	[']']: 8,
+	['a']: 9,
+	['b']: 9,
+	['c']: 9,
+	['d']: 9,
+	['e']: 9,
+	['f']: 9,
+	['g']: 9,
+	['h']: 9,
+	['i']: 5,
+	['j']: 9,
+	['k']: 9,
+	['l']: 6,
+	['m']: 9,
+	['n']: 9,
+	['o']: 9,
+	['p']: 9,
+	['q']: 9,
+	['r']: 9,
+	['s']: 9,
+	['t']: 9,
+	['u']: 9,
+	['v']: 9,
+	['w']: 9,
+	['x']: 9,
+	['y']: 9,
+	['z']: 9,
+	['~']: 11,
+	['À']: 15,
+	['Á']: 15,
+	['Â']: 15,
+	['Ä']: 15,
+	['È']: 15,
+	['É']: 15,
+	['Ê']: 15,
+	['Ë']: 15,
+	['Ì']: 13,
+	['Í']: 13,
+	['Î']: 13,
+	['Ï']: 13,
+	['Ò']: 15,
+	['Ó']: 15,
+	['Ô']: 15,
+	['Ö']: 15,
+	['Œ']: 16,
+	['Ù']: 14,
+	['Ú']: 14,
+	['Û']: 14,
+	['Ü']: 14,
+	['Ç']: 14,
+	['Ñ']: 15,
+	['à']: 9,
+	['á']: 9,
+	['â']: 9,
+	['ä']: 9,
+	['è']: 9,
+	['é']: 9,
+	['ê']: 9,
+	['ë']: 9,
+	['ì']: 9,
+	['í']: 9,
+	['î']: 9,
+	['ï']: 9,
+	['ò']: 9,
+	['ó']: 9,
+	['ô']: 9,
+	['ö']: 9,
+	['œ']: 9,
+	['ù']: 9,
+	['ú']: 9,
+	['û']: 9,
+	['ü']: 9,
+	['ç']: 9,
+	['ñ']: 9,
+	['ß']: 14,
+	['£']: 13,
+	['€']: 13,
+	['܀']: 15,
+	['܁']: 15,
+	['܂']: 15,
+	['܃']: 15,
+	['܄']: 15,
+	['܅']: 15,
+	["܆"]: 15,
+	["܇"]: 15,
+	["܈"]: 15,
+	["܉"]: 15,
+	["܊"]: 15,
+	["܋"]: 15,
+	["܌"]: 15,
+	["܍"]: 15,
+	["܎"]: 15,
+	["܏"]: 15,
+	["ܐ"]: 15,
+	["ܑ"]: 15,
+	["ܒ"]: 15,
+	["ܓ"]: 17,
+	["ܔ"]: 17,
+	["ܕ"]: 17,
+	["ܖ"]: 13,
+	["ܗ"]: 13,
+};
+
+function indexInFontBitmap(letter) {
+	const conversionMap = {
+		['À']: 128,
+		['Á']: 129,
+		['Â']: 130,
+		['Ä']: 131,
+		['È']: 132,
+		['É']: 133,
+		['Ê']: 134,
+		['Ë']: 135,
+		['Ì']: 136,
+		['Í']: 137,
+		['Î']: 138,
+		['Ï']: 139,
+		['Ò']: 140,
+		['Ó']: 141,
+		['Ô']: 142,
+		['Ö']: 143,
+		['Œ']: 144,
+		['Ù']: 145,
+		['Ú']: 146,
+		['Û']: 147,
+		['Ü']: 148,
+		['Ç']: 149,
+		['Ñ']: 150,
+		['à']: 151,
+		['á']: 152,
+		['â']: 153,
+		['ä']: 154,
+		['è']: 155,
+		['é']: 156,
+		['ê']: 157,
+		['ë']: 158,
+		['ì']: 159,
+		['í']: 160,
+		['î']: 161,
+		['ï']: 162,
+		['ò']: 163,
+		['ó']: 164,
+		['ô']: 165,
+		['ö']: 166,
+		['œ']: 167,
+		['ù']: 168,
+		['ú']: 169,
+		['û']: 170,
+		['ü']: 171,
+		['ç']: 172,
+		['ñ']: 173,
+		['ß']: 174,
+		['£']: 176,
+		['€']: 177,
+		['܀']: 1,
+		['܁']: 2,
+		['܂']: 3,
+		['܃']: 4,
+		['܄']: 5,
+		['܅']: 6,
+		["܆"]: 7,
+		["܇"]: 8,
+		["܈"]: 9,
+		["܉"]: 10,
+		["܊"]: 11,
+		["܋"]: 12,
+		["܌"]: 13,
+		["܍"]: 14,
+		["܎"]: 15,
+		["܏"]: 16,
+		["ܐ"]: 17,
+		["ܑ"]: 18,
+		["ܒ"]: 19,
+		["ܓ"]: 20,
+		["ܔ"]: 21,
+		["ܕ"]: 22,
+		["ܖ"]: 23,
+		["ܗ"]: 24,
+	};
+	let code = conversionMap[letter];
+	return code !== undefined ? code : letter.charCodeAt(0);;
 }

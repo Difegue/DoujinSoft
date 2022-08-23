@@ -86,11 +86,11 @@ const switchWhenMap = {
 };
 
 function switchWhenFromNumber(digit) {
-    let switchWhen = switchWhenMap[digit];
-    if (switchWhen === undefined) {
-        console.warn('Unknown SwitchWhen');
-    }
-    return switchWhen;
+	let switchWhen = switchWhenMap[digit];
+	if (switchWhen === undefined) {
+		console.warn('Unknown SwitchWhen');
+	}
+	return switchWhen;
 }
 
 const GameCondition = {
@@ -107,16 +107,16 @@ const gameConditionMap = {
 	[1]: GameCondition.Loss,
 	[2]: GameCondition.HasBeenWon,
 	[3]: GameCondition.HasBeenLost,
-    [4]: GameCondition.NotYetWon,
-    [5]: GameCondition.NotYetLost,
+	[4]: GameCondition.NotYetWon,
+	[5]: GameCondition.NotYetLost,
 };
 
 function gameConditionFromNumber(digit) {
-    let gameCondition = gameConditionMap[digit];
-    if (gameCondition === undefined) {
-        console.warn('Unknown GameCondition');
-    }
-    return gameCondition;
+	let gameCondition = gameConditionMap[digit];
+	if (gameCondition === undefined) {
+		console.warn('Unknown GameCondition');
+	}
+	return gameCondition;
 }
 
 const Trigger = {
@@ -169,18 +169,18 @@ const specificDirectionMap = {
 	[1]: SpecificDirection.NorthEast,
 	[2]: SpecificDirection.East,
 	[3]: SpecificDirection.SouthEast,
-    [4]: SpecificDirection.South,
-    [5]: SpecificDirection.SouthWest,
-    [6]: SpecificDirection.West,
-    [7]: SpecificDirection.NorthWest,
+	[4]: SpecificDirection.South,
+	[5]: SpecificDirection.SouthWest,
+	[6]: SpecificDirection.West,
+	[7]: SpecificDirection.NorthWest,
 };
 
 function specificDirectionFromNumber(digit) {
-    let direction = specificDirectionMap[digit];
-    if (direction === undefined) {
-        console.warn('Unknown SpecificDirection');
-    }
-    return direction;
+	let direction = specificDirectionMap[digit];
+	if (direction === undefined) {
+		console.warn('Unknown SpecificDirection');
+	}
+	return direction;
 }
 
 const Travel = {
@@ -209,11 +209,11 @@ const roamMap = {
 };
 
 function roamFromNumber(digit) {
-    let roam = roamMap[digit];
-    if (roam === undefined) {
-        console.warn('Unknown Roam');
-    }
-    return roam;
+	let roam = roamMap[digit];
+	if (roam === undefined) {
+		console.warn('Unknown Roam');
+	}
+	return roam;
 }
 
 const ScreenEffect = {
@@ -247,7 +247,7 @@ function nameFromData(data, offset, length) {
 		slice = sliceFrom(data, offset, length);
 	}
 
-	return String.fromCharCode(...slice);
+	return new TextDecoder().decode(slice);
 }
 
 function firstHexDigit(_byte) {
@@ -295,14 +295,14 @@ class GameData {
 
 	winCondition(conditionIndex, switchIndex) {
 		let offset = 0xE5B9 + conditionIndex * 6 + switchIndex;
-        let switchMap = {
-            [1]: Switch.On,
-            [2]: Switch.Off
-        };
-        let switchState = switchMap[secondHexDigit(this.data[offset])];
-        if (switchState === undefined) {
-            return null;
-        }
+		let switchMap = {
+			[1]: Switch.On,
+			[2]: Switch.Off
+		};
+		let switchState = switchMap[secondHexDigit(this.data[offset])];
+		if (switchState === undefined) {
+			return null;
+		}
 		let index = firstHexDigit(this.data[offset]);
 		return { index, switchState };
 	}
@@ -405,15 +405,15 @@ class AssemblyData {
 
 	get startInstruction() {
 		let art = this.startArt;
-        let location = this.startLocation;
+		let location = this.startLocation;
 
 		return { art, location };
 	}
 
-    get startArt() {
-        let offset = this.offset;
+	get startArt() {
+		let offset = this.offset;
 
-        let index = firstHexDigit(this.data[offset + 1]);
+		let index = firstHexDigit(this.data[offset + 1]);
 		let style = styleFromNumber(firstHexDigit(this.data[offset + 2]));
 		let speed = speedFromNumber(firstHexDigit(this.data[offset + 3]));
 		let art = {
@@ -422,13 +422,13 @@ class AssemblyData {
 			speed
 		};
 
-        return art;
-    }
+		return art;
+	}
 
-    get startLocation() {
-        let offset = this.offset;
+	get startLocation() {
+		let offset = this.offset;
 
-        let positionSlice = sliceFrom(this.data, offset + 14, 8);
+		let positionSlice = sliceFrom(this.data, offset + 14, 8);
 
 		let x = positionFromScrambledData(positionSlice, 'GFEDCBA-	-----!IH');
 		let y = positionFromScrambledData(positionSlice, '--------	EDCBA---	---!IHGF');
@@ -459,9 +459,9 @@ class AssemblyData {
 			return { tag: StartLocation.AttachToObject, index, offset: _offset }
 		} else {
 			console.warn('Unknown start location type');
-            return null;
+			return null;
 		}
-    }
+	}
 
 	instruction(index) {
 		return new InstructionData(this.data, this, index);
@@ -469,9 +469,9 @@ class AssemblyData {
 }
 
 /*
-    unscambleInstructions is a tab separated string of bit -> number mappings
-    For example you might pass in 'GFEDCBA_   -----!IH'
-    where { A, B, C, D, E, F, G, H, I, ! } represent { 1, 2, 4, 8, 16, 32, 64, 128, 256, -512 } if they are set
+	unscambleInstructions is a tab separated string of bit -> number mappings
+	For example you might pass in 'GFEDCBA_   -----!IH'
+	where { A, B, C, D, E, F, G, H, I, ! } represent { 1, 2, 4, 8, 16, 32, 64, 128, 256, -512 } if they are set
 
 */
 function positionFromScrambledData(data, unscrambleInstructions) {
@@ -708,7 +708,7 @@ class InstructionData {
 			y = positionFromScrambledData(positionSlice, '--------	CBA-----	-!IHGFED');
 			let max = { x, y };
 			let area = { min, max };
-            
+
 			let roamTypeDigit = this.data[offset + 1] % 4;
 			let roam = roamFromNumber(roamTypeDigit);
 
