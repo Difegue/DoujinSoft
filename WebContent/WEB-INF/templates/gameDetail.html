@@ -84,25 +84,29 @@ const musicPlayer = window.timidity('js/timidity');
 
 let mioData = null;
 
-var idealCanvasWidth = 192;
-var idealCanvasHeight = 128;
+var originalCanvasWidth = 192;
+var originalCanvasHeight = 128;
 var canvas = document.getElementById('canvas_game');
 var context = canvas.getContext('2d');
 
-scaleCanvas(windowScale());
+scaleCanvas(bestPossibleWindowSize());
 
 // re-scale canvas when the window size changes
 window.addEventListener('resize', function () {
-  scaleCanvas(windowScale());
+  scaleCanvas(bestPossibleWindowSize());
 });
 
 function modalSize() {
   return [$('#game-modal').width() - 48, $('#game-modal').height() - 48]; // Account for padding
 }
 
-function windowScale() {
+function windowSizeComparedToOriginal(width, height) {
+  return Math.min(width / originalCanvasWidth, height / originalCanvasHeight);
+}
+
+function bestPossibleWindowSize() {
   let [width, height] = modalSize();
-  return Math.min(width / idealCanvasWidth, height / idealCanvasHeight);
+  return windowSizeComparedToOriginal(width, height);
 }
 
 function createModal(gameHash) {

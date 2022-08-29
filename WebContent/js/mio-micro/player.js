@@ -4,8 +4,8 @@ function windowSize(window) {
 }
 
 function scaleCanvas(scale) {
-	canvas.width = idealCanvasWidth * scale;
-	canvas.height = idealCanvasHeight * scale;
+	canvas.width = originalCanvasWidth * scale;
+	canvas.height = originalCanvasHeight * scale;
 	context.scale(scale, scale);
 	context.imageSmoothingEnabled = false;
 }
@@ -773,8 +773,9 @@ let mouseDown = false;
 
 function handleMouseMove(event) {
 	let rect = canvas.getBoundingClientRect();
-	mouse.x = Math.floor((event.clientX - rect.left) / windowScale());
-	mouse.y = Math.floor((event.clientY - rect.top) / windowScale());
+	let scale = windowSizeComparedToOriginal(canvas.width, canvas.height);
+	mouse.x = Math.floor((event.clientX - rect.left) / scale);
+	mouse.y = Math.floor((event.clientY - rect.top) / scale);
 }
 
 function handleMouseDown(event) {
