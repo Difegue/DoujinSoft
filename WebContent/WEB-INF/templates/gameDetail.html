@@ -89,16 +89,20 @@ var idealCanvasHeight = 128;
 var canvas = document.getElementById('canvas_game');
 var context = canvas.getContext('2d');
 
-let scale = 3;
-scaleCanvas(scale);
+scaleCanvas(windowScale());
+
+// re-scale canvas when the window size changes
+window.addEventListener('resize', function () {
+  scaleCanvas(windowScale());
+});
 
 function modalSize() {
-	return [$('#modal1').width(), $('#modal1').height()];
+  return [$('#game-modal').width() - 48, $('#game-modal').height() - 48]; // Account for padding
 }
 
 function windowScale() {
-	let [width, height] = modalSize();
-	return Math.min(width / idealCanvasWidth, height / idealCanvasHeight);
+  let [width, height] = modalSize();
+  return Math.min(width / idealCanvasWidth, height / idealCanvasHeight);
 }
 
 function createModal(gameHash) {

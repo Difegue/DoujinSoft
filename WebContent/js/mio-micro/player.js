@@ -773,8 +773,8 @@ let mouseDown = false;
 
 function handleMouseMove(event) {
 	let rect = canvas.getBoundingClientRect();
-	mouse.x = Math.floor((event.clientX - rect.left) / scale);
-	mouse.y = Math.floor((event.clientY - rect.top) / scale);
+	mouse.x = Math.floor((event.clientX - rect.left) / windowScale());
+	mouse.y = Math.floor((event.clientY - rect.top) / windowScale());
 }
 
 function handleMouseDown(event) {
