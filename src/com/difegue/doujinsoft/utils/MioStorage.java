@@ -46,10 +46,22 @@ public class MioStorage {
     }
 
     /*
-     * Craft ID from .mio metadata.
+     * Craft serial number ID from .mio metadata.
      */
     public static String computeMioID(Metadata mio) {
         return mio.getSerial1() + "-" + mio.getSerial2() + "-" + mio.getSerial3();
+    }
+
+    /*
+     * Craft unique player ID from .mio metadata for Doujinsoft cataloging purposes.
+     */
+    public static String computeCreatorID(Metadata mio)
+    {
+        String uniquePlayerID1, uniquePlayerID2;
+        uniquePlayerID1 = new String(mio.getUniquePlayerID1());
+        uniquePlayerID2 = new String(mio.getUniquePlayerID2());
+
+        return uniquePlayerID1 + "-" + uniquePlayerID2;
     }
 
     public static void ScanForNewMioFiles(String dataDir, Logger logger) throws SQLException {

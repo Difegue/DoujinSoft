@@ -32,6 +32,7 @@ public class BaseMio {
 		}
 
 		mioID += MioStorage.computeMioID(m);
+		creatorID = MioStorage.computeCreatorID(m);
 
 		if (m.getDescription().length() > 19) {
 			mioDesc1 = m.getDescription().substring(0,18);
@@ -59,6 +60,7 @@ public class BaseMio {
     	hash = result.getString("hash");
 		brand = result.getString("brand");
 		creator = result.getString("creator");
+		creatorID = result.getString("creatorId");
 
 		if (desc.length() > 18) {
 			mioDesc1 = desc.substring(0,18);
@@ -88,7 +90,7 @@ public class BaseMio {
 	
 	}
 	
-	public String name, timestamp, mioID, hash, brand, creator, mioDesc1, mioDesc2, colorLogo, colorCart, specialBrand;
+	public String name, timestamp, mioID, hash, brand, creator, mioDesc1, mioDesc2, colorLogo, colorCart, specialBrand, creatorID;
 	public int logo;
 	
 }
