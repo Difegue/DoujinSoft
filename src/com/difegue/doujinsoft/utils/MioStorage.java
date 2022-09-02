@@ -58,10 +58,23 @@ public class MioStorage {
     public static String computeCreatorID(Metadata mio)
     {
         String uniquePlayerID1, uniquePlayerID2;
-        uniquePlayerID1 = new String(mio.getUniquePlayerID1());
-        uniquePlayerID2 = new String(mio.getUniquePlayerID2());
+        uniquePlayerID1 = byteArrayToString(mio.getUniquePlayerID1());
+        uniquePlayerID2 = byteArrayToString(mio.getUniquePlayerID2());
 
         return uniquePlayerID1 + "-" + uniquePlayerID2;
+    }
+
+    private static String byteArrayToString(byte[] bytes)
+    {
+        String intString = "";
+
+        for (int byteIndex = 0; byteIndex < bytes.length; byteIndex++)
+        {
+            int byteValue = Byte.toUnsignedInt(bytes[byteIndex]);
+            intString += Integer.toString(byteValue);
+        }
+
+        return intString;
     }
 
     public static void ScanForNewMioFiles(String dataDir, Logger logger) throws SQLException {
