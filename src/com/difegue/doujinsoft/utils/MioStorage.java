@@ -66,14 +66,11 @@ public class MioStorage {
 
     private static String byteArrayToString(byte[] bytes)
     {
-        String intString = "";
+        String hexString = "";
+        for (byte i : bytes)
+            hexString += String.format("%02X", i);
 
-        for (int byteIndex = 0; byteIndex < bytes.length; byteIndex++)
-        {
-            intString += Byte.toString(bytes[byteIndex]);
-        }
-
-        return intString;
+        return hexString;
     }
 
     public static void ScanForNewMioFiles(String dataDir, Logger logger) throws SQLException {
