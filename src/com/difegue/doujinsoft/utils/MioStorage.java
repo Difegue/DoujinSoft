@@ -70,8 +70,7 @@ public class MioStorage {
 
         for (int byteIndex = 0; byteIndex < bytes.length; byteIndex++)
         {
-            int byteValue = Byte.toUnsignedInt(bytes[byteIndex]);
-            intString += Integer.toString(byteValue);
+            intString += Byte.toString(bytes[byteIndex]);
         }
 
         return intString;
