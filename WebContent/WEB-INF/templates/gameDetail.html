@@ -73,8 +73,6 @@ Sad.
 
 <script>
 
-const musicPlayer = window.timidity('js/timidity');
-
 var isInitialised = false;
 var mioData = null;
 
@@ -118,7 +116,7 @@ function createModal(gameHash) {
     onCloseEnd: function() {
       context.clearRect(0, 0, canvas.width, canvas.height);
       gameId++;
-      musicPlayer.pause();
+      player.pause();
     }
   });
   $('#game-modal').modal('open');
@@ -141,7 +139,7 @@ async function playGame(url) {
 
   console.debug(midiData);
 
-  musicPlayer.load(midiData)
+  player.load(midiData)
 
   if (!isInitialised) {
 
@@ -169,7 +167,7 @@ async function playGame(url) {
     document.addEventListener('touchend', handleTouchEnd, false)
 
     
-    musicPlayer.on('ended', () => { hasTrackEnded = true; })
+    player.on('ended', () => { hasTrackEnded = true; })
 
     isInitialised = true;
   } 
@@ -178,12 +176,12 @@ async function playGame(url) {
 }
 
 function playMusic() {
-  musicPlayer.seek(0);
-  musicPlayer.play();
+  player.seek(0);
+  player.play();
 }
 
 function pauseMusic() {
-  musicPlayer.pause();
+  player.pause();
 }
 
 
