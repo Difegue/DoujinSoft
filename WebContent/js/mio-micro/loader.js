@@ -469,7 +469,7 @@ class AssemblyData {
 }
 
 /*
-	unscambleInstructions is a tab separated string of bit -> number mappings
+	unscrambleInstructions is a tab separated string of bit -> number mappings
 	For example you might pass in 'GFEDCBA_   -----!IH'
 	where { A, B, C, D, E, F, G, H, I, ! } represent { 1, 2, 4, 8, 16, 32, 64, 128, 256, -512 } if they are set
 

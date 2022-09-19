@@ -55,10 +55,8 @@ fontBitmap.src = 'img/miofont.png';
 let drawText = (text, size = 16) => {
 	let gradient = context.createLinearGradient(0, 0, 1, 100);
 	gradient.addColorStop(0, 'white');
-	gradient.addColorStop(0.638, 'white');
-	gradient.addColorStop(0.638, '#D6D6D6');
-	gradient.addColorStop(0.65, '#D6D6D6');
-	gradient.addColorStop(0.65, '#B5B5B5');
+	gradient.addColorStop(0.6, 'white');
+	gradient.addColorStop(0.675, 'gray');
 
 	let w = 18;
 	let h = 18;
@@ -1173,27 +1171,28 @@ function cloneArea(area) {
 }
 
 function goStraightTravel(action, state, props) {
+	let fromPosition = null;
 	if (action.from.tag === FromLocation.AnotherPosition) {
-		props.position = clonePosition(action.from.position);
+		fromPosition = clonePosition(action.from.position);
 	} else if (action.from.tag === FromLocation.AnotherObject) {
 		// TODO: Is this done from the position at the start of the frame?
-		props.position = clonePosition(state.properties[action.from.index].position);
-		props.position.x += action.from.offset.x;
-		props.position.y += action.from.offset.y;
+		fromPosition = clonePosition(state.properties[action.from.index].position);
+		fromPosition.x += action.from.offset.x;
+		fromPosition.y += action.from.offset.y;
 	}
 	let speed = valueFromSpeed(action.speed);
 	let travel;
 	if (action.direction.tag === Direction.Random) {
 		let direction = randomInArray(possibleDirections);
 		let velocity = velocityFromDirection(direction, speed);
-		travel = { tag: ActiveTravel.GoStraight, velocity };
+		travel = { tag: ActiveTravel.GoStraight, velocity, fromPosition };
 	} else if (action.direction.tag === Direction.Specific) {
 		let direction = action.direction.direction;
 		let velocity = velocityFromDirection(direction, speed);
-		travel = { tag: ActiveTravel.GoStraight, velocity };
+		travel = { tag: ActiveTravel.GoStraight, velocity, fromPosition };
 	} else {
 		let position = action.direction.position;
-		travel = { tag: ActiveTravel.GoToPoint, position, speed };
+		travel = { tag: ActiveTravel.GoToPoint, position, speed, fromPosition };
 	}
 	return travel;
 }
@@ -1241,17 +1240,19 @@ function roamTravel(action, state, props, collisionArea) {
 			let angle = randomInRange(0, Math.PI * 2);
 			velocity = { x: speed * Math.cos(angle), y: speed * Math.sin(angle) };
 		} else if (area.min.x > area.max.x) {
-			velocity = { x: 0, y: initialSpeed };
+			//velocity = { x: 0, y: initialSpeed };
 		} else {
-			velocity = { x: initialSpeed, y: 0 };
+			//velocity = { x: initialSpeed, y: 0 };
 		}
-		/*if (lastTravel.tag === ActiveTravel.GoStraight) {
+		let angle = randomInRange(0, Math.PI * 2);
+		velocity = { x: speed * Math.cos(angle), y: speed * Math.sin(angle) };
+		if (lastTravel.tag === ActiveTravel.GoStraight) {
 			// TODO: Adjust for speed
 			velocity = clonePosition(lastTravel.velocity);
 			let d = Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
 			velocity.x = velocity.x / d * speed;
 			velocity.y = velocity.y / d * speed;
-		}*/
+		}
 		travel = { tag, roam, area, speed, overlap, velocity };
 	} else if (roam === Roam.Bounce) {
 		let acceleration = speed / 16;
@@ -1273,7 +1274,10 @@ function roamTravel(action, state, props, collisionArea) {
 
 		if (lastTravel.tag === ActiveTravel.GoStraight) {
 			// TODO: Add velocity to GoToPoint to use here? or just calc now. and check if gotopoint is called same frame as bounce in game this affects before thought
+			//velocity.x = lastTravel.velocity.x;
+			//velocity.y = lastTravel.velocity.y || velocity.y;
 			velocity = clonePosition(lastTravel.velocity);
+			
 		} else if (lastTravel.tag === ActiveTravel.GoToPoint) {
 			let position = lastTravel.position;
 			let targetVector = { x: position.x - props.position.x, y: position.y - props.position.y };
@@ -1282,7 +1286,7 @@ function roamTravel(action, state, props, collisionArea) {
 				x: targetVector.x / d * speed / 2,
 				y: targetVector.y / d * speed
 			};
-		} else if (lastTravel.tag === ActiveTravel.Roam && lastTravel.roam === Roam.Bounce) {
+		} else if (lastTravel.tag === ActiveTravel.Roam && (lastTravel.roam === Roam.Bounce || lastTravel.roam === Roam.Reflect)) {
 			velocity = clonePosition(lastTravel.velocity);
 		} else if (lastTravel.tag === ActiveTravel.GoToObject) {
 			let position = state.properties[lastTravel.index].position;
@@ -1396,6 +1400,9 @@ function applyAction(state, i, action, gameData) {
 			props.art.timeToNextChange = animationTimeFromSpeed(action.speed);
 			props.art.speed = action.speed;
 			props.art.style = action.style;
+			if (art.bank.length === 1) {
+				props.art.style = AnimationStyle.Hold;
+			}
 			return;
 		}
 		case Action.SoundEffect: {
@@ -1577,7 +1584,6 @@ function moveObjects(state, gameData) {
 
 			if (t < props.travel.length - 1
 				&& (travel.tag === ActiveTravel.GoStraight
-					|| travel.tag === ActiveTravel.GoStraight
 					|| travel.tag === ActiveTravel.GoToPoint
 					|| travel.tag === ActiveTravel.GoToObject
 					|| travel.tag === ActiveTravel.Roam
@@ -1626,11 +1632,19 @@ function moveObjects(state, gameData) {
 					break;
 				}
 				case ActiveTravel.GoStraight: {
+					if (travel.fromPosition != null) {
+						props.position = travel.fromPosition;
+						travel.fromPosition = null;
+					}
 					props.position.x += travel.velocity.x;
 					props.position.y += travel.velocity.y;
 					break;
 				}
 				case ActiveTravel.GoToPoint: {
+					if (travel.fromPosition != null) {
+						props.position = travel.fromPosition;
+						travel.fromPosition = null;
+					}
 					let position = clonePosition(travel.position);
 					moveToward(props, position);
 					break;
@@ -1656,6 +1670,20 @@ function moveObjects(state, gameData) {
 						return position.x >= area.min.x && position.x <= area.max.x
 							&& position.y >= area.min.y && position.y <= area.max.y;
 					};
+					let isPositionInExtendedArea = (position, area) => {
+						if (area.min.x <= area.max.x && area.min.y <= area.max.y) {
+							return position.x >= area.min.x && position.x <= area.max.x
+								&& position.y >= area.min.y && position.y <= area.max.y;
+						}
+						if (area.min.x > area.max.x) {
+							return position.x.toFixed(2) === ((area.min.x + area.max.x) / 2).toFixed(2)
+								&& position.y >= area.min.y && position.y <= area.max.y;
+						}
+						if (area.min.y > area.max.y) {
+							return position.x >= area.min.x && position.x <= area.max.x
+								&& position.y.toFixed(2) === ((area.min.y + area.max.y) / 2).toFixed(2);
+						}
+					};
 					if (travel.roam === Roam.Wiggle) {
 						if (isPositionInArea(props.position, area)) {
 							let directions = possibleDirections;
@@ -1672,10 +1700,10 @@ function moveObjects(state, gameData) {
 										if (i === otherIndex) {
 											continue object_loop;
 										}
-										if (props[otherIndex] === null || props[otherIndex].position === null) {
+										if (state.properties[otherIndex] === null || state.properties[otherIndex].position === null) {
 											continue object_loop;
 										}
-										if (areTouching(props, i, otherIndex, gameData.collisionData)) {
+										if (areTouching(state.properties, i, otherIndex, gameData.collisionData)) {
 											continue direction_loop;
 										}
 									}
@@ -1695,6 +1723,56 @@ function moveObjects(state, gameData) {
 
 							props.position.x += velocity.x;
 							props.position.y += velocity.y;
+						} else if (area.min.x > area.max.x || area.min.y > area.max.y) {
+							// TODO: Duplicate code
+							if (area.min.x > area.max.x || area.min.y > area.max.y) {
+								area = cloneArea(area);
+								area.min.x -= gameData.objects[i].spriteSize / 2;
+								area.min.y -= gameData.objects[i].spriteSize / 2;
+								area.max.x += gameData.objects[i].spriteSize / 2;
+								area.max.y += gameData.objects[i].spriteSize / 2;
+							}
+							if (isPositionInArea(props.position, area)) {
+								let directions = possibleDirections;
+								if (travel.overlap === Overlap.TryNotToOverlap) {
+									let position = clonePosition(props.position);
+									let nonOverlappingDirections = [];
+									direction_loop: for (let d = 0; d < possibleDirections.length; d++) {
+										props.position = clonePosition(position);
+										let direction = possibleDirections[d];
+										let velocity = velocityFromDirection(direction, travel.speed);
+										props.position.x += velocity.x;
+										props.position.y += velocity.y;
+										object_loop: for (let otherIndex = 0; otherIndex < OBJECT_COUNT; otherIndex++) {
+											if (i === otherIndex) {
+												continue object_loop;
+											}
+											if (state.properties[otherIndex] === null || state.properties[otherIndex].position === null) {
+												continue object_loop;
+											}
+											if (areTouching(state.properties, i, otherIndex, gameData.collisionData)) {
+												continue direction_loop;
+											}
+										}
+	
+										nonOverlappingDirections.push(direction);
+									}
+									if (nonOverlappingDirections.length === 0) {
+										directions = possibleDirections;
+									} else {
+										directions = nonOverlappingDirections;
+									}
+	
+									props.position = clonePosition(position);
+								}
+								let direction = randomInArray(directions);
+								let velocity = velocityFromDirection(direction, travel.speed);
+	
+								props.position.x += velocity.x;
+								props.position.y += velocity.y;
+							} else {
+								moveToward(props, centre);
+							}
 						} else {
 							moveToward(props, centre);
 						}
@@ -1744,27 +1822,38 @@ function moveObjects(state, gameData) {
 								}
 							}
 						}
-						if (props.position.x + travel.velocity.x < area.min.x) {
+						if (isPositionInExtendedArea(props.position, area)) {
+							if (Math.floor(props.position.x) > area.max.x) {
+								travel.velocity.x = -Math.abs(travel.velocity.x);
+							}
+							if (props.position.x < area.min.x) {
 							travel.velocity.x = Math.abs(travel.velocity.x);
 						}
-						if (props.position.x + travel.velocity.x > area.max.x) {
-							travel.velocity.x = -Math.abs(travel.velocity.x);
+							if (Math.floor(props.position.y) > area.max.y) {
+								travel.velocity.y = -Math.abs(travel.velocity.y);
 						}
-						if (props.position.y + travel.velocity.y < area.min.y) {
+							if (props.position.y < area.min.y) {
 							travel.velocity.y = Math.abs(travel.velocity.y);
 						}
-						if (props.position.y + travel.velocity.y > area.max.y) {
-							travel.velocity.y = -Math.abs(travel.velocity.y);
-						}
+							
 						// When area is smaller than object
 						if (props.position.x >= area.max.x && props.position.x <= area.min.x) {
 							travel.velocity.x = 0;
+								travel.velocity.y = travel.velocity.y > 0 ? travel.speed : -travel.speed;
+								
+								//props.position.x = (area.min.x + area.max.x) / 2.0;
 						}
 						if (props.position.y >= area.max.y && props.position.y <= area.min.y) {
 							travel.velocity.y = 0;
+								travel.velocity.x = travel.velocity.x > 0 ? travel.speed : -travel.speed;
+								//props.position.y = (area.min.y + area.max.y) / 2.0;
 						}
 						props.position.x += travel.velocity.x;
 						props.position.y += travel.velocity.y;
+						} else {
+							// TODO: Does this cause problems when velocity is specifically set using GoStraight?
+							travel.velocity = moveToward(props, centre);
+						}
 					} else if (travel.roam === Roam.Bounce) {
 						// TODO: Implement TryNotToOverlap (properly) for bounce
 						if (travel.overlap === Overlap.TryNotToOverlap) {
@@ -1783,31 +1872,35 @@ function moveObjects(state, gameData) {
 								}
 							}
 							if (touching) {
+								if (Math.abs(props.position.x - state.properties[touchingIndex].position.x) > Math.abs(props.position.y - state.properties[touchingIndex].position.y)) {
 								if (props.position.x < state.properties[touchingIndex].position.x) {
 									travel.velocity.x = -Math.abs(travel.velocity.x);
 								}
 								if (props.position.x > state.properties[touchingIndex].position.x) {
 									travel.velocity.x = Math.abs(travel.velocity.x);
 								}
-								/*if (props.position.y < state.properties[touchingIndex].position.y) {
-									travel.velocity.y = ...;
+								} else {
+									if (props.position.y < state.properties[touchingIndex].position.y) {
+										// Dunno why I put this as it
+										travel.velocity.y = props.position.y > travel.area.min.y ? -Math.sqrt(2 * travel.acceleration * (travel.area.max.y - travel.area.min.y)) : 0.0;
 								}
 								if (props.position.y > state.properties[touchingIndex].position.y) {
-									travel.velocity.y = ...;
-								}*/
+										travel.velocity.y = 0;
+									}
+								}
 							}
 						}
 						if (props.position.y < area.min.y) {
 							// TODO: Why is abs necessary?
 							travel.velocity.y += Math.abs(travel.acceleration);
-						} else if (props.position.y < area.max.y) {
+						} else if (props.position.y <= area.max.y) {
 							travel.velocity.y += travel.acceleration;
-						} else if (props.position.y > area.max.y) {
+						} else if (Math.floor(props.position.y) > area.max.y) {
 							travel.velocity.y = props.position.y > travel.area.min.y ? -Math.sqrt(2 * travel.acceleration * (props.position.y - travel.area.min.y)) : 0.0;
 						}
-						if (props.position.x > area.max.x) {
+						if (Math.floor(props.position.x) > area.max.x) {
 							travel.velocity.x = -Math.abs(travel.velocity.x);
-						} else if (props.position.x < area.min.x) {
+						} else if (Math.floor(props.position.x) < area.min.x) {
 							travel.velocity.x = Math.abs(travel.velocity.x);
 						}
 						let horizontalSpeed = travel.speed / 2;
