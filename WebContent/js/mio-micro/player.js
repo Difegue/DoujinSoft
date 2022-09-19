@@ -12,7 +12,7 @@ function scaleCanvas(scale) {
 
 let gameId = 0;
 let shouldShowCommand = true;
-let isInfiniteMode = true;
+let isInfiniteMode = false;
 let isPaused = false;
 
 // _fetch function taken from timidity by Feross Aboukhadijeh
@@ -48,9 +48,9 @@ let commandFont = new FontFace('warioware-diy-ds-microgame-font', 'url(fonts/war
 let fontBitmap = new Image();
 fontBitmap.src = 'img/miofont.png';
 
-fontBitmap.onload = () => {
+/*fontBitmap.onload = () => {
 	console.debug('font bitmap loaded')
-}
+}*/
 
 let drawText = (text, size = 16) => {
 	let gradient = context.createLinearGradient(0, 0, 1, 100);
@@ -108,13 +108,12 @@ let drawText = (text, size = 16) => {
 commandFont.load().then(function (font) {
 	document.fonts.add(font);
 
-	console.log('Font loaded');
+	//console.log('Font loaded');
 });
 
 let audioNames = [
 	'explosion',
 	'glass',
-
 	'gong',
 	'spring',
 	'pistol',
@@ -178,24 +177,6 @@ let audioNames = [
 	'struck',
 	'barrel_hop',
 ];
-
-let sounds = [];
-
-const loadSound = (name) => {
-	let audio = new Audio('audio/' + name + '.ogg');
-	audio.volume = 1;
-	sounds.push(audio);
-	return audio;
-};
-
-audioNames.forEach(name => {
-	let audio = new Audio('audio/' + name + '.ogg');
-	audio.volume = 1;
-	sounds.push(audio);
-});
-
-let winSounds = [loadSound('win1'), loadSound('win2')];
-let loseSounds = [loadSound('lose1'), loadSound('lose2')];
 
 let randomInRange = (min, max) => min + (max - min) * Math.random();
 let randomIntInRange = (min, max) => Math.floor(randomInRange(min, max));
@@ -740,6 +721,7 @@ function loadAndStartGame(data) {
 	console.log(properties);
 
 	requestAnimationFrame(() => {
+		
 		if (shouldShowCommand) {
 			drawText(command);
 		}
@@ -765,17 +747,12 @@ let mouse = {
 	state: ButtonState.Up,
 };
 
-document.addEventListener('mousemove', handleMouseMove, false);
-document.addEventListener('mousedown', handleMouseDown, false);
-document.addEventListener('mouseup', handleMouseUp, false)
-
 let mouseDown = false;
 
 function handleMouseMove(event) {
-	let rect = canvas.getBoundingClientRect();
-	let scale = windowSizeComparedToOriginal(canvas.width, canvas.height);
-	mouse.x = Math.floor((event.clientX - rect.left) / scale);
-	mouse.y = Math.floor((event.clientY - rect.top) / scale);
+	if (typeof canvas !== 'undefined') {
+		setMousePosition(event);
+	}
 }
 
 function handleMouseDown(event) {
@@ -790,9 +767,32 @@ function handleMouseUp(event) {
 	}
 }
 
+function setMousePosition(event) {
+	let rect = canvas.getBoundingClientRect();
+	let scale = windowSizeComparedToOriginal(canvas.width, canvas.height);
+	mouse.x = Math.floor((event.clientX - rect.left) / scale);
+	mouse.y = Math.floor((event.clientY - rect.top) / scale);
+}
+
+function handleTouchStart(event) {
+	if (typeof canvas !== 'undefined') {
+		var touch = event.touches[0] || event.changedTouches[0];
+		setMousePosition(touch);
+	}
+	mouseDown = true;
+}
+
+function handleTouchEnd(event) {
+	mouseDown = false;
+}
+
+function replayGame() {
+	loadAndStartGame(mioData);
+}
+
 window.addEventListener('keydown', event => {
 	if (event.code === 'KeyR' && mioData !== null) {
-		loadAndStartGame(mioData);
+		replayGame();
 	}
 
 	if (event.code === 'KeyC') {
@@ -1399,9 +1399,15 @@ function applyAction(state, i, action, gameData) {
 			return;
 		}
 		case Action.SoundEffect: {
-			if (sounds[action.effect].paused) {
-				sounds[action.effect].play();
+			let sound = sounds[action.effect];
+			if (sound.paused) {
+				sound.play();
+			} else if (sound.currentTime > 0.025) {
+				sound.pause();
+				sound.currentTime = 0;
+				sound.play();
 			}
+			
 			return;
 		}
 		case Action.ScreenEffect: {
@@ -1422,25 +1428,41 @@ function runFrame(gameData, state, assets) {
 	} else if (gameData.length === Length.Long) {
 		end = 64;
 	}
-	// TODO: Check if multiplying by 8 is correct move
 	if (gameData.id !== gameId) {
 		return;
 	}
 
-	if (state.frame > end * 8 && !isInfiniteMode) {
+	if (state.frame > end * 7.5 && !isInfiniteMode) {
 		isPaused = true;
+	} else if (gameData.length === Length.Boss) {
+		let hasConcluded = (state.winStatus === GameCondition.HasBeenWon || state.winStatus === GameCondition.HasBeenLost);
+		if (hasConcluded && state.frame % 240 === 0 && !isInfiniteMode) {
+			isPaused = true;
+		} else {
+			isPaused = false;
+		}
 	} else {
 		isPaused = false;
 	}
 
 	let frameDelay = 1000 / 60;
 	if (isPaused) {
+		pauseMusic();
 		drawGame(state, gameData, assets);
 		context.fillStyle = "#88888844";
 		context.fillRect(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-		//drawText('GAME COMPLETE');
 	} else {
+		// TODO: Continue music?
 		if (state.time > state.frame * frameDelay) {
+			if (state.frame === 0) {
+				playMusic();
+			}
+
+			if (hasTrackEnded && gameData.length === Length.Boss) {
+				hasTrackEnded = false;
+				playMusic();
+			}
+
 			updateGame(gameData, state, assets);
 		}
 	}
@@ -1465,6 +1487,7 @@ function updateMouse(mouse) {
 	if (mouse.state === ButtonState.Up || mouse.state === ButtonState.Release) {
 		if (mouseDown) {
 			console.log('Mouse pressed');
+			
 			mouse.state = ButtonState.Press;
 		} else {
 			mouse.state = ButtonState.Up;
@@ -1889,7 +1912,7 @@ function loseIfOutOfTime(state, gameData) {
 		end = 64;
 	}
 	if (gameData.length !== Length.Boss) {
-		if (state.frame === end * 8) {
+		if (state.frame === end * 7.5) {
 			if (state.winStatus !== GameCondition.Win
 				&& state.winStatus !== GameCondition.Loss
 				&& state.winStatus !== GameCondition.HasBeenLost
@@ -1928,7 +1951,7 @@ function drawGame(state, gameData, assets) {
 		}
 	}
 
-	if (state.frame < 30 && shouldShowCommand) {
+	if (state.frame < 45 && shouldShowCommand) {
 		drawText(gameData.command);
 	}
 }

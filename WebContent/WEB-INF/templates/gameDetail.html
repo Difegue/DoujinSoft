@@ -71,32 +71,36 @@ Sad.
 	
 <span id="total_items" style="display:none">{{ totalitems }}</span>
 
-<a class="waves-effect waves-light btn modal-trigger" href="#game-modal">Play</a>
-
-<script src="js/mio-micro/midi-bundle.js"></script>
-<script src="js/mio-micro/loader.js"></script>
-<script src="js/mio-micro/player.js"></script>
-
 <script>
 
 const musicPlayer = window.timidity('js/timidity');
 
-let mioData = null;
+var isInitialised = false;
+var mioData = null;
+
+var sounds = [];
+var winSounds = [];
+var loseSounds = [];
 
 var originalCanvasWidth = 192;
 var originalCanvasHeight = 128;
 var canvas = document.getElementById('canvas_game');
 var context = canvas.getContext('2d');
 
+var hasTrackEnded = false;
+
 scaleCanvas(bestPossibleWindowSize());
 
 // re-scale canvas when the window size changes
 window.addEventListener('resize', function () {
+  // Expand the canvas so the modal is expanded too.
+  canvas.width = 1920;
+  canvas.height = 1280;
   scaleCanvas(bestPossibleWindowSize());
 });
 
 function modalSize() {
-  return [$('#game-modal').width() - 48, $('#game-modal').height() - 48]; // Account for padding
+  return [$('#game-modal').width() - 48, $('#game-modal').height() - 108]; // Account for padding
 }
 
 function windowSizeComparedToOriginal(width, height) {
@@ -112,6 +116,7 @@ function createModal(gameHash) {
   $('.modal').modal({
     dismissible: true,
     onCloseEnd: function() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
       gameId++;
       musicPlayer.pause();
     }
@@ -123,16 +128,62 @@ function createModal(gameHash) {
 async function playGame(url) {
   mioData = await _fetch(url);
 
-  let midiData = window.buildMidiFile(mioData);
+  let loopTimes;
+
+  if (mioData[0xE605] === 0) {
+    loopTimes = 0;
+  } else if (mioData[0xE605] === 1) {
+    loopTimes = 1;
+  } else {
+    loopTimes = 11;
+  }
+  let midiData = window.buildMidiFile(mioData, loopTimes);
+
+  console.debug(midiData);
 
   musicPlayer.load(midiData)
 
-  // TODO: This is supposed to loop the music but it's not working
-  musicPlayer.on('ended', () => { console.debug('music ended'); musicPlayer.play() })
+  if (!isInitialised) {
 
-  musicPlayer.play();
+    const loadSound = (name) => {
+      let audio = new Audio('audio/' + name + '.ogg');
+      audio.volume = 1;
+      sounds.push(audio);
+      return audio;
+    };
 
+    audioNames.forEach(name => {
+      let audio = new Audio('audio/' + name + '.ogg');
+      audio.volume = 1;
+      sounds.push(audio);
+    });
+
+    winSounds = [loadSound('win1'), loadSound('win2')];
+    loseSounds = [loadSound('lose1'), loadSound('lose2')];
+
+    document.addEventListener('mousemove', handleMouseMove, false);
+    canvas.addEventListener('mousedown', handleMouseDown, false);
+    document.addEventListener('mouseup', handleMouseUp, false)
+
+    canvas.addEventListener('touchstart', handleTouchStart, false);
+    document.addEventListener('touchend', handleTouchEnd, false)
+
+    
+    musicPlayer.on('ended', () => { hasTrackEnded = true; })
+
+    isInitialised = true;
+  } 
+  
   loadAndStartGame(mioData);
+}
+
+function playMusic() {
+  musicPlayer.seek(0);
+  musicPlayer.play();
+}
+
+function pauseMusic() {
+  musicPlayer.pause();
 }
 
 
