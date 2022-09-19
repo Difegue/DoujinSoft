@@ -112,7 +112,6 @@ window.buildMidiFile = (mioData, loopTimes = 0) => {
 		}
 		track.addEvent(new MidiWriter.ProgramChangeEvent({ channel, instrument: parseInt(instrumentCodes[instrumentUsed]) }));
 		for (let loopIter = 0; loopIter <= loopTimes; loopIter++) {
-			console.debug({ loopIter });
 			for (let i = 0; i < trackLength; i++) {
 				let note = mioData[songOffset + i];
 				if (note !== 255) {
@@ -144,21 +143,23 @@ window.buildMidiFile = (mioData, loopTimes = 0) => {
 		let volume = mioData[BASE_VOLUME_OFFSET + 4] * VOLUME_MULTIPLIER;
 
 
-		for (let i = 0; i < trackLength; i++) {
-			for (let drumIndex = 0; drumIndex < SIMULTANEOUS_DRUMS; drumIndex++) {
-				let drumUsed = mioData[BASE_DRUM_OFFSET + i + drumIndex * 32];
-				if (drumUsed !== 255) {
-					let drumConversion = [35, 38, 42, 46, 49, 45, 50, 47, 31, 39, 54, 73, 80, 81];
-					let duration = 'T32';
-					track.addEvent([
-						new MidiWriter.NoteEvent({
-							pitch: drumConversion[drumUsed],
-							duration,
-							channel: 10,
-							startTick: 32 * i,
-							velocity: volume
-						}),
-					]);
+		for (let loopIter = 0; loopIter <= loopTimes; loopIter++) {
+			for (let i = 0; i < trackLength; i++) {
+				for (let drumIndex = 0; drumIndex < SIMULTANEOUS_DRUMS; drumIndex++) {
+					let drumUsed = mioData[BASE_DRUM_OFFSET + i + drumIndex * 32];
+					if (drumUsed !== 255) {
+						let drumConversion = [35, 38, 42, 46, 49, 45, 50, 47, 31, 39, 54, 73, 80, 81];
+						let duration = 'T32';
+						track.addEvent([
+							new MidiWriter.NoteEvent({
+								pitch: drumConversion[drumUsed],
+								duration,
+								channel: 10,
+								startTick: 32 * i + loopIter * 1024,
+								velocity: volume
+							}),
+						]);
+					}
 				}
 			}
 		}
