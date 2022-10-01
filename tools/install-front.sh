@@ -2,6 +2,9 @@
 
 echo "Installing front-end dependencies..."
 
+mkdir WebContent/js/vendor
+mkdir WebContent/css/vendor
+
 cp node_modules/jquery/dist/jquery.min.js WebContent/js/vendor
 cp node_modules/jquery-ui/dist/jquery-ui.min.js WebContent/js/vendor
 cp node_modules/blueimp-file-upload/js/jquery.fileupload.js WebContent/js/vendor
