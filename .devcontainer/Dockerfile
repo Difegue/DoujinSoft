@@ -12,8 +12,8 @@ USER root
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 #
 
-RUN cd /tmp && wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz && tar -xzf apache-tomcat-9.0.65.tar.gz \
-    && mv apache-tomcat-9.0.65 /usr/local/tomcat && chmod -R 777 /usr/local/tomcat && rm -rf apache-tomcat-9.0.65.tar.gz
+RUN cd /tmp && wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.67/bin/apache-tomcat-9.0.67.tar.gz && tar -xzf apache-tomcat-9.0.67.tar.gz \
+    && mv apache-tomcat-9.0.67 /usr/local/tomcat && chmod -R 777 /usr/local/tomcat && rm -rf apache-tomcat-9.0.67.tar.gz
 
 # Grab the DB backup from the live site and use it as a starting point. 
 RUN cd /tmp && wget https://tvc-16.science/dsoft-backup.zip && unzip dsoft-backup.zip && mv doujinsoft2 /home/doujinsoft && chmod -R 777 /home/doujinsoft

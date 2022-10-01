@@ -33,7 +33,7 @@ Adding `&format=json` to most search pages in the webapp will give you a JSON eq
 ## Deploy/develop on Codespaces
 
 You can use [GitHub Codespaces](https://github.com/Difegue/DoujinSoft/codespaces) to develop on the app using the provided configuration.  
-Once in the codespace, you should be able to execute the `dev-server.sh` script to immediately build/start a DoujinSoft instance.
+Once in the codespace, you should be able to use `npm run dev-server` to immediately build/start a DoujinSoft instance.
 
 ## Deploying through Docker
 
