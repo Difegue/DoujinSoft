@@ -1,0 +1,34 @@
+{
+  "name": "doujinsoft",
+  "scripts": {
+    "install-front": "./tools/install-front.sh",
+    "lint": "eslint --ext .js WebContent/js/",
+    "dev-server": "./tools/dev-server.sh",
+    "docker-build": "docker build -t difegue/doujinsoft -f ./Docker/Dockerfile ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Difegue/DoujinSoft.git"
+  },
+  "author": "dfug",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/Difegue/DoujinSoft/issues"
+  },
+  "homepage": "https://github.com/Difegue/DoujinSoft#readme",
+  "dependencies": {
+    "bg-sound": "^2.0.0",
+    "blueimp-file-upload": "^10.32.0",
+    "jquery": "^3.6.0",
+    "jquery-ui": "^1.12.1",
+    "materialize-css": "^1.0.0",
+    "mio-loader": "^0.1.0",
+    "mio-player": "^0.1.2",
+    "timidity": "^1.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
+}

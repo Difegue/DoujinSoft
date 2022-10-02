@@ -7,9 +7,9 @@
 
 	updateCartCount();
 
-	// Due to quirks with libTimidity, the exact location of the folder containing the .wasm must be set here.
-	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/js/timidity".
-	player = window.timidity("js/timidity");
+	// The exact location of the folder containing the .wasm must be set here.
+	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/soundfont".
+	player = new window.timidity("soundfont");
     idPlaying = "";
     
     $('.pagination').pagination({

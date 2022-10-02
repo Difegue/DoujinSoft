@@ -6,6 +6,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Pull and organize front-end dependencies
+      run: |
+        npm install
+        npm run install-front
     - name: Pull submodule
       run : |
         git submodule init

@@ -1,6 +1,8 @@
 # Script to quickly bringup a Dsoft server 
 # (meant for codespaces but should work on anything as long as you have the /home/doujinsoft directory created)
 
+npm install
+npm run install-front
 mvn package -f "pom.xml"
 
 # Copy WAR from context
