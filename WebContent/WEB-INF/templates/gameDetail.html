@@ -80,21 +80,21 @@ var sounds = [];
 var winSounds = [];
 var loseSounds = [];
 
-var originalCanvasWidth = 192;
-var originalCanvasHeight = 128;
 var canvas = document.getElementById('canvas_game');
 var context = canvas.getContext('2d');
 
 var hasTrackEnded = false;
 
-scaleCanvas(bestPossibleWindowSize());
+var mioPlayer = new window.mio.Player(canvas, document);
+
+mioPlayer.scaleCanvas(bestPossibleWindowSize());
 
 // re-scale canvas when the window size changes
 window.addEventListener('resize', function () {
   // Expand the canvas so the modal is expanded too.
   canvas.width = 1920;
   canvas.height = 1280;
-  scaleCanvas(bestPossibleWindowSize());
+  mioPlayer.scaleCanvas(bestPossibleWindowSize());
 });
 
 function modalSize() {
@@ -102,7 +102,7 @@ function modalSize() {
 }
 
 function windowSizeComparedToOriginal(width, height) {
-  return Math.min(width / originalCanvasWidth, height / originalCanvasHeight);
+  return Math.min(width / window.mio.ORIGINAL_CANVAS_WIDTH, height / window.mio.ORIGINAL_CANVAS_HEIGHT);
 }
 
 function bestPossibleWindowSize() {
@@ -115,12 +115,57 @@ function createModal(gameHash) {
     dismissible: true,
     onCloseEnd: function() {
       context.clearRect(0, 0, canvas.width, canvas.height);
-      gameId++;
       player.pause();
+      mioPlayer.stop();
     }
   });
   $('#game-modal').modal('open');
   playGame('./download?type=game&id=' + gameHash);
+}
+
+function handleMouseMove(event) {
+	if (typeof canvas !== 'undefined') {
+		mioPlayer.setStylusPosition(event.clientX, event.clientY);
+	}
+}
+
+function handleMouseDown(event) {
+	if (event.button === 0) {
+		mioPlayer.touchScreen();
+	}
+}
+
+function handleMouseUp(event) {
+	if (event.button === 0) {
+		mioPlayer.withdrawTouchFromScreen();
+	}
+}
+
+function handleTouchStart(event) {
+	if (typeof canvas !== 'undefined') {
+		let touch = event.touches[0] || event.changedTouches[0];
+		mioPlayer.setStylusPosition(touch.clientX, touch.clientY);
+	}
+	mioPlayer.touchScreen();
+}
+
+function handleTouchEnd() {
+	mioPlayer.withdrawTouchFromScreen();
+}
+
+// _fetch function taken from timidity by Feross Aboukhadijeh
+// https://github.com/feross/timidity
+async function _fetch(url) {
+	const opts = {
+		mode: 'cors',
+		credentials: 'same-origin'
+	}
+	const response = await window.fetch(url, opts)
+	if (response.status !== 200) throw new Error(`Could not load ${url}`)
+
+	const arrayBuffer = await response.arrayBuffer()
+	const buf = new Uint8Array(arrayBuffer)
+	return buf
 }
 
 async function playGame(url) {
@@ -139,50 +184,60 @@ async function playGame(url) {
 
   console.debug(midiData);
 
-  player.load(midiData)
+  player.load(midiData);
 
   if (!isInitialised) {
-
     const loadSound = (name) => {
       let audio = new Audio('audio/' + name + '.ogg');
       audio.volume = 1;
-      sounds.push(audio);
       return audio;
     };
 
-    audioNames.forEach(name => {
-      let audio = new Audio('audio/' + name + '.ogg');
-      audio.volume = 1;
+    mioPlayer.soundNames.forEach(name => {
+      let audio = loadSound(name);
       sounds.push(audio);
     });
 
     winSounds = [loadSound('win1'), loadSound('win2')];
     loseSounds = [loadSound('lose1'), loadSound('lose2')];
 
+    mioPlayer.sounds = sounds;
+    mioPlayer.winSounds = winSounds;
+    mioPlayer.loseSounds = loseSounds;
+
     document.addEventListener('mousemove', handleMouseMove, false);
     canvas.addEventListener('mousedown', handleMouseDown, false);
     document.addEventListener('mouseup', handleMouseUp, false)
 
     canvas.addEventListener('touchstart', handleTouchStart, false);
-    document.addEventListener('touchend', handleTouchEnd, false)
-
+    document.addEventListener('touchend', handleTouchEnd, false);
     
-    player.on('ended', () => { hasTrackEnded = true; })
+    player.on('ended', () => { hasTrackEnded = true; });
+
+    mioPlayer.musicPlayer = {
+      playMusic: () => {
+        player.pause();
+        player.seek(0);
+        player.play();
+        hasTrackEnded = false;
+      },
+      pauseMusic: () => player.pause(),
+      hasTrackEnded: () => hasTrackEnded,
+    };
+
+    let fontBitmap = new Image();
+    fontBitmap.src = 'img/miofont.png';
+
+    mioPlayer.fontBitmap = fontBitmap;
 
     isInitialised = true;
   } 
   
-  loadAndStartGame(mioData);
+  mioPlayer.loadAndStart(mioData);
 }
 
-function playMusic() {
-  player.seek(0);
-  player.play();
+function replayGame() {
+  mioPlayer.loadAndStart(mioData);
 }
-
-function pauseMusic() {
-  player.pause();
-}
-
 
 </script>
