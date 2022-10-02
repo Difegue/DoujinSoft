@@ -75,6 +75,7 @@ Sad.
 
 var isInitialised = false;
 var mioData = null;
+var midiData = null;
 
 var sounds = [];
 var winSounds = [];
@@ -180,7 +181,7 @@ async function playGame(url) {
   } else {
     loopTimes = 11;
   }
-  let midiData = window.buildMidiFile(mioData, loopTimes);
+  midiData = window.buildMidiFile(mioData, loopTimes);
 
   console.debug(midiData);
 
@@ -237,6 +238,8 @@ async function playGame(url) {
 }
 
 function replayGame() {
+  player.pause();
+  player.load(midiData);
   mioPlayer.loadAndStart(mioData);
 }
 
