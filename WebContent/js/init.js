@@ -4,6 +4,7 @@
 	$('.sidenav').sidenav();
 	$('select').formSelect();
 	$('.tooltipped').tooltip({enterDelay: 50});
+	$('.collapsible').collapsible();
 
 	updateCartCount();
 
