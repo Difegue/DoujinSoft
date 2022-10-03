@@ -7,9 +7,9 @@
 
 {% block desc %}
 
-<span style="font-size:20px;">👇 Latest News 👇</span> 
-<div class="red darken-1 white-text z-depth-2" style="border-radius:16px; margin-top: 10px" >
-    <span style="font-size:18px"> {{ news }} </span>
+<span style="font-size:20px;">👇 Latest News 👇</span>
+<div class="red darken-1 white-text z-depth-2" style="border-radius:16px; margin-top: 10px">
+	<span style="font-size:18px"> {{ news }} </span>
 </div>
 {% endblock %}
 
@@ -18,61 +18,68 @@
 
 <div class="row">
 
-<img class="col l3 m4 hide-on-small-only" src="./img/truck3D.png"/>
+	<img class="col l4 m4 hide-on-small-only" src="./img/truck3D.png" />
 
-<div class="col l9 m8 s12 white-text center"> 
-	
-	<h5>The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available for reading, listening, and transferring to your own copies of the game.<br/><br/>
-		Select any of the categories in the upper menu to start exploring! <br/>Or you could look at our curated selections below. Make sure to check the <a href="./about">FAQ</a> for more info!
-	</h5>
-	<br/><br/>
-	
+	<div class="col l8 m8 s12 white-text center">
+
+		<h5>The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game
+			WarioWare DIY, available for reading, listening, and transferring to your own copies of the
+			game.<br /><br />
+			Select any of the categories in the upper menu to start exploring! <br />Or you could look at our curated
+			selections below. Make sure to check the <a href="./about">FAQ</a> for more info!
+		</h5>
+
+	</div>
+
+	<div class="col l8 m8 s6 white-text center">
+
+		<h3>We're currently hosting: </h3>
+		<h4 class="green-text">
+			<object style="height:25px" class="tooltipped" data="./img/fc-cart.svg" type="image/svg+xml"
+				data-tooltip="Games" data-position="left"></object>
+			{{ totalGames }}
+		</h4>
+		<h4 class="pink-text ">
+			<i style="font-size:40px" class="material-icons pink-text prefix tooltipped" data-tooltip="Records"
+				data-position="left">album</i>
+			{{ totalRecords }}
+		</h4>
+		<h4 class="blue-text ">
+			<i style="font-size:40px" class="material-icons blue-text prefix tooltipped" data-tooltip="Comics"
+				data-position="left">local_library</i>
+			{{ totalComics }}
+		</h4>
+
+	</div>
+
+	<img style="margin-left:20px; margin-top:20px" class="center hide-on-med-and-up" src="./img/truck3D.png" />
+
 </div>
 
-<div class="col l9 m8 s6 white-text center">
-
-	 <h3>We're currently hosting: </h3> 
-	 <h4 class="green-text" >
-	 	<object style="height:25px" class="tooltipped" data="./img/fc-cart.svg" type="image/svg+xml" data-tooltip="Games" data-position="left"></object> 
-	 	{{ totalGames }} 
-	 </h4>
-	 <h4 class="pink-text " >
-	 	<i style="font-size:40px" class="material-icons pink-text prefix tooltipped" data-tooltip="Records" data-position="left">album</i> 
-	 	{{ totalRecords }}  
-	 </h4> 
-	 <h4 class="blue-text " >
-	 	<i style="font-size:40px" class="material-icons blue-text prefix tooltipped" data-tooltip="Comics" data-position="left">local_library</i> 
-	 	{{ totalComics }} 
-	 </h4>
-
-</div>
-
-<object style="margin-left:20px; margin-top:20px"class="center hide-on-med-and-up" data="./img/dsoft-clipart.svg" type="image/svg+xml" >
-</object>
-
-</div>
-	
 {% endblock %}
 
 {% block footdata %}
 
 <!-- Collections go here, as cards. Maybe generate those dynamically later ? -->
 <h2 class="white-text">Our selections:</h2>
- 
+
 {% for collection in collections %}
 
 <div class="col s12 m6 l4">
-    <a class="card selection-card waves-effect waves-light" href="./collection?id={{collection.id}}" style="width:100%; background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('{{collection.background_pic}}') !important;">
-        <div class="card-content white-text">
-           <i class="material-icons {{collection.collection_color}}-text" style="font-size: 35px">{{collection.collection_icon}}</i>
-            <span class="card-title" style="height:32px">{{collection.collection_name}}</span>
-        </div>
-    </a>
+	<a class="card selection-card waves-effect waves-light" href="./collection?id={{collection.id}}"
+		style="width:100%; background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('{{collection.background_pic}}') !important;">
+		<div class="card-content white-text">
+			<i class="material-icons {{collection.collection_color}}-text"
+				style="font-size: 35px">{{collection.collection_icon}}</i>
+			<span class="card-title" style="height:32px">{{collection.collection_name}}</span>
+		</div>
+	</a>
 </div>
 
- {% else %}
-   
-<h5 class="white-text">We don't have any selections currently available. <br/> You can still look at the entire catalogue through the main menu!</h5>
+{% else %}
+
+<h5 class="white-text">We don't have any selections currently available. <br /> You can still look at the entire
+	catalogue through the main menu!</h5>
 
 {% endfor %}
 
