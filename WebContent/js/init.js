@@ -8,6 +8,10 @@
 	updateTooltips();
 	updateCartCount();
 
+	// Remove nsfw blur if disabled by user
+	if (localStorage.hasOwnProperty("disabledNsfwCheck"))
+		$(".game-blur").remove();
+
 	// The exact location of the folder containing the .wasm must be set here.
 	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/soundfont".
 	player = new window.timidity("soundfont");
@@ -86,6 +90,11 @@ function loadItems(pageNumber) {
 		.done(function( data ) {		
 			$("#content").html(data);
 			updateTooltips();
+
+			// Remove nsfw blur if disabled by user
+			if (localStorage.hasOwnProperty("disabledNsfwCheck"))
+				$(".game-blur").remove();
+
 			$('.pagination').pagination('updateItems', $("#total_items").html());
 			$('.pagination').pagination('drawPage', pageNumber);
 			$('.pagination-survey').pagination('updateItems', $("#total_items").html());

@@ -150,7 +150,7 @@ Sad.
   let tempHash = null;
   let tempTitle = null;
   function createModal(gameHash, gameTitle, isNsfw) {
-    if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck") && !localStorage.disabledNsfwCheck) {
+    if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck")) {
       tempHash = gameHash;
       tempTitle = gameTitle;
       $('#nsfw-modal').modal('open');
