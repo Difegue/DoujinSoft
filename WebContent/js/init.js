@@ -3,9 +3,9 @@
 	 
 	$('.sidenav').sidenav();
 	$('select').formSelect();
-	$('.tooltipped').tooltip({enterDelay: 50});
 	$('.collapsible').collapsible();
 
+	updateTooltips();
 	updateCartCount();
 
 	// The exact location of the folder containing the .wasm must be set here.
@@ -85,7 +85,7 @@ function loadItems(pageNumber) {
 									sort_by: $("#sort_by").val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
-			$('.tooltipped').tooltip({enterDelay: 50});
+			updateTooltips();
 			$('.pagination').pagination('updateItems', $("#total_items").html());
 			$('.pagination').pagination('drawPage', pageNumber);
 			$('.pagination-survey').pagination('updateItems', $("#total_items").html());
@@ -97,6 +97,12 @@ function loadItems(pageNumber) {
 			return 0;
 		});
 
+}
+
+function updateTooltips() {
+	// Don't use jQuery for tooltips, looks like that's broken
+	var elems = document.querySelectorAll('.tooltipped');
+	M.Tooltip.init(elems, { enterDelay: 50 });
 }
 
 function clearSearch() {

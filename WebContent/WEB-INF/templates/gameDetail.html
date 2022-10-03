@@ -1,246 +1,260 @@
 {% for game in items %}
-  
-  {% if singleitem != true %}
-	<div class="col s12 m6 l4">
+
+{% if singleitem != true %}
+<div class="col s12 m6 l4">
   {% else %}
-	<div class="col s12 m12 l12"></div>
+  <div class="col s12 m12 l12"></div>
   {% endif %}
-          <div class="card {{ game.colorCart }} darken-2">
-            <div class="game-header {{ game.colorLogo }} accent-4">
-                <div class="chip game-title" id="{{ game.hash }}-name">
-                  {{ game.name }}
-                </div>
-                <div class="game-metadata black-text">
-                  Released {{ game.timestamp }}<br/>
-                  MIO-ID: G-{{ game.mioID }}
-                </div>
-              </div>
+  <div class="card {{ game.colorCart }} darken-2">
+    <div class="game-header {{ game.colorLogo }} accent-4">
+      <div class="chip game-title" id="{{ game.hash }}-name">
+        {{ game.name }}
+      </div>
+      <div class="game-metadata black-text">
+        Released {{ game.timestamp }}<br />
+        MIO-ID: G-{{ game.mioID }}
+      </div>
+    </div>
 
-            <div class="card-content black-text">
+    <div class="card-content black-text">
 
-                  <div class="game-data">
+      <div class="game-data">
 
-                    <div style="width:125px; float:left">
+        <div style="width:125px; float:left">
 
-                    {% if game.specialBrand != null %}
-                      <div class="brand {{ game.specialBrand }}-brand white-text"></div> 
-                    {% else %}
-                      <div class="brand game-brand white-text">
-                      	{{ game.brand }} <br/>Software
-                      </div>  
-                    {% endif %}
-                    
-                      <div class="game-creator black white-text">
-                        Made By
-                        <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" onclick="searchForUser('{{ game.creator }}')">
-                          {{ game.creator }}
-                          </div>
-                      </div>
+          {% if game.specialBrand != null %}
+          <div class="brand {{ game.specialBrand }}-brand white-text"></div>
+          {% else %}
+          <div class="brand game-brand white-text">
+            {{ game.brand }} <br />Software
+          </div>
+          {% endif %}
 
-                  </div>
-
-                  <img class ="game-preview z-depth-1 waves-effect tooltipped" style="overflow:hidden; width:100%; height:100%"
-                       data-tooltip="Play" onclick="createModal('{{ game.hash }}')" src="{{ game.preview }}" />
-                  </div>
-
-              <span class="game-text card-title white-text" style=""><br/>{{ game.mioDesc1 }} <br/>{{ game.mioDesc2 }}</span>          
-            </div>
-
-            <div class="card-action center">
-
-              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=game&id={{ game.hash }}" style="width:31%" >
-                <i class="material-icons">file_download</i>
-              </a>
-              <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" style=" width:31%" onclick="copyShareLink('games','{{ game.hash }}')" data-tooltip="Get sharing link">
-                <i class="material-icons">share</i>
-              </a>
-              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Add to cart" onclick="addToCart('game','{{ game.hash }}')" style="width:31%">
-                <i class="material-icons">shopping_cart</i>
-              </a>
+          <div class="game-creator black white-text">
+            Made By
+            <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer"
+              onclick="searchForUser('{{ game.creator }}')">
+              {{ game.creator }}
             </div>
           </div>
 
         </div>
-        
-   {% else %}
-   
-No more games. <br/>
+
+        <div class="game-preview z-depth-1 waves-effect tooltipped" data-tooltip="Play!"
+          onclick="createModal('{{ game.hash }}')" style="background-image: url('{{ game.preview }}');">
+          {% if game.isNsfw %}
+          <span class="game-blur" style="width:100%; height: 100%; backdrop-filter:blur(5px); display:inline-block">
+            <i class="medium white-text material-icons"
+              style="margin-top: 15%; background: black; border-radius: 6px;">18_up_rating</i>
+          </span>
+          {% endif %}
+          <i class="medium white-text material-icons"
+            style="margin-top: 15%; background: black; border-radius: 30px;">play_circle</i>
+        </div>
+
+      </div>
+
+      <span class="game-text card-title white-text" style=""><br />{{ game.mioDesc1 }} <br />{{ game.mioDesc2 }}</span>
+    </div>
+
+    <div class="card-action center">
+
+      <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download"
+        href="./download?type=game&id={{ game.hash }}" style="width:31%">
+        <i class="material-icons">file_download</i>
+      </a>
+      <a class="btn waves-effect tooltipped" data-position="top" data-delay="50" style=" width:31%"
+        onclick="copyShareLink('games','{{ game.hash }}')" data-tooltip="Get sharing link">
+        <i class="material-icons">share</i>
+      </a>
+      <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Add to cart"
+        onclick="addToCart('game','{{ game.hash }}')" style="width:31%">
+        <i class="material-icons">shopping_cart</i>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+{% else %}
+
+No more games. <br />
 Sad.
-       
+
 {% endfor %}
-	
+
 <span id="total_items" style="display:none">{{ totalitems }}</span>
 
 <script>
 
-var isInitialised = false;
-var mioData = null;
-var midiData = null;
+  var isInitialised = false;
+  var mioData = null;
+  var midiData = null;
 
-var sounds = [];
-var winSounds = [];
-var loseSounds = [];
+  var sounds = [];
+  var winSounds = [];
+  var loseSounds = [];
 
-var canvas = document.getElementById('canvas_game');
-var context = canvas.getContext('2d');
+  var canvas = document.getElementById('canvas_game');
+  var context = canvas.getContext('2d');
 
-var hasTrackEnded = false;
+  var hasTrackEnded = false;
 
-var mioPlayer = new window.mio.Player(canvas, document);
+  var mioPlayer = new window.mio.Player(canvas, document);
 
-mioPlayer.scaleCanvas(bestPossibleWindowSize());
-
-// re-scale canvas when the window size changes
-window.addEventListener('resize', function () {
-  // Expand the canvas so the modal is expanded too.
-  canvas.width = 1920;
-  canvas.height = 1280;
   mioPlayer.scaleCanvas(bestPossibleWindowSize());
-});
 
-function modalSize() {
-  return [$('#game-modal').width() - 48, $('#game-modal').height() - 108]; // Account for padding
-}
-
-function windowSizeComparedToOriginal(width, height) {
-  return Math.min(width / window.mio.ORIGINAL_CANVAS_WIDTH, height / window.mio.ORIGINAL_CANVAS_HEIGHT);
-}
-
-function bestPossibleWindowSize() {
-  let [width, height] = modalSize();
-  return windowSizeComparedToOriginal(width, height);
-}
-
-function createModal(gameHash) {
-  $('.modal').modal({
-    dismissible: true,
-    onCloseEnd: function() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      player.pause();
-      mioPlayer.stop();
-    }
+  // re-scale canvas when the window size changes
+  window.addEventListener('resize', function () {
+    // Expand the canvas so the modal is expanded too.
+    canvas.width = 1920;
+    canvas.height = 1280;
+    mioPlayer.scaleCanvas(bestPossibleWindowSize());
   });
-  $('#game-modal').modal('open');
-  playGame('./download?type=game&id=' + gameHash);
-}
 
-function handleMouseMove(event) {
-	if (typeof canvas !== 'undefined') {
-		mioPlayer.setStylusPosition(event.clientX, event.clientY);
-	}
-}
-
-function handleMouseDown(event) {
-	if (event.button === 0) {
-		mioPlayer.touchScreen();
-	}
-}
-
-function handleMouseUp(event) {
-	if (event.button === 0) {
-		mioPlayer.withdrawTouchFromScreen();
-	}
-}
-
-function handleTouchStart(event) {
-	if (typeof canvas !== 'undefined') {
-		let touch = event.touches[0] || event.changedTouches[0];
-		mioPlayer.setStylusPosition(touch.clientX, touch.clientY);
-	}
-	mioPlayer.touchScreen();
-}
-
-function handleTouchEnd() {
-	mioPlayer.withdrawTouchFromScreen();
-}
-
-// _fetch function taken from timidity by Feross Aboukhadijeh
-// https://github.com/feross/timidity
-async function _fetch(url) {
-	const opts = {
-		mode: 'cors',
-		credentials: 'same-origin'
-	}
-	const response = await window.fetch(url, opts)
-	if (response.status !== 200) throw new Error(`Could not load ${url}`)
-
-	const arrayBuffer = await response.arrayBuffer()
-	const buf = new Uint8Array(arrayBuffer)
-	return buf
-}
-
-async function playGame(url) {
-  mioData = await _fetch(url);
-
-  let loopTimes;
-
-  if (mioData[0xE605] === 0) {
-    loopTimes = 0;
-  } else if (mioData[0xE605] === 1) {
-    loopTimes = 1;
-  } else {
-    loopTimes = 11;
+  function modalSize() {
+    return [$('#game-modal').width() - 48, $('#game-modal').height() - 108]; // Account for padding
   }
-  midiData = window.buildMidiFile(mioData, loopTimes);
 
-  console.debug(midiData);
+  function windowSizeComparedToOriginal(width, height) {
+    return Math.min(width / window.mio.ORIGINAL_CANVAS_WIDTH, height / window.mio.ORIGINAL_CANVAS_HEIGHT);
+  }
 
-  player.load(midiData);
+  function bestPossibleWindowSize() {
+    let [width, height] = modalSize();
+    return windowSizeComparedToOriginal(width, height);
+  }
 
-  if (!isInitialised) {
-    const loadSound = (name) => {
-      let audio = new Audio('audio/' + name + '.ogg');
-      audio.volume = 1;
-      return audio;
-    };
-
-    mioPlayer.soundNames.forEach(name => {
-      let audio = loadSound(name);
-      sounds.push(audio);
-    });
-
-    winSounds = [loadSound('win1'), loadSound('win2')];
-    loseSounds = [loadSound('lose1'), loadSound('lose2')];
-
-    mioPlayer.sounds = sounds;
-    mioPlayer.winSounds = winSounds;
-    mioPlayer.loseSounds = loseSounds;
-
-    document.addEventListener('mousemove', handleMouseMove, false);
-    canvas.addEventListener('mousedown', handleMouseDown, false);
-    document.addEventListener('mouseup', handleMouseUp, false)
-
-    canvas.addEventListener('touchstart', handleTouchStart, false);
-    document.addEventListener('touchend', handleTouchEnd, false);
-    
-    player.on('ended', () => { hasTrackEnded = true; });
-
-    mioPlayer.musicPlayer = {
-      playMusic: () => {
+  function createModal(gameHash) {
+    $('.modal').modal({
+      dismissible: true,
+      onCloseEnd: function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
         player.pause();
-        player.seek(0);
-        player.play();
-        hasTrackEnded = false;
-      },
-      pauseMusic: () => player.pause(),
-      hasTrackEnded: () => hasTrackEnded,
-    };
+        mioPlayer.stop();
+      }
+    });
+    $('#game-modal').modal('open');
+    playGame('./download?type=game&id=' + gameHash);
+  }
 
-    let fontBitmap = new Image();
-    fontBitmap.src = 'img/miofont.png';
+  function handleMouseMove(event) {
+    if (typeof canvas !== 'undefined') {
+      mioPlayer.setStylusPosition(event.clientX, event.clientY);
+    }
+  }
 
-    mioPlayer.fontBitmap = fontBitmap;
+  function handleMouseDown(event) {
+    if (event.button === 0) {
+      mioPlayer.touchScreen();
+    }
+  }
 
-    isInitialised = true;
-  } 
-  
-  mioPlayer.loadAndStart(mioData);
-}
+  function handleMouseUp(event) {
+    if (event.button === 0) {
+      mioPlayer.withdrawTouchFromScreen();
+    }
+  }
 
-function replayGame() {
-  player.pause();
-  player.load(midiData);
-  mioPlayer.loadAndStart(mioData);
-}
+  function handleTouchStart(event) {
+    if (typeof canvas !== 'undefined') {
+      let touch = event.touches[0] || event.changedTouches[0];
+      mioPlayer.setStylusPosition(touch.clientX, touch.clientY);
+    }
+    mioPlayer.touchScreen();
+  }
+
+  function handleTouchEnd() {
+    mioPlayer.withdrawTouchFromScreen();
+  }
+
+  // _fetch function taken from timidity by Feross Aboukhadijeh
+  // https://github.com/feross/timidity
+  async function _fetch(url) {
+    const opts = {
+      mode: 'cors',
+      credentials: 'same-origin'
+    }
+    const response = await window.fetch(url, opts)
+    if (response.status !== 200) throw new Error(`Could not load ${url}`)
+
+    const arrayBuffer = await response.arrayBuffer()
+    const buf = new Uint8Array(arrayBuffer)
+    return buf
+  }
+
+  async function playGame(url) {
+    mioData = await _fetch(url);
+
+    let loopTimes;
+
+    if (mioData[0xE605] === 0) {
+      loopTimes = 0;
+    } else if (mioData[0xE605] === 1) {
+      loopTimes = 1;
+    } else {
+      loopTimes = 11;
+    }
+    midiData = window.buildMidiFile(mioData, loopTimes);
+
+    console.debug(midiData);
+
+    player.load(midiData);
+
+    if (!isInitialised) {
+      const loadSound = (name) => {
+        let audio = new Audio('audio/' + name + '.ogg');
+        audio.volume = 1;
+        return audio;
+      };
+
+      mioPlayer.soundNames.forEach(name => {
+        let audio = loadSound(name);
+        sounds.push(audio);
+      });
+
+      winSounds = [loadSound('win1'), loadSound('win2')];
+      loseSounds = [loadSound('lose1'), loadSound('lose2')];
+
+      mioPlayer.sounds = sounds;
+      mioPlayer.winSounds = winSounds;
+      mioPlayer.loseSounds = loseSounds;
+
+      document.addEventListener('mousemove', handleMouseMove, false);
+      canvas.addEventListener('mousedown', handleMouseDown, false);
+      document.addEventListener('mouseup', handleMouseUp, false)
+
+      canvas.addEventListener('touchstart', handleTouchStart, false);
+      document.addEventListener('touchend', handleTouchEnd, false);
+
+      player.on('ended', () => { hasTrackEnded = true; });
+
+      mioPlayer.musicPlayer = {
+        playMusic: () => {
+          player.pause();
+          player.seek(0);
+          player.play();
+          hasTrackEnded = false;
+        },
+        pauseMusic: () => player.pause(),
+        hasTrackEnded: () => hasTrackEnded,
+      };
+
+      let fontBitmap = new Image();
+      fontBitmap.src = 'img/miofont.png';
+
+      mioPlayer.fontBitmap = fontBitmap;
+
+      isInitialised = true;
+    }
+
+    mioPlayer.loadAndStart(mioData);
+  }
+
+  function replayGame() {
+    player.pause();
+    player.load(midiData);
+    mioPlayer.loadAndStart(mioData);
+  }
 
 </script>

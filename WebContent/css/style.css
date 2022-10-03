@@ -6,13 +6,29 @@
  * Made By MaterializeCSS.com
  */
 
-@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+@-moz-keyframes spin {
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
 
 .icon-block {
-  padding: 0 15px;
+    padding: 0 15px;
 }
+
 .icon-block .material-icons {
     font-size: inherit;
 }
@@ -25,12 +41,12 @@
 }
 
 html {
-	font-family: Karla, Calibri, Trebuchet, sans-serif;
+    font-family: Karla, Calibri, Trebuchet, sans-serif;
 }
 
 body {
     background-image: url('../img/bg_gam.png');
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.6) 100%), url('../img/bg_gam.png');
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.6) 100%), url('../img/bg_gam.png');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
@@ -47,11 +63,11 @@ main {
 }
 
 .sidenav-overlay {
-	z-index: 995 !important;
+    z-index: 995 !important;
 }
 
 label.active {
-	margin-top:8px;
+    margin-top: 8px;
 }
 
 .pagination li.active {
@@ -69,15 +85,15 @@ label.active {
 }
 
 .pagination-wrapper {
-	height: 50px; 
-	max-width: 700px; 
-	min-width: 70%;
+    height: 50px;
+    max-width: 700px;
+    min-width: 70%;
 }
 
 .game-header {
 
-    overflow:hidden;
-    width:100%;
+    overflow: hidden;
+    width: 100%;
 }
 
 .game-title {
@@ -100,173 +116,189 @@ label.active {
     display: inline-block;
     margin-top: 5px;
     overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width:150px
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px
 }
 
 .game-data {
     display: inline-block;
     float: right;
-    width: 100%; 
+    width: 100%;
 }
 
 .brand {
-	line-height:17px; 
-    font-size:15px; 
-    width: 125px; 
-    height: 50px; 
-    text-align:center; 
-    padding:7px; 
-    margin-right:10px; 
-    display:inline-block; 
+    line-height: 17px;
+    font-size: 15px;
+    width: 125px;
+    height: 50px;
+    text-align: center;
+    padding: 7px;
+    margin-right: 10px;
+    display: inline-block;
     vertical-align: top;
     background-repeat: no-repeat;
 }
 
 .game-brand {
-    background-image: url('../img/icons/game/publisher.png'); 
+    background-image: url('../img/icons/game/publisher.png');
 }
 
 .theme-brand {
-	background-image: url('../img/icons/theme.png') !important; 
+    background-image: url('../img/icons/theme.png') !important;
 }
 
 .wario-brand {
-	background-image: url('../img/icons/wario.png') !important; 
+    background-image: url('../img/icons/wario.png') !important;
 }
 
 .nintendo-brand {
-	background-image: url('../img/icons/ninsoft.png') !important; 
+    background-image: url('../img/icons/ninsoft.png') !important;
 }
 
 .manga-brand {
-    background-image: url('../img/icons/comic/publisher.png'); 
+    background-image: url('../img/icons/comic/publisher.png');
 }
 
 .record-brand {
-	background-image: url('../img/icons/music/publisher.png'); 
+    background-image: url('../img/icons/music/publisher.png');
 }
 
 .game-creator {
-    width:125px; 
-    text-align:center; 
-    margin-top:10px; 
-    border: 3px solid black; 
-    border-radius:10px; 
-    font-size:12px; 
+    width: 125px;
+    text-align: center;
+    margin-top: 10px;
+    border: 3px solid black;
+    border-radius: 10px;
+    font-size: 12px;
 }
 
 .game-preview {
-
-    display:inline-block; 
-    float:right; 
-    max-width:180px; 
-    width:100%; 
+    float: right;
+    width: 180px;
+    height: 120px;
     border: 3px solid black;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-align: center;
 }
 
 .manga-preview {
-	cursor: zoom-in; 
+    cursor: zoom-in;
 }
 
 .record-preview {
-	cursor: pointer;
+    cursor: pointer;
 }
 
-.manga-preview, .record-preview {
+.manga-preview,
+.record-preview {
 
-    display:inline-block; 
-    float:right; 
-    max-width:180px; 
-    width:100%; 
-    text-align: center; 
-    height:100px; 
+    display: inline-block;
+    float: right;
+    max-width: 180px;
+    width: 100%;
+    text-align: center;
+    height: 100px;
     border: none;
 }
 
-.manga-preview > img {
-	background-color: #353535; 
-	height: 75%; 
-	margin: 10%; 
-	border-radius: 5px;
+.manga-preview>img {
+    background-color: #353535;
+    height: 75%;
+    margin: 10%;
+    border-radius: 5px;
 }
 
 .record-image {
-	height: 104px;
-	width: 104px;
-	position: relative;
-	margin-left: auto;
-	margin-right: auto;
-	background-image: url("../img/icons/music/disc.svg");
-	background-repeat: no-repeat;
-	background-size: 100% auto; 
+    height: 104px;
+    width: 104px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    background-image: url("../img/icons/music/disc.svg");
+    background-repeat: no-repeat;
+    background-size: 100% auto;
 }
 
 .playing {
-    -webkit-animation:spin 4s linear infinite;
-    -moz-animation:spin 4s linear infinite;
-    animation:spin 4s linear infinite;
+    -webkit-animation: spin 4s linear infinite;
+    -moz-animation: spin 4s linear infinite;
+    animation: spin 4s linear infinite;
 }
 
 .game-text {
 
-    margin-bottom:-10px !important; 
-    font-size: 22px !important; 
+    margin-bottom: -10px !important;
+    font-size: 22px !important;
     display: inline-flex !important;
     height: 80px;
     text-overflow: ellipsis;
 }
 
 .selection-card {
-	border-radius: 10px; 
-	background-image:linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.5) 100%), url('../img/bg_mix.png');
-	min-height:166px;
-	background-size: cover;
-	background-position: left bottom;
+    border-radius: 10px;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%), url('../img/bg_mix.png');
+    min-height: 166px;
+    background-size: cover;
+    background-position: left bottom;
 }
 
 .cart-item {
-	min-height: 40px !important; 
+    min-height: 40px !important;
 }
 
 .cart-icon {
-	left: 20px; 
-	position: absolute;
+    left: 20px;
+    position: absolute;
 }
 
 .cart-del {
-	top: 9px !important;
-	cursor: pointer;
+    top: 9px !important;
+    cursor: pointer;
 }
 
 .materialboxed:not(.active) {
-  display:none;
+    display: none;
 }
 
 .ellipse {
-	cursor: pointer;
-	margin-left:10px;
-	margin-right:10px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
-.ellipse > input {
-	width:50px;
-	font-size:20px;
+.ellipse>input {
+    width: 50px;
+    font-size: 20px;
 }
 
-.note-1 > .star-1, 
-.note-2 > .star-1, .note-2 > .star-2, 
-.note-3 > .star-1, .note-3 > .star-2, .note-3 > .star-3,
-.note-4 > .star-1, .note-4 > .star-2, .note-4 > .star-3, .note-4 > .star-4, 
-.note-5 > .star-1, .note-5 > .star-2, .note-5 > .star-3, .note-5 > .star-4, .note-5 > .star-5{
+.note-1>.star-1,
+.note-2>.star-1,
+.note-2>.star-2,
+.note-3>.star-1,
+.note-3>.star-2,
+.note-3>.star-3,
+.note-4>.star-1,
+.note-4>.star-2,
+.note-4>.star-3,
+.note-4>.star-4,
+.note-5>.star-1,
+.note-5>.star-2,
+.note-5>.star-3,
+.note-5>.star-4,
+.note-5>.star-5 {
     color: #ffc107 !important;
 }
 
-@media screen and (max-width:1700px) and (min-width:992px), screen and (max-width:920px) and (min-width:600px), screen and (max-width: 420px ){
+@media screen and (max-width:1700px) and (min-width:992px),
+screen and (max-width:920px) and (min-width:600px),
+screen and (max-width: 420px) {
 
-    .game-preview, .manga-preview, .record-preview {
-        width:50%; 
+    .manga-preview,
+    .record-preview {
+        width: 50%;
     }
 
 
@@ -285,16 +317,25 @@ label.active {
     }
 }
 
-@media screen and (max-width:1360px) and (min-width:992px), screen and (max-width:750px) and (min-width:600px), screen and (max-width: 400px ){
+@media screen and (max-width:1360px) and (min-width:992px),
+screen and (max-width:750px) and (min-width:600px),
+screen and (max-width: 400px) {
 
-    .game-preview, .manga-preview, .record-preview {
+    .manga-preview,
+    .record-preview {
         margin-top: 10px;
-        width:100%; 
-        float:none;
+        width: 100%;
+        float: none;
     }
-    
+
+    .game-preview {
+        margin-top: 10px;
+        float: none;
+        display: inline-block;
+    }
+
     .game-data {
-    text-align: center;
+        text-align: center;
     }
 
 
