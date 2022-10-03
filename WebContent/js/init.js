@@ -93,7 +93,7 @@ function loadItems(pageNumber) {
 			$("#"+currentlyPlayingMidi+"-record").addClass("playing");
 		})
 		.fail(function() {
-			alert("Couldn't load items from DoujinSoft.");
+			popToast("Couldn't load items from DoujinSoft.");
 			return 0;
 		});
 

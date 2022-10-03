@@ -41,15 +41,14 @@
         </div>
 
         <div class="game-preview z-depth-1 waves-effect tooltipped" data-tooltip="Play!"
-          onclick="createModal('{{ game.hash }}')" style="background-image: url('{{ game.preview }}');">
+          onclick="createModal('{{ game.hash }}', '{{ game.name }}')"
+          style="background-image: url('{{ game.preview }}');">
           {% if game.isNsfw %}
           <span class="game-blur" style="width:100%; height: 100%; backdrop-filter:blur(5px); display:inline-block">
-            <i class="medium white-text material-icons"
-              style="margin-top: 15%; background: black; border-radius: 6px;">18_up_rating</i>
+            <i class="medium white-text material-icons game-icon" style="border-radius: 6px;">18_up_rating</i>
           </span>
           {% endif %}
-          <i class="medium white-text material-icons"
-            style="margin-top: 15%; background: black; border-radius: 30px;">play_circle</i>
+          <i class="medium white-text material-icons game-icon" style="border-radius: 30px;">play_circle</i>
         </div>
 
       </div>
@@ -91,16 +90,26 @@ Sad.
   var mioData = null;
   var midiData = null;
 
-  var sounds = [];
-  var winSounds = [];
-  var loseSounds = [];
-
-  var canvas = document.getElementById('canvas_game');
+  var canvas = document.getElementById('canvas-game');
   var context = canvas.getContext('2d');
 
   var hasTrackEnded = false;
 
   var mioPlayer = new window.mio.Player(canvas, document);
+  const loadSound = (name) => {
+    let audio = new Audio('audio/' + name + '.ogg');
+    audio.volume = 1;
+    return audio;
+  };
+
+  var sounds = [];
+  mioPlayer.soundNames.forEach(name => {
+    let audio = loadSound(name);
+    sounds.push(audio);
+  });
+
+  var winSounds = [loadSound('win1'), loadSound('win2')];
+  var loseSounds = [loadSound('lose1'), loadSound('lose2')];
 
   mioPlayer.scaleCanvas(bestPossibleWindowSize());
 
@@ -125,7 +134,7 @@ Sad.
     return windowSizeComparedToOriginal(width, height);
   }
 
-  function createModal(gameHash) {
+  function createModal(gameHash, gameTitle) {
     $('.modal').modal({
       dismissible: true,
       onCloseEnd: function () {
@@ -135,6 +144,7 @@ Sad.
       }
     });
     $('#game-modal').modal('open');
+    $("#player-title").text(gameTitle)
     playGame('./download?type=game&id=' + gameHash);
   }
 
@@ -197,28 +207,28 @@ Sad.
     }
     midiData = window.buildMidiFile(mioData, loopTimes);
 
-    console.debug(midiData);
+    //console.debug(midiData);
 
     player.load(midiData);
 
     if (!isInitialised) {
-      const loadSound = (name) => {
-        let audio = new Audio('audio/' + name + '.ogg');
-        audio.volume = 1;
-        return audio;
-      };
-
-      mioPlayer.soundNames.forEach(name => {
-        let audio = loadSound(name);
-        sounds.push(audio);
-      });
-
-      winSounds = [loadSound('win1'), loadSound('win2')];
-      loseSounds = [loadSound('lose1'), loadSound('lose2')];
-
       mioPlayer.sounds = sounds;
       mioPlayer.winSounds = winSounds;
       mioPlayer.loseSounds = loseSounds;
+
+      // current frame and the final frame in which the game will end: i.e. 240 for SHORT, 480 for LONG and undefined for BOSS
+      mioPlayer.on('frameupdate', (frame, endFrame) => {
+
+        // Update game-timer div
+        if (endFrame === undefined) {
+          $("#game-timer").attr("class", "indeterminate");
+        }
+        else {
+          $("#game-timer").attr("class", "determinate");
+          $("#game-timer").attr("style", "width:" + (100 - (frame / endFrame * 100)) + "%");
+        }
+
+      });
 
       document.addEventListener('mousemove', handleMouseMove, false);
       canvas.addEventListener('mousedown', handleMouseDown, false);

@@ -4,29 +4,29 @@
 {% block color %}{{ collection.collection_color }}{% endblock %}
 {% block title %}{{ collection.collection_name }}{% endblock %}
 {% block desc %}
-{{ collection.collection_desc }}<br/><br/>
-{{ collection.collection_desc2 }}<br/><br/>
+{{ collection.collection_desc }}<br /><br />
+{{ collection.collection_desc2 }}<br /><br />
 
 <div id="game-search">
-	
+
 	<div style="height: 50px; width: 300px;" class="chip">
-	      <div class="input-field" style="margin-top:-5px; margin-left: -10px;">
-	          <i style="margin-top: 5px;" class="material-icons prefix">account_circle</i>
-	          <input id="maker_name" class="validate" type="text">
-	          <label class="" for="maker_name"  style="margin-top:-5px">Creator Name</label>
-	        </div>
+		<div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+			<i style="margin-top: 5px;" class="material-icons prefix">account_circle</i>
+			<input id="maker_name" class="validate" type="text">
+			<label class="" for="maker_name" style="margin-top:-5px">Creator Name</label>
+		</div>
 	</div>
 
 	<div style="height: 50px; width: 300px" class="chip">
-        <div class="input-field" style="margin-top:-5px; margin-left: -10px;">
-            <i style="margin-top: 5px;" class="material-icons prefix">videogame_asset</i>
-            <input id="item_name" type="text">
-            <label class="" for="item_name"  style="margin-top:-5px">Item Name</label>
-          </div>
-	  </div>
-	  
+		<div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+			<i style="margin-top: 5px;" class="material-icons prefix">videogame_asset</i>
+			<input id="item_name" type="text">
+			<label class="" for="item_name" style="margin-top:-5px">Item Name</label>
+		</div>
+	</div>
+
 	<div style="height: 50px; width: 150px" class="chip">
-        <div class="input-field white-text" style="margin-top: -10px; padding-top:5px">
+		<div class="input-field white-text" style="margin-top: -10px; padding-top:5px">
 			<select id="sort_by" onchange="loadItems(1)">
 				<option value="name">Name</option>
 				<option value="date" selected>Most Recent</option>
@@ -35,28 +35,18 @@
 		</div>
 	</div>
 
-    <br/>  <br/>   
-  	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
-  		<i class="material-icons left">search</i>Search
-  	</a>
-  	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
-  		<i class="material-icons left">clear</i>Clear
-  	</a>
+	<br /> <br />
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
+		<i class="material-icons left">search</i>Search
+	</a>
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
+		<i class="material-icons left">clear</i>Clear
+	</a>
 
 </div>
-<br/>
+<br />
 <div id="pagination-top" class="pagination-wrapper chip">
-  <ul class="pagination"></ul>
-</div>
-
-<div id="game-modal" class="modal">
-	<div class="modal-content" style="position: unset;">
-		<canvas id="canvas_game" width="1920" height="1280" style="background-color:white; display: block; margin: 0 auto;" style="position: unset;"></canvas>
-	</div>
-	<div class="modal-footer">
-		<a href="#!" class="modal-action waves-effect waves-green btn-flat" onclick="replayGame()">Replay</a>
-		<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
-	</div>
+	<ul class="pagination"></ul>
 </div>
 
 {% endblock %}
@@ -64,21 +54,22 @@
 
 {% block content %}
 
-	{% if collection.collection_type equals "manga" %}
-		{% include "./mangaDetail.html" %}
-	{% elseif collection.collection_type equals "record" %}
-		{% include "./recordsDetail.html" %}	
-	{% else %}
-		{% include "./gameDetail.html" %}
-	{% endif %}
-	
-	
+{% include "./modalPlayer.html" %}
+
+{% if collection.collection_type equals "manga" %}
+{% include "./mangaDetail.html" %}
+{% elseif collection.collection_type equals "record" %}
+{% include "./recordsDetail.html" %}
+{% else %}
+{% include "./gameDetail.html" %}
+{% endif %}
+
 {% endblock %}
 
 {% block footdata %}
 
 <div id="pagination-bottom" class="pagination-wrapper chip">
-  <ul class="pagination"></ul>
+	<ul class="pagination"></ul>
 </div>
 
 <img class="materialboxed" height="513">

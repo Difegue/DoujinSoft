@@ -1,0 +1,15 @@
+<div id="game-modal" class="modal">
+    <div class="modal-content" style="position: unset;">
+        <h4 id="player-title" style="font-family: warioware" class="black-text">Game Name</h4>
+        <canvas id="canvas-game" class="player-canvas" width="1920" height="1280"></canvas>
+    </div>
+    <div class="modal-footer" style="display: flex; padding: 6px 20px;">
+        <div class="progress" style="width: 80%; display: inline-block; margin-right: 15px; margin-top: 15px;">
+            <div class="determinate" id="game-timer"></div>
+        </div>
+        <a href="#!" id="replay-button" class="modal-action waves-effect waves-green btn-flat"
+            style="margin-left: auto; margin-top: 0;" onclick="replayGame()">Replay</a>
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat"
+            style="margin-left: auto; margin-top: 0;">Close</a>
+    </div>
+</div>

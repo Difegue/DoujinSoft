@@ -292,6 +292,28 @@ label.active {
     color: #ffc107 !important;
 }
 
+.player-canvas {
+    border: 5px solid;
+    border-color: #c62828 #9f1f1f #791818 #9f1f1f;
+    background-color: white;
+    display: block;
+    margin: 0 auto 0 -5px;
+}
+
+.game-icon {
+    margin-top: 15%;
+    background: black;
+}
+
+.game-icon:hover {
+    opacity: 0.3;
+}
+
+#game-timer {
+    -webkit-transition: none !important;
+    transition: none !important;
+}
+
 @media screen and (max-width:1700px) and (min-width:992px),
 screen and (max-width:920px) and (min-width:600px),
 screen and (max-width: 420px) {
