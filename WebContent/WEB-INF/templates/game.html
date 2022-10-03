@@ -64,10 +64,12 @@ You can download .mio files directly or make a selection to import into a save l
 
 {% endblock %}
 
+{% block extradata %}
+{% include "./modalPlayer.html" %}
+{% endblock %}
 
 {% block content %}
 
-{% include "./modalPlayer.html" %}
 {% include "./gameDetail.html" %}
 
 {% endblock %}

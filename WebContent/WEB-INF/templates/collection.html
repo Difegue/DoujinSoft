@@ -51,10 +51,11 @@
 
 {% endblock %}
 
+{% block extradata %}
+{% include "./modalPlayer.html" %}
+{% endblock %}
 
 {% block content %}
-
-{% include "./modalPlayer.html" %}
 
 {% if collection.collection_type equals "manga" %}
 {% include "./mangaDetail.html" %}

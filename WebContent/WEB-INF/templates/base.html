@@ -63,7 +63,6 @@
 
 <body>
 
-
   <div class="navbar-fixed">
     <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">
       <div class="nav-wrapper container">
@@ -136,6 +135,8 @@
   <main>
     <div class="container">
       <div class="section">
+
+        {% block extradata %}{% endblock %}
 
         <!--   Content Section   -->
         <div class="row white-text" id="content">

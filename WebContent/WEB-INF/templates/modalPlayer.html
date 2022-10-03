@@ -13,3 +13,21 @@
             style="margin-left: auto; margin-top: 0;">Close</a>
     </div>
 </div>
+
+<div id="nsfw-modal" class="modal">
+    <div class="modal-content">
+        <h4 style="font-family: warioware" class="black-text">NSFW Content heads-up</h4>
+        <p class="black-text">
+            This microgame has been flagged as containing R18 content. Do you still want to play it?<br>
+            You can choose to only reveal this once, or to always reveal NSFW content.
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" id="replay-button" class="modal-action waves-effect waves-green btn-flat"
+            style="margin-left: auto; margin-top: 0;" onclick="bypassNsfwCheck(false)">Only this time!</a>
+        <a href="#!" id="replay-" class="modal-action waves-effect waves-green btn-flat"
+            style="margin-left: auto; margin-top: 0;" onclick="bypassNsfwCheck(true)">Don't show this warning again</a>
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat"
+            style="margin-left: auto; margin-top: 0;">Cancel</a>
+    </div>
+</div>

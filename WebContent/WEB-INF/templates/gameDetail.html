@@ -41,7 +41,7 @@
         </div>
 
         <div class="game-preview z-depth-1 waves-effect tooltipped" data-tooltip="Play!"
-          onclick="createModal('{{ game.hash }}', '{{ game.name }}')"
+          onclick="createModal('{{ game.hash }}', '{{ game.name }}', {{game.isNsfw}})"
           style="background-image: url('{{ game.preview }}');">
           {% if game.isNsfw %}
           <span class="game-blur" style="width:100%; height: 100%; backdrop-filter:blur(5px); display:inline-block">
@@ -108,6 +108,19 @@ Sad.
     sounds.push(audio);
   });
 
+  $('#game-modal').modal({
+    dismissible: true,
+    onCloseEnd: function () {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      player.pause();
+      mioPlayer.stop();
+    }
+  });
+
+  $('#nsfw-modal').modal({
+    dismissible: true
+  });
+
   var winSounds = [loadSound('win1'), loadSound('win2')];
   var loseSounds = [loadSound('lose1'), loadSound('lose2')];
 
@@ -134,15 +147,28 @@ Sad.
     return windowSizeComparedToOriginal(width, height);
   }
 
-  function createModal(gameHash, gameTitle) {
-    $('.modal').modal({
-      dismissible: true,
-      onCloseEnd: function () {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        player.pause();
-        mioPlayer.stop();
-      }
-    });
+  let tempHash = null;
+  let tempTitle = null;
+  function createModal(gameHash, gameTitle, isNsfw) {
+    if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck") && !localStorage.disabledNsfwCheck) {
+      tempHash = gameHash;
+      tempTitle = gameTitle;
+      $('#nsfw-modal').modal('open');
+    } else {
+      startMioPlayer(gameHash, gameTitle);
+    }
+  }
+
+  function bypassNsfwCheck(permanentlyDisable) {
+    $('#nsfw-modal').modal('close');
+    if (permanentlyDisable) {
+      localStorage.disabledNsfwCheck = true;
+      $(".game-blur").remove();
+    }
+    startMioPlayer(tempHash, tempTitle);
+  }
+
+  function startMioPlayer(gameHash, gameTitle) {
     $('#game-modal').modal('open');
     $("#player-title").text(gameTitle)
     playGame('./download?type=game&id=' + gameHash);
