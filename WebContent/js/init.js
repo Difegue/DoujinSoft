@@ -11,7 +11,7 @@
 	// The exact location of the folder containing the .wasm must be set here.
 	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/soundfont".
 	player = new window.timidity("soundfont");
-    idPlaying = "";
+    currentlyPlayingMidi = "";
     
     $('.pagination').pagination({
         items: $("#total_items").html(),
@@ -90,7 +90,7 @@ function loadItems(pageNumber) {
 			$('.pagination').pagination('drawPage', pageNumber);
 			$('.pagination-survey').pagination('updateItems', $("#total_items").html());
 			$('.pagination-survey').pagination('drawPage', pageNumber);
-			$("#"+idPlaying+"-record").addClass("playing");
+			$("#"+currentlyPlayingMidi+"-record").addClass("playing");
 		})
 		.fail(function() {
 			alert("Couldn't load items from DoujinSoft.");
@@ -167,9 +167,9 @@ function playMidi(id) {
 	$("#toast-container .toast").remove();
 	$(".playing").removeClass("playing");
 
-	if (id != idPlaying) {
+	if (id != currentlyPlayingMidi) {
 	
-		idPlaying=id;
+		currentlyPlayingMidi=id;
 		popToast("Playing MIDI for id "+id);
 		
 		$("#"+id+"-record").addClass("playing");
@@ -178,7 +178,7 @@ function playMidi(id) {
 	}
 	else {
 		player.pause();
-		idPlaying = "";
+		currentlyPlayingMidi = "";
 		popToast("Playback Stopped.");
 	}
 }
@@ -187,25 +187,13 @@ function copyShareLink(type, id) {
 
 	str = "https://"+window.location.hostname+"/"+type+"?id="+id;
 
-	// A minimal polyfill for `navigator.clipboard.writeText()` that works most of the time in most modern browsers.
-	return new Promise(function(resolve, reject) {
-	  var success = false;
-	  function listener(e) {
-		e.clipboardData.setData("text/plain", str);
-		e.preventDefault();
-		success = true;
-	  }
-	  document.addEventListener("copy", listener);
-	  document.execCommand("copy");
-	  document.removeEventListener("copy", listener);
-	  success ? resolve(): reject();
-
-	  if (success) 
+	navigator.clipboard.writeText(str)
+	.then(() => {
 		popToast("Link copied to your clipboard!");
-	  else
-	    popToast("Couldn't copy link to your clipboard.");
+	})
+	.catch(() => {
+		popToast("Couldn't copy link to your clipboard.");
 	});
-
 }
 
 function addToCart(type, id) {
