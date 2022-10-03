@@ -26,7 +26,7 @@ import com.xperia64.diyedit.metadata.Metadata;
 public class MioUtils {
 
   // Constants for timestamp printing
-  private static final ZonedDateTime date = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
+  static final ZonedDateTime DIY_TIMESTAMP_ORIGIN = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
   // Basic enum to distinguish mio files quickly.
@@ -43,7 +43,7 @@ public class MioUtils {
    * Returns a readable date from DIY's weird timestamp ints.
    */
   public static String getTimeString(int timestamp) {
-    ZonedDateTime dateMio = date.plusDays(timestamp);
+    ZonedDateTime dateMio = DIY_TIMESTAMP_ORIGIN.plusDays(timestamp);
     return dateMio.format(formatter);
   }
 

@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -156,7 +158,13 @@ public class MioStorage {
         ret.setString(5, mio.getCreator());
         ret.setString(6, mio.getBrand());
         ret.setString(7, mio.getDescription());
-        ret.setInt(8, mio.getTimestamp());
+
+        int timestamp = mio.getTimestamp();
+        // If the timestamp is larger than today's date, set it to today's date
+        if (MioUtils.DIY_TIMESTAMP_ORIGIN.plusDays(timestamp).toLocalDate().isAfter(LocalDate.now()))
+            timestamp = (int) MioUtils.DIY_TIMESTAMP_ORIGIN.until(LocalDate.now(), ChronoUnit.DAYS);
+
+        ret.setInt(8, timestamp);
 
         return ret;
     }
