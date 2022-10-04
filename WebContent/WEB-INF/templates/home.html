@@ -1,6 +1,6 @@
 {% extends "./base.html" %}
 
-{% block background %}./img/bg_home_final.jpg{% endblock %}
+{% block background %}./img/bg_home_2.jpg{% endblock %}
 {% block color %}red{% endblock %}
 {% block title %}Your one-stop shop for WarioWare DIY{% endblock %}
 
@@ -11,6 +11,13 @@
 <div class="red darken-1 white-text z-depth-2" style="border-radius:16px; margin-top: 10px">
 	<span style="font-size:18px"> {{ news }} </span>
 </div>
+
+<style>
+	body {
+		background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.2) 100%),
+			url('./img/bg_home_2.jpg') !important;
+	}
+</style>
 {% endblock %}
 
 
@@ -18,7 +25,8 @@
 
 <div class="row">
 
-	<img class="col l4 m4 hide-on-small-only" src="./img/truck3D.png" />
+	<img class="col l4 m4 hide-on-small-only" src="./img/truck3D.png"
+		style="animation: shake 10s; animation-iteration-count: infinite; cursor:pointer;" onclick="truckClicked()" />
 
 	<div class="col l8 m8 s12 white-text center">
 
@@ -31,28 +39,33 @@
 
 	</div>
 
-	<div class="col l8 m8 s6 white-text center">
+	<div class="col l8 m12 s6 white-text center">
 
-		<h3>We're currently hosting: </h3>
-		<h4 class="green-text">
-			<object style="height:25px" class="tooltipped" data="./img/fc-cart.svg" type="image/svg+xml"
-				data-tooltip="Games" data-position="left"></object>
-			{{ totalGames }}
-		</h4>
-		<h4 class="pink-text ">
-			<i style="font-size:40px" class="material-icons pink-text prefix tooltipped" data-tooltip="Records"
-				data-position="left">album</i>
-			{{ totalRecords }}
-		</h4>
-		<h4 class="blue-text ">
-			<i style="font-size:40px" class="material-icons blue-text prefix tooltipped" data-tooltip="Comics"
-				data-position="left">local_library</i>
-			{{ totalComics }}
-		</h4>
+		<div class="card selection-card">
+			<div class="card-content white-text">
+				<span class="card-title">Now hosting:</span>
+				<span class="center"
+					style="display:flex; font-family:'warioware'; justify-content: space-around; flex-wrap: wrap">
+					<h4 class="green-text tooltipped" data-tooltip="{{ totalGames }} Games" data-position="bottom">
+						<object data="./img/fc-cart.svg" type="image/svg+xml" style="height:25px;"></object>
+						{{ totalGames }}
+					</h4>
+					<h4 class="pink-text tooltipped" data-tooltip="{{ totalRecords }} Records" data-position="bottom">
+						<i style="font-size:34px;" class="material-icons pink-text prefix">album</i>
+						{{ totalRecords }}
+					</h4>
+					<h4 class="blue-text tooltipped" data-tooltip="{{ totalComics }} Comics" data-position="bottom">
+						<i style="font-size:34px;" class="material-icons blue-text prefix">local_library</i>
+						{{ totalComics }}
+					</h4>
+				</span>
+			</div>
+		</div>
 
 	</div>
 
-	<img style="margin-left:20px; margin-top:20px" class="center hide-on-med-and-up" src="./img/truck3D.png" />
+	<img style="margin-top:20px;" src="./img/truck3D.png" class="col center hide-on-med-and-up s6"
+		style="animation: shake 10s; animation-iteration-count: infinite; cursor:pointer;" onclick="truckClicked()" />
 
 </div>
 

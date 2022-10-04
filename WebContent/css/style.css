@@ -45,7 +45,6 @@ html {
 }
 
 body {
-    background-image: url('../img/bg_gam.png');
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.6) 100%), url('../img/bg_gam.png');
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -314,6 +313,20 @@ label.active {
     -webkit-transition: none !important;
     transition: none !important;
 }
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px); }
+    10% { transform: translate(-1px, -2px); }
+    20% { transform: translate(-3px, 0px); }
+    30% { transform: translate(3px, 2px); }
+    40% { transform: translate(1px, -1px); }
+    50% { transform: translate(-1px, 2px); }
+    60% { transform: translate(-3px, 1px); }
+    70% { transform: translate(3px, 1px); }
+    80% { transform: translate(-1px, -1px); }
+    90% { transform: translate(1px, 2px); }
+    100% { transform: translate(1px, 1px); }
+  }
 
 @media screen and (max-width:1700px) and (min-width:992px),
 screen and (max-width:920px) and (min-width:600px),
