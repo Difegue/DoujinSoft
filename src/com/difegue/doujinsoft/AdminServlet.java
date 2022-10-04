@@ -51,10 +51,36 @@ public class AdminServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        res.setContentType("text/html");
-
         if (!authenticate(req, res))
             return;
+
+        // ./manage?preview=true&file={file} can be used to download pending mio files.
+        if (req.getParameterMap().containsKey("preview")) {
+            ServletContext application = getServletConfig().getServletContext();
+            String dataDir = application.getInitParameter("dataDirectory");
+
+            // Serve file asked for
+            String filename = req.getParameter("file");
+            File previewMio = new File(dataDir + "/pending/" + filename);
+            if (previewMio.exists()) {
+                res.setContentType("application/octet-stream");
+                res.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+                res.setContentLength((int) previewMio.length());
+                FileInputStream fileIn = new FileInputStream(previewMio);
+                OutputStream out = res.getOutputStream();
+                byte[] outputByte = new byte[4096];
+                // copy binary content to output stream
+                while (fileIn.read(outputByte, 0, 4096) != -1) {
+                    out.write(outputByte, 0, 4096);
+                }
+                fileIn.close();
+                out.flush();
+                out.close();
+            } else {
+                res.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+            return;
+        }
 
         // Allowed
         res.setContentType("text/html; charset=UTF-8");
@@ -84,6 +110,27 @@ public class AdminServlet extends HttpServlet {
 
         if (!authenticate(req, res))
             return;
+
+        if (req.getParameterMap().containsKey("nsfw_ids")) {
+            // Add hashes to NSFW list
+            // Get content of textarea and split by line
+            output = "param is " + req.getParameter("nsfw_ids");
+            String[] nsfwHashes = req.getParameter("nsfw_ids").split("\\r?\\n");
+            // Add to NSFW list
+            try (Connection connection = DriverManager
+                    .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+                Statement statement = connection.createStatement();
+                statement.setQueryTimeout(30); // set timeout to 30 sec.
+                for (String hash : nsfwHashes) {
+                    output += "Adding " + hash + " to NSFW list... \n";
+                    statement.executeUpdate("update Games set isNsfw=1 where hash='" + hash + "'");
+                }
+            } catch (SQLException e) {
+                ServletLog.log(Level.SEVERE, e.getMessage());
+                output += e.getMessage();
+            }
+            output += "Added " + nsfwHashes.length + " hashes to NSFW list.";
+        }
 
         if (req.getParameterMap().containsKey("collection_name")) {
             // New collection
