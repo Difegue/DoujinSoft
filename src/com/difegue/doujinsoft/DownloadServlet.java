@@ -68,6 +68,7 @@ public class DownloadServlet extends HttpServlet {
 
 			if (filePath != null) {
 
+				// TODO add cache
 				File downloadFile = MioCompress.uncompressMio(new File(filePath));
 				FileInputStream inStream = new FileInputStream(downloadFile);
 
