@@ -12,14 +12,15 @@ Unapproved .mios will be deleted.
 
 <script>
 
-	function testGame(id) {
+	async function testGame(id) {
 		$('#game-modal').modal('open');
-		// TODO remove this when we can use the player's data
-		$("#player-title").text(id);
 
 		// encode id for url use
 		var encodedId = encodeURIComponent(id);
-		playGame('./manage?preview=true&file=' + encodedId);
+
+		mioData = await _fetch(`./manage?preview=true&file=${encodedId}`);
+		buildMidiData(mioData);
+		playGame(mioData);
 	}
 
 	function easyFilter() {
