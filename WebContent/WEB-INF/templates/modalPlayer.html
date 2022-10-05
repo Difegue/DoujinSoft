@@ -1,7 +1,16 @@
 <div id="game-modal" class="modal">
     <div class="modal-content" style="position: unset;">
         <h4 id="player-title" style="font-family: warioware" class="black-text">Game Name</h4>
-        <canvas id="canvas-game" class="player-canvas" width="1920" height="1280"></canvas>
+
+        <div style="position: relative;" class="player-canvas">
+            <canvas id="canvas-game" width="1920" height="1280"></canvas>
+            <div id="animation-overlay" style="position: absolute; bottom: 0; width:100%; height: 100%; opacity: 0.2;">
+                <img id="truck-player" src="./img/diy-car.svg" class="animate__animated"
+                    style="position: absolute; top: 52%; left: 35%; width: 25%; height: 25%;">
+                <img src="./img/bg_player.png" style="height:100%; width: 100%" />
+            </div>
+        </div>
+
     </div>
     <div class="modal-footer" style="display: flex; padding: 6px 20px;">
         <div class="progress" style="width: 80%; display: inline-block; margin-right: 15px; margin-top: 15px;">
@@ -9,6 +18,9 @@
         </div>
         <a href="#!" id="replay-button" class="modal-action waves-effect waves-green btn-flat"
             style="margin-left: auto; margin-top: 0;" onclick="replayGame()">Replay</a>
+        <span id="score-counter" style="margin-left: auto; margin-top: -8px;text-align: center;">Score:<br>
+            <span id="score-number">255</span>
+        </span>
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat"
             style="margin-left: auto; margin-top: 0;">Close</a>
     </div>
@@ -42,7 +54,11 @@
     var canvas = document.getElementById('canvas-game');
     var context = canvas.getContext('2d');
 
+    var lives;
+    var score;
+    var isPlayingCollection = false;
     var hasTrackEnded = false;
+    var lostLastGame = false;
 
     var mioPlayer = new window.mio.Player(canvas, document);
     const loadSound = (name) => {
@@ -63,6 +79,12 @@
             context.clearRect(0, 0, canvas.width, canvas.height);
             player.pause();
             mioPlayer.stop();
+
+            if (isPlayingCollection) {
+                isPlayingCollection = false;
+                $("#replay-button").show();
+                $("#score-counter").hide();
+            }
         }
     });
 
@@ -74,6 +96,9 @@
     var loseSounds = [loadSound('lose1'), loadSound('lose2')];
 
     mioPlayer.scaleCanvas(bestPossibleWindowSize());
+    // Adjust the size of the overlay
+    $('.player-canvas').css('height', canvas.height + 9);
+    $('.player-canvas').css('width', canvas.width + 9);
 
     // re-scale canvas when the window size changes
     window.addEventListener('resize', function () {
@@ -81,6 +106,10 @@
         canvas.width = 1920;
         canvas.height = 1280;
         mioPlayer.scaleCanvas(bestPossibleWindowSize());
+
+        // Adjust the size of the overlay
+        $('.player-canvas').css('height', canvas.height + 9);
+        $('.player-canvas').css('width', canvas.width + 9);
     });
 
     function modalSize() {
@@ -117,10 +146,132 @@
         startMioPlayer(tempHash, tempTitle);
     }
 
-    function startMioPlayer(gameHash, gameTitle) {
+    async function startMioPlayer(gameHash, gameTitle) {
         $('#game-modal').modal('open');
-        $("#player-title").text(gameTitle)
-        playGame('./download?type=game&id=' + gameHash);
+
+        // TODO change this to use the player's data when we can
+        $("#player-title").text(gameTitle);
+        $("#score-counter").hide();
+
+        mioData = await _fetch('./download?type=game&id=' + gameHash);
+        playGame(mioData);
+    }
+
+    function setAnimation(animationClass) {
+        $("#truck-player").attr('class', 'animate__animated');
+        $("#truck-player").addClass(animationClass);
+    }
+
+    function animationEnd() {
+        // Wait for "animationend" event
+        return new Promise(resolve => {
+            $("#truck-player").on('animationend', resolve);
+        });
+    }
+
+    async function startCollectionPlayer(gameHashes) {
+        isPlayingCollection = true;
+        $("#replay-button").hide();
+        $("#score-counter").show();
+        $("#score-number").html(score);
+        lives = 4;
+        score = 0;
+
+        $('#game-modal').modal('open');
+
+        let nextGame;
+        let firstGame = _fetch('./download?type=game&id=' + gameHashes[0]);
+
+        // Intro animation while fetching first game
+        setAnimation('animate__bounceInLeft');
+        await animationEnd();
+        setAnimation('animate__rubberBand');
+        await animationEnd();
+
+        // Collection gameplay loop
+        mioData = await firstGame;
+
+        while (isPlayingCollection) {
+
+            // animate__bounce + animate__bounceOutRight         
+            setAnimation('animate__bounce');
+            await animationEnd();
+            setAnimation('animate__bounceOutRight');
+            await animationEnd();
+
+            playGame(mioData);
+
+            // Wait for "playing" event to hide mask
+            await new Promise(resolve => {
+                mioPlayer.on('playing', resolve);
+            });
+
+            // Animate opacity of animation-overlay to 0
+            $("#animation-overlay").css('opacity', 0);
+            $("#animation-overlay").hide();
+
+            // Pick a random hash
+            let gameHash = gameHashes[Math.floor(Math.random() * gameHashes.length)];
+
+            // Download the next game while the current one is playing
+            console.log("Fetching next game " + gameHash);
+            nextGame = _fetch('./download?type=game&id=' + gameHash).catch(e => {
+                console.log("Error fetching next game: " + e);
+                // Pick another hash and retry
+                gameHash = gameHashes[Math.floor(Math.random() * gameHashes.length)];
+                nextGame = _fetch('./download?type=game&id=' + gameHash);
+            });
+
+            // Wait for mioPlayer's 'ended' event
+            await new Promise(resolve => {
+                mioPlayer.on('ended', resolve);
+            });
+
+            $("#animation-overlay").show();
+            $("#animation-overlay").css('opacity', 1);
+
+            if (!isPlayingCollection) break;
+
+            // Check win/lose status
+            score++;
+            $("#score-number").html(score);
+            if (lostLastGame) {
+                $("#player-title").text("Oh no!");
+                lives--;
+
+                // animate__lightSpeedInLeft + animate__rotateOut + animate__bounceInDown
+                setAnimation('animate__lightSpeedInLeft');
+                await animationEnd();
+                setAnimation('animate__rotateOut');
+                await animationEnd();
+                setAnimation('animate__bounceInDown');
+                await animationEnd();
+            } else {
+
+                $("#player-title").text("Nice!");
+
+                // animate__zoomInLeft + animate__heartBeat 
+                setAnimation('animate__zoomInLeft');
+                await animationEnd();
+                setAnimation('animate__heartBeat');
+                await animationEnd();
+            }
+
+            if (lives <= 0) {
+                $("#player-title").text("Game Over");
+                isPlayingCollection = false;
+
+                // animate__hinge
+                setAnimation('animate__hinge');
+                await animationEnd();
+
+                break;
+            }
+
+            // Wait for the next game to be downloaded
+            mioData = await nextGame;
+        }
+
     }
 
     function handleMouseMove(event) {
@@ -168,9 +319,7 @@
         return buf
     }
 
-    async function playGame(url) {
-        mioData = await _fetch(url);
-
+    function playGame(mioData) {
         let loopTimes;
 
         if (mioData[0xE605] === 0) {
@@ -182,58 +331,62 @@
         }
         midiData = window.buildMidiFile(mioData, loopTimes);
 
-        //console.debug(midiData);
-
         player.load(midiData);
 
         if (!isInitialised) {
-            mioPlayer.sounds = sounds;
-            mioPlayer.winSounds = winSounds;
-            mioPlayer.loseSounds = loseSounds;
-
-            // current frame and the final frame in which the game will end: i.e. 240 for SHORT, 480 for LONG and undefined for BOSS
-            mioPlayer.on('frameupdate', (frame, endFrame) => {
-
-                // Update game-timer div
-                if (endFrame === undefined) {
-                    $("#game-timer").attr("class", "indeterminate");
-                }
-                else {
-                    $("#game-timer").attr("class", "determinate");
-                    $("#game-timer").attr("style", "width:" + (100 - (frame / endFrame * 100)) + "%");
-                }
-
-            });
-
-            document.addEventListener('mousemove', handleMouseMove, false);
-            canvas.addEventListener('mousedown', handleMouseDown, false);
-            document.addEventListener('mouseup', handleMouseUp, false)
-
-            canvas.addEventListener('touchstart', handleTouchStart, false);
-            document.addEventListener('touchend', handleTouchEnd, false);
-
-            player.on('ended', () => { hasTrackEnded = true; });
-
-            mioPlayer.musicPlayer = {
-                playMusic: () => {
-                    player.pause();
-                    player.seek(0);
-                    player.play();
-                    hasTrackEnded = false;
-                },
-                pauseMusic: () => player.pause(),
-                hasTrackEnded: () => hasTrackEnded,
-            };
-
-            let fontBitmap = new Image();
-            fontBitmap.src = 'img/miofont.png';
-
-            mioPlayer.fontBitmap = fontBitmap;
-
-            isInitialised = true;
+            initializeMioPlayer();
         }
 
         mioPlayer.loadAndStart(mioData);
+    }
+
+    function initializeMioPlayer() {
+        mioPlayer.sounds = sounds;
+        mioPlayer.winSounds = winSounds;
+        mioPlayer.loseSounds = loseSounds;
+
+        // current frame and the final frame in which the game will end: i.e. 240 for SHORT, 480 for LONG and undefined for BOSS
+        mioPlayer.on('frameupdate', (frame, endFrame) => {
+
+            // Update game-timer div
+            if (endFrame === undefined) {
+                $("#game-timer").attr("class", "indeterminate");
+            }
+            else {
+                $("#game-timer").attr("class", "determinate");
+                $("#game-timer").attr("style", "width:" + (100 - (frame / endFrame * 100)) + "%");
+            }
+        });
+
+        mioPlayer.on('won', () => lostLastGame = false);
+        mioPlayer.on('lost', () => lostLastGame = true);
+
+        document.addEventListener('mousemove', handleMouseMove, false);
+        canvas.addEventListener('mousedown', handleMouseDown, false);
+        document.addEventListener('mouseup', handleMouseUp, false)
+
+        canvas.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchend', handleTouchEnd, false);
+
+        player.on('ended', () => { hasTrackEnded = true; });
+
+        mioPlayer.musicPlayer = {
+            playMusic: () => {
+                player.pause();
+                player.seek(0);
+                player.play();
+                hasTrackEnded = false;
+            },
+            pauseMusic: () => player.pause(),
+            hasTrackEnded: () => hasTrackEnded,
+        };
+
+        let fontBitmap = new Image();
+        fontBitmap.src = 'img/miofont.png';
+
+        mioPlayer.fontBitmap = fontBitmap;
+
+        isInitialised = true;
     }
 
     function replayGame() {

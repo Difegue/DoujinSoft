@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Difegue/DoujinSoft#readme",
   "dependencies": {
     "@materializecss/materialize": "^1.1.0",
+    "animate.css": "^4.1.1",
     "bg-sound": "^2.0.0",
     "blueimp-file-upload": "^10.32.0",
     "jquery": "^3.6.0",
