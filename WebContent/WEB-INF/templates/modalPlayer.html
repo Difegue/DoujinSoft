@@ -4,7 +4,17 @@
 
         <div style="position: relative;" class="player-canvas">
             <canvas id="canvas-game" width="1920" height="1280"></canvas>
-            <div id="animation-overlay" style="position: absolute; bottom: 0; width:100%; height: 100%; opacity: 0.2;">
+            <div id="animation-overlay"
+                style="position: absolute; bottom: 0; width:100%; height: 100%; overflow:hidden">
+                <span id="score-number" class="score-counter">255</span>
+                <img id="life-1" class="life-icon"
+                    style="position: absolute; top: 80%; left: 16%; width: 20%; height: 20%;" src="./img/nds.svg">
+                <img id="life-2" class="life-icon"
+                    style="position: absolute; top: 80%; left: 31%; width: 20%; height: 20%;" src="./img/nds.svg">
+                <img id="life-3" class="life-icon"
+                    style="position: absolute; top: 80%; left: 46%; width: 20%; height: 20%;" src="./img/nds.svg">
+                <img id="life-4" class="life-icon"
+                    style="position: absolute; top: 80%; left: 61%; width: 20%; height: 20%;" src="./img/nds.svg">
                 <img id="truck-player" src="./img/diy-car.svg" class="animate__animated"
                     style="position: absolute; top: 52%; left: 35%; width: 25%; height: 25%;">
                 <img src="./img/bg_player.png" style="height:100%; width: 100%" />
@@ -18,9 +28,6 @@
         </div>
         <a href="#!" id="replay-button" class="modal-action waves-effect waves-green btn-flat"
             style="margin-left: auto; margin-top: 0;" onclick="replayGame()">Replay</a>
-        <span id="score-counter" style="margin-left: auto; margin-top: -8px;text-align: center;">Score:<br>
-            <span id="score-number">255</span>
-        </span>
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat"
             style="margin-left: auto; margin-top: 0;">Close</a>
     </div>
@@ -57,12 +64,15 @@
     var lives;
     var score;
     var isPlayingCollection = false;
+    var currentCollectionIteration = 0;
     var hasTrackEnded = false;
     var lostLastGame = false;
+    var tempHash = null;
+    var tempTitle = null;
 
     var mioPlayer = new window.mio.Player(canvas, document);
     const loadSound = (name) => {
-        let audio = new Audio('audio/' + name + '.ogg');
+        let audio = new Audio(`audio/${name}.ogg`);
         audio.volume = 1;
         return audio;
     };
@@ -80,10 +90,18 @@
             player.pause();
             mioPlayer.stop();
 
+            // Stop all sounds
+            playerSounds.forEach(sound => {
+                sound.pause();
+                sound.currentTime = 0;
+            });
+
             if (isPlayingCollection) {
                 isPlayingCollection = false;
                 $("#replay-button").show();
-                $("#score-counter").hide();
+                $("#truck-player").attr('class', '');
+                $("#animation-overlay").attr('class', '');
+                score = 0;
             }
         }
     });
@@ -94,6 +112,8 @@
 
     var winSounds = [loadSound('win1'), loadSound('win2')];
     var loseSounds = [loadSound('lose1'), loadSound('lose2')];
+
+    var playerSounds = [loadSound('player/player_start'), loadSound('player/player_game'), loadSound('player/player_win'), loadSound('player/player_lose'), loadSound('player/player_gameover')];
 
     mioPlayer.scaleCanvas(bestPossibleWindowSize());
     // Adjust the size of the overlay
@@ -125,8 +145,6 @@
         return windowSizeComparedToOriginal(width, height);
     }
 
-    let tempHash = null;
-    let tempTitle = null;
     function createModal(gameHash, gameTitle, isNsfw) {
         if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck")) {
             tempHash = gameHash;
@@ -148,78 +166,81 @@
 
     async function startMioPlayer(gameHash, gameTitle) {
         $('#game-modal').modal('open');
-
-        // TODO change this to use the player's data when we can
-        $("#player-title").text(gameTitle);
-        $("#score-counter").hide();
-
-        mioData = await _fetch('./download?type=game&id=' + gameHash);
+        mioData = await _fetch(`./download?type=game&id=${gameHash}`);
+        buildMidiData(mioData);
         playGame(mioData);
     }
 
-    function setAnimation(animationClass) {
+    async function playAnimation(animationClass) {
         $("#truck-player").attr('class', 'animate__animated');
         $("#truck-player").addClass(animationClass);
-    }
 
-    function animationEnd() {
-        // Wait for "animationend" event
-        return new Promise(resolve => {
-            $("#truck-player").on('animationend', resolve);
+        currentAnimation = new Promise((resolve, reject) => {
+            $("#truck-player").on('animationend', () => {
+                if (isPlayingCollection)
+                    resolve();
+                else
+                    reject();
+
+            });
         });
+
+        return currentAnimation;
     }
 
     async function startCollectionPlayer(gameHashes) {
         isPlayingCollection = true;
-        $("#replay-button").hide();
-        $("#score-counter").show();
-        $("#score-number").html(score);
+        currentCollectionIteration++;
+        const currentIteration = currentCollectionIteration;
         lives = 4;
-        score = 0;
+        score = 1;
+        $("#replay-button").hide();
+        $("#animation-overlay").show();
+        $("#score-number").html(score);
 
         $('#game-modal').modal('open');
 
         let nextGame;
-        let firstGame = _fetch('./download?type=game&id=' + gameHashes[0]);
+        let currentSound;
+        let firstGame = _fetch(`./download?type=game&id=${gameHashes[0]}`);
 
         // Intro animation while fetching first game
-        setAnimation('animate__bounceInLeft');
-        await animationEnd();
-        setAnimation('animate__rubberBand');
-        await animationEnd();
+        currentSound = playerSounds[0].play();
+        $(".life-icon").attr('class', 'animate__animated animate__rollIn life-icon');
+        $("#truck-player").attr('class', 'animate__animated');
+        await playAnimation('animate__bounceInLeft');
+        await playAnimation('animate__rubberBand animate__fast');
+        await playAnimation('animate__tada animate__fast');
 
         // Collection gameplay loop
         mioData = await firstGame;
 
-        while (isPlayingCollection) {
+        while (isPlayingCollection && currentCollectionIteration === currentIteration) {
 
-            // animate__bounce + animate__bounceOutRight         
-            setAnimation('animate__bounce');
-            await animationEnd();
-            setAnimation('animate__bounceOutRight');
-            await animationEnd();
+            // GAME_START
+            currentSound = playerSounds[1].play();
+            await playAnimation('animate__bounce');
+            buildMidiData(mioData);
+            await playAnimation('animate__bounceOutRight');
 
-            playGame(mioData);
+            if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
+                break;
 
-            // Wait for "playing" event to hide mask
-            await new Promise(resolve => {
-                mioPlayer.on('playing', resolve);
-            });
+            playGame(mioData); // Start playback so that mio loads during the animation
 
-            // Animate opacity of animation-overlay to 0
-            $("#animation-overlay").css('opacity', 0);
-            $("#animation-overlay").hide();
+            // Animate overlay away animate__flipOutX
+            $("#animation-overlay").attr('class', 'animate__animated animate__backOutDown animate__faster');
 
             // Pick a random hash
             let gameHash = gameHashes[Math.floor(Math.random() * gameHashes.length)];
 
             // Download the next game while the current one is playing
-            console.log("Fetching next game " + gameHash);
-            nextGame = _fetch('./download?type=game&id=' + gameHash).catch(e => {
+            console.log(`Fetching next game : ${gameHash}`);
+            nextGame = _fetch(`./download?type=game&id=${gameHash}`).catch(e => {
                 console.log("Error fetching next game: " + e);
                 // Pick another hash and retry
                 gameHash = gameHashes[Math.floor(Math.random() * gameHashes.length)];
-                nextGame = _fetch('./download?type=game&id=' + gameHash);
+                nextGame = _fetch(`./download?type=game&id=${gameHash}`);
             });
 
             // Wait for mioPlayer's 'ended' event
@@ -227,46 +248,54 @@
                 mioPlayer.on('ended', resolve);
             });
 
-            $("#animation-overlay").show();
-            $("#animation-overlay").css('opacity', 1);
+            // isPlayingCollection is not enough to break out of the loop, since if the player restarts a game,
+            // we'll come back here after the player finishes the first game of the new iteration.
+            if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
+                break;
 
-            if (!isPlayingCollection) break;
+            // Bring back overlay
+            $("#animation-overlay").attr('class', 'animate__animated animate__flipInX animate__faster');
+            $("#animation-overlay").show();
 
             // Check win/lose status
             score++;
             $("#score-number").html(score);
             if (lostLastGame) {
                 $("#player-title").text("Oh no!");
-                lives--;
 
-                // animate__lightSpeedInLeft + animate__rotateOut + animate__bounceInDown
-                setAnimation('animate__lightSpeedInLeft');
-                await animationEnd();
-                setAnimation('animate__rotateOut');
-                await animationEnd();
-                setAnimation('animate__bounceInDown');
-                await animationEnd();
+                // Animate life icon
+                let icon = `#life-${lives}`;
+                lives--;
+                $(icon).attr('class', 'animate__animated animate__hinge life-icon');
+
+                // GAME_LOSS
+                currentSound = playerSounds[3].play();
+                await playAnimation('animate__lightSpeedInLeft animate__faster');
+                await playAnimation('animate__rotateOut animate__faster');
+                await playAnimation('animate__bounceInDown animate__faster');
             } else {
 
                 $("#player-title").text("Nice!");
 
-                // animate__zoomInLeft + animate__heartBeat 
-                setAnimation('animate__zoomInLeft');
-                await animationEnd();
-                setAnimation('animate__heartBeat');
-                await animationEnd();
+                // GAME_WIN
+                currentSound = playerSounds[2].play();
+                await playAnimation('animate__zoomInLeft');
+                await playAnimation('animate__heartBeat animate__fast');
             }
 
             if (lives <= 0) {
                 $("#player-title").text("Game Over");
                 isPlayingCollection = false;
 
-                // animate__hinge
-                setAnimation('animate__hinge');
-                await animationEnd();
+                // GAME_OVER
+                currentSound = playerSounds[4].play();
+                await playAnimation('animate__hinge');
 
                 break;
             }
+
+            if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
+                break;
 
             // Wait for the next game to be downloaded
             mioData = await nextGame;
@@ -312,27 +341,32 @@
             credentials: 'same-origin'
         }
         const response = await window.fetch(url, opts)
-        if (response.status !== 200) throw new Error(`Could not load ${url}`)
+        if (response.status !== 200) {
+            popToast(`Could not load ${url}`);
+            throw new Error(`Could not load ${url}`)
+        };
 
         const arrayBuffer = await response.arrayBuffer()
         const buf = new Uint8Array(arrayBuffer)
         return buf
     }
 
-    function playGame(mioData) {
+    function buildMidiData(mioData) {
         let loopTimes;
 
         if (mioData[0xE605] === 0) {
             loopTimes = 0;
         } else if (mioData[0xE605] === 1) {
-            loopTimes = 1;
+            loopTimes = 1; // double length
         } else {
-            loopTimes = 11;
+            loopTimes = 11; // boss length (11 is a completely arbitrary number)
         }
         midiData = window.buildMidiFile(mioData, loopTimes);
 
         player.load(midiData);
+    }
 
+    function playGame(mioData) {
         if (!isInitialised) {
             initializeMioPlayer();
         }
@@ -354,12 +388,15 @@
             }
             else {
                 $("#game-timer").attr("class", "determinate");
-                $("#game-timer").attr("style", "width:" + (100 - (frame / endFrame * 100)) + "%");
+                $("#game-timer").attr("style", `width:${(100 - (frame / endFrame * 100))}%`);
             }
         });
 
         mioPlayer.on('won', () => lostLastGame = false);
         mioPlayer.on('lost', () => lostLastGame = true);
+        mioPlayer.on('playing', () => {
+            $("#player-title").text(mioPlayer.gameData.name);
+        });
 
         document.addEventListener('mousemove', handleMouseMove, false);
         canvas.addEventListener('mousedown', handleMouseDown, false);

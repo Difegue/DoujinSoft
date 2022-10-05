@@ -297,7 +297,7 @@ label.active {
     border-color: #c62828 #9f1f1f #791818 #9f1f1f;
     background-color: white;
     display: block;
-    margin: 0 auto 0 -5px;
+    margin: 0 -5px;
 }
 
 .game-icon {
@@ -314,19 +314,65 @@ label.active {
     transition: none !important;
 }
 
+.score-counter {
+    position: absolute;
+    text-align: center;
+    font-size: 6vw;
+    width: 12vw;
+    font-family: warioware;
+    left: 40%;
+    top: 10%;
+    background: linear-gradient(to bottom, #ffcf57 25%, #b5b5b5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 @keyframes shake {
-    0% { transform: translate(1px, 1px); }
-    10% { transform: translate(-1px, -2px); }
-    20% { transform: translate(-3px, 0px); }
-    30% { transform: translate(3px, 2px); }
-    40% { transform: translate(1px, -1px); }
-    50% { transform: translate(-1px, 2px); }
-    60% { transform: translate(-3px, 1px); }
-    70% { transform: translate(3px, 1px); }
-    80% { transform: translate(-1px, -1px); }
-    90% { transform: translate(1px, 2px); }
-    100% { transform: translate(1px, 1px); }
-  }
+    0% {
+        transform: translate(1px, 1px);
+    }
+
+    10% {
+        transform: translate(-1px, -2px);
+    }
+
+    20% {
+        transform: translate(-3px, 0px);
+    }
+
+    30% {
+        transform: translate(3px, 2px);
+    }
+
+    40% {
+        transform: translate(1px, -1px);
+    }
+
+    50% {
+        transform: translate(-1px, 2px);
+    }
+
+    60% {
+        transform: translate(-3px, 1px);
+    }
+
+    70% {
+        transform: translate(3px, 1px);
+    }
+
+    80% {
+        transform: translate(-1px, -1px);
+    }
+
+    90% {
+        transform: translate(1px, 2px);
+    }
+
+    100% {
+        transform: translate(1px, 1px);
+    }
+}
 
 @media screen and (max-width:1700px) and (min-width:992px),
 screen and (max-width:920px) and (min-width:600px),
