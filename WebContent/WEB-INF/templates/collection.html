@@ -49,10 +49,43 @@
 	<ul class="pagination"></ul>
 </div>
 
+<div class="fixed-action-btn">
+	<!-- style="scale: 2;margin-right: 12px;margin-bottom: 24px;"-->
+	<a id="playbtn" class="waves-effect waves-light btn btn-floating tooltipped" data-tooltip="Play!"
+		data-position="top" onclick="startCollectionPlayer(collectionHashes)">
+		<i class="material-icons">play_arrow</i></a>
+</div>
+<div class="tap-target" data-target="playbtn">
+	<div class="tap-target-content">
+		<h5 style="font-family: warioware;">Fancy a game?</h5>
+		<p>You can play all the games in this collection randomly thrown at you, (mostly*) just like the real thing.
+			<br>4 lives and you're out!
+			<br><sub>* Some games may be unwinnable or behave weirdly.</sub>
+		</p>
+	</div>
+</div>
+
 {% endblock %}
 
 {% block extradata %}
+
+<!-- ew -->
+{% if collection.collection_type equals "manga" %}
+{% elseif collection.collection_type equals "record" %}
+{% else %}
 {% include "./modalPlayer.html" %}
+<script>
+	// Keep track of all the hashes in this collection
+	const collectionHashes = [{% for hash in collection.mios %} "{{hash}}", {% endfor %} ];
+	let tapTarget = $('.tap-target').tapTarget({
+		onClose: () => localStorage.sawCollectionInfo = true
+	});
+
+	//if (localStorage.getItem("sawCollectionInfo") === null) {
+	tapTarget.tapTarget('open');
+	//}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block content %}

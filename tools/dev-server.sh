@@ -3,6 +3,7 @@
 
 npm install
 npm run install-front
+rm -rf target/*.war
 mvn package -f "pom.xml"
 
 # Copy WAR from context

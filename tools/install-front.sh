@@ -13,6 +13,7 @@ cp node_modules/timidity/libtimidity.wasm WebContent/soundfont
 
 cp node_modules/@materializecss/materialize/dist/css/materialize.min.css WebContent/css/vendor
 cp node_modules/blueimp-file-upload/css/jquery.fileupload.css WebContent/css/vendor
+cp node_modules/animate.css/animate.min.css WebContent/css/vendor
 
 npm install -g browserify
 
