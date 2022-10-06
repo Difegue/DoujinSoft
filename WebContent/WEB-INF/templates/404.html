@@ -1,0 +1,38 @@
+{% extends "./base.html" %}
+
+{% block background %}./img/bg_home_2.jpg{% endblock %}
+{% block color %}red{% endblock %}
+{% block title %}Error 404: Not Found{% endblock %}
+
+
+{% block desc %}
+
+<style>
+	body {
+		background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.2) 100%),
+			url('./img/bg_home_2.jpg') !important;
+	}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="row">
+
+	<img class="col l4 m4 hide-on-small-only center" src="./img/wario404.png" />
+
+	<div class="col l8 m8 s12 white-text center">
+
+		<h5>Sorry, what you were looking for could not be found. Either it never existed on the server or Wario
+			caused some antics again.</h5>
+
+	</div>
+
+</div>
+
+{% endblock %}
+
+{% block footdata %}
+
+{% endblock %}
