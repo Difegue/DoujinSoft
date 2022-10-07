@@ -78,6 +78,7 @@
     };
 
     var sounds = [];
+    var playerSounds = [];
 
     $('#game-modal').modal({
         dismissible: true,
@@ -182,7 +183,10 @@
     async function startCollectionPlayer(gameHashes) {
 
         // Load sounds now since this is the first function called by player action
-        var playerSounds = [loadSound('player/player_start'), loadSound('player/player_game'), loadSound('player/player_win'), loadSound('player/player_lose'), loadSound('player/player_gameover')];
+        // only if playerSounds is empty
+        if (playerSounds.length == 0)
+            playerSounds = [loadSound('player/player_start'), loadSound('player/player_game'), loadSound('player/player_win'),
+            loadSound('player/player_lose'), loadSound('player/player_gameover')];
 
         isPlayingCollection = true;
         currentCollectionIteration++;

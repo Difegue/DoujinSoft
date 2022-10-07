@@ -41,7 +41,7 @@
         </div>
 
         <div class="game-preview z-depth-1 waves-effect tooltipped" data-tooltip="Play!"
-          onclick="createModal('{{ game.hash }}', `{{ game.name }}`, {{game.isNsfw}})"
+          onclick="createModal('{{ game.hash }}', {{game.isNsfw}})"
           style="background-image: url('{{ game.preview }}');">
           {% if game.isNsfw %}
           <span class="game-blur" style="width:100%; height: 100%; backdrop-filter:blur(5px); display:inline-block">
