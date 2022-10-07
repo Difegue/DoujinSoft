@@ -39,6 +39,8 @@
 
   <script data-goatcounter="https://ohmy.tvc-16.science/count" async src="//ohmy.tvc-16.science/count.js"></script>
 
+  {% block meta %}
+
   {% if singleitem == true %}
   {% for item in items %}
   <meta name="twitter:card" content="summary_large_image">
@@ -53,11 +55,13 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta property="og:title" content="DoujinSoft Store" />
   <meta property="og:type" content="website" />
-  <meta property="og:description" content="The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available to play with and
-    transfer to your own copies of the game." />
+  <meta property="og:description"
+    content="The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available to play with and transfer to your own copies of the game." />
   <meta property="og:image" content="http://diy.tvc-16.science/meta.jpg" />
   <!-- Hardcoding the URL kinda sucks here -->
   {% endif %}
+
+  {% endblock %}
 
 </head>
 
