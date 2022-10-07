@@ -69,7 +69,6 @@
     var lostLastGame = false;
     var isBossGame = false;
     var tempHash = null;
-    var tempTitle = null;
 
     var mioPlayer = new window.mio.Player(canvas, document);
     const loadSound = (name) => {
@@ -147,13 +146,12 @@
         return windowSizeComparedToOriginal(width, height);
     }
 
-    function createModal(gameHash, gameTitle, isNsfw) {
+    function createModal(gameHash, isNsfw) {
         if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck")) {
             tempHash = gameHash;
-            tempTitle = gameTitle;
             $('#nsfw-modal').modal('open');
         } else {
-            startMioPlayer(gameHash, gameTitle);
+            startMioPlayer(gameHash);
         }
     }
 
@@ -166,7 +164,7 @@
         startMioPlayer(tempHash, tempTitle);
     }
 
-    async function startMioPlayer(gameHash, gameTitle) {
+    async function startMioPlayer(gameHash) {
         $('#game-modal').modal('open');
         mioData = await _fetch(`./download?type=game&id=${gameHash}`);
         buildMidiData(mioData);
