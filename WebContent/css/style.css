@@ -300,6 +300,10 @@ label.active {
     margin: 0 -5px;
 }
 
+.game-player {
+    max-height: 100% !important;
+}
+
 .game-icon {
     margin-top: 15%;
     background: black;
