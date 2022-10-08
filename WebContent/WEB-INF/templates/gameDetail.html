@@ -44,7 +44,7 @@
           onclick="createModal('{{ game.hash }}', {{game.isNsfw}})"
           style="background-image: url('{{ game.preview }}');">
           {% if game.isNsfw %}
-          <span class="game-blur" style="width:100%; height: 100%; backdrop-filter:blur(5px); display:inline-block">
+          <span class="game-blur">
             <i class="medium white-text material-icons game-icon" style="border-radius: 6px;">18_up_rating</i>
           </span>
           {% endif %}

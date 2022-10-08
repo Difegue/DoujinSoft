@@ -309,6 +309,14 @@ label.active {
     background: black;
 }
 
+.game-blur {
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: inline-block;
+}
+
 .game-icon:hover {
     opacity: 0.3;
 }
