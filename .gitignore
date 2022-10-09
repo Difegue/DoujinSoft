@@ -6,6 +6,7 @@ package-lock.json
 WebContent/soundfont/libtimidity.wasm
 WebContent/js/vendor/*
 WebContent/css/vendor/*
-.settings
+.settings/*
 DoujinSoft.ipr
 DoujinSoft.iws
+.project
