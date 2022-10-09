@@ -24,7 +24,7 @@
     "jquery": "^3.6.0",
     "jquery-ui": "^1.12.1",
     "mio-midi": "^0.5.0",
-    "mio-player": "^0.4.1",
+    "mio-player": "^0.4.0",
     "timidity": "git://github.com/yeahross0/timidity#9cb57cf"
   },
   "devDependencies": {
