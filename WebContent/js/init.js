@@ -81,7 +81,7 @@ function truckClicked() {
 	// One random message out of 8
 	var r_text = new Array();
 	r_text[0] = "Keep on trucking!";
-	r_text[1] = "You can use '%' in search queries to find more results...but it'll be slower!";
+	r_text[1] = "You can use '%' at the start of a search query to find more results...but it'll be slower!";
 	r_text[2] = "Have you read the FAQ recently?";
 	r_text[3] = "You can play a game by clicking on its image...but did you know you can play entire collections?";
 	r_text[4] = "I'm a truck lol";
@@ -94,6 +94,14 @@ function truckClicked() {
 	popToast(r_text[i]);
 }
 
+function searchStore(category, name) {
+	// url encode name
+	name = encodeURIComponent(name);
+
+	const href=`./${category}?name=${name}`;
+	window.location.href = href;
+}
+
 function loadItems(pageNumber) {
 	
 	// Show a preloader
@@ -104,8 +112,13 @@ function loadItems(pageNumber) {
 	// Scroll up
 	window.scrollTo(0,0);  
 
+	// Strip "name" and "creator" from the URL's query params if they were set
+	var url = window.location.href;
+	url = url.replace(/name=[^&]*/g, "");
+	url = url.replace(/creator=[^&]*/g, "");
+
 	//Posts to itself -> one function for all three pages
-	$.post( window.location.href, { page: pageNumber, 
+	$.post( url, { page: pageNumber, 
 									name: $("#item_name").val(), 
 									creator: $("#maker_name").val(),
 									sort_by: $("#sort_by").val()} )

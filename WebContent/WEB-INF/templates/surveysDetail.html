@@ -20,7 +20,7 @@
       {{ item.comment }}
 
       <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Search for this on the Store!"
-        href="./{{item.category}}?name={{item.name}}" style="float: right;">
+        onclick="searchStore('{{item.category}}','{{ item.name }}')" style="float: right;">
         <i class="material-icons">search</i>
       </a>
     </div>

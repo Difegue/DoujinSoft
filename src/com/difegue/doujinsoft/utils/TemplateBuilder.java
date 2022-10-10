@@ -190,6 +190,10 @@ public class TemplateBuilder {
 		String name = isNameSearch ? request.getParameter("name") + "%" : "%";
 		String creator = isCreatorSearch ? request.getParameter("creator") + "%" : "%";
 
+		// Remove last char for context display
+		context.put("nameSearch", name.substring(0, name.length() - 1));
+		context.put("creatorSearch", creator.substring(0, creator.length() - 1));
+
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
