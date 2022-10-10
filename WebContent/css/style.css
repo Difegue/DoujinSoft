@@ -62,6 +62,15 @@ main {
     flex: 1 0 auto;
 }
 
+nav .brand-logo {
+    display: inline-flex !important;
+}
+
+nav .nav-wrapper {
+    width: 90% !important;
+    max-width: none !important;
+}
+
 .sidenav-overlay {
     z-index: 995 !important;
 }

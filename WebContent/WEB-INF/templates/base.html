@@ -17,7 +17,7 @@
   <link href="css/vendor/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
   <link href="css/vendor/jquery.fileupload.css" type="text/css" rel="stylesheet" media="screen,projection" />
   <link href="css/vendor/animate.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
-  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="css/style.css?v3" type="text/css" rel="stylesheet" media="screen,projection" />
 
   <style>
     body {
@@ -35,7 +35,7 @@
   <script src='js/vendor/mio-player.js'></script>
   <script src='js/vendor/mio-midi.js'></script>
   <script src="js/jquery.simplePagination.js"></script>
-  <script src="js/init.js"></script>
+  <script src="js/init.js?v3"></script>
 
   <script data-goatcounter="https://ohmy.tvc-16.science/count" async src="//ohmy.tvc-16.science/count.js"></script>
 
@@ -71,49 +71,77 @@
     <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">
       <div class="nav-wrapper container">
 
-        <object data="./img/logo.svg" type="image/svg+xml" style="height:35px; margin-top:15px; margin-right: 10px">
+        <object data="./img/logo.svg" type="image/svg+xml" style="height:35px; margin-top:15px; margin-right: 10px;">
         </object>
-        <a id="logo-container" href="./" class="brand-logo hide-on-small-and-down">DoujinSoft Store</a>
+        <span id="logo-container" href="./" class="brand-logo hide-on-small-and-down"><a href="./">DoujinSoft Store</a>
+          <ul class="hide-on-med-and-down" style="margin-left: 16px;">
+            <li class="{% block gamepage %}{% endblock %}">
+              <a href="./games"> <object data="./img/fc-cart.svg" type="image/svg+xml"
+                  style="height:12px; margin-right:8px; filter: brightness(10);"></object>Games</a>
+            </li>
+            <li class="{% block recordpage %}{% endblock %}">
+              <a href="./records"><i style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                  class="material-icons white-text prefix">album</i> Records</a>
+            </li>
+            <li class="{% block comicpage %}{% endblock %}">
+              <a href="./comics"><i style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                  class="material-icons white-text prefix">local_library</i> Comics</a>
+            </li>
+          </ul>
+        </span>
+
         <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+
         <ul class="right hide-on-med-and-down">
-          <li class="{% block gamepage %}{% endblock %}">
-            <a href="./games">Games</a>
-          </li>
-          <li class="{% block recordpage %}{% endblock %}">
-            <a href="./records">Records</a>
-          </li>
-          <li class="{% block comicpage %}{% endblock %}">
-            <a href="./comics">Comics</a>
-          </li>
+
           <li class="{% block surveypage %}{% endblock %}">
             <a href="./surveys">Surveys</a>
           </li>
+
           <li class="{% block uploadpage %}{% endblock %}">
             <a href="./upload">Upload</a>
           </li>
+          <li>|</li>
           <li class="{% block cartpage %}{% endblock %}">
             <a href="./cart"><span class="cart-header">Cart</span></a>
+          </li>
+
+          <li class="{% block faqpage %}{% endblock %}">
+            <a href="./about"><i style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">help</i> Help</a>
           </li>
         </ul>
 
         <ul id="nav-mobile" class="sidenav {% block color %}indigo{% endblock %} darken-1">
           <li class="{% block gamepage %}{% endblock %}">
-            <a class=" white-text" href="./games">Games</a>
+            <a class="white-text" href="./games"> <object data="./img/fc-cart.svg" type="image/svg+xml"
+                style="height:12px; margin-right:8px; filter: brightness(10);"></object>Games</a>
           </li>
           <li class="{% block recordpage %}{% endblock %}">
-            <a class=" white-text" href="./records">Records</a>
+            <a class="white-text" href="./records"><i
+                style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">album</i> Records</a>
           </li>
           <li class="{% block comicpage %}{% endblock %}">
-            <a class=" white-text" href="./comics">Comics</a>
+            <a class="white-text" href="./comics"><i
+                style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">local_library</i> Comics</a>
           </li>
+
           <li class="{% block surveypage %}{% endblock %}">
-            <a class=" white-text" href="./surveys">Surveys</a>
+            <a class="white-text" href="./surveys">Surveys</a>
           </li>
           <li class="{% block uploadpage %}{% endblock %}">
-            <a class=" white-text" href="./upload">Upload your DIY Content</a>
+            <a class="white-text" href="./upload">Upload your DIY Content</a>
           </li>
           <li class="{% block cartpage %}{% endblock %}">
-            <a class=" white-text" href="./cart"><span class="cart-header">Cart</span></a>
+            <a class="white-text" href="./cart"><span class="cart-header">Cart</span></a>
+          </li>
+
+          <li class="{% block faqpage %}{% endblock %}">
+            <a class="white-text" href="./about"><i
+                style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">help</i> Help</a>
           </li>
         </ul>
 
