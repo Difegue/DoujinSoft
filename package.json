@@ -23,7 +23,7 @@
     "blueimp-file-upload": "^10.32.0",
     "jquery": "^3.6.0",
     "jquery-ui": "^1.12.1",
-    "mio-midi": "^0.6.0",
+    "mio-midi": "^0.7.0-beta.3",
     "mio-player": "^0.5.2",
     "timidity": "git://github.com/yeahross0/timidity#aa1b2e0"
   },
