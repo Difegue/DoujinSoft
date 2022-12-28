@@ -5,7 +5,7 @@
 ![screen1](https://cloud.githubusercontent.com/assets/8237712/26278790/4ffd633a-3da3-11e7-865f-015cab5fef5e.png)
 
 Java Web Application for managing and distributing WWDIY content.  
-Relies on the original [DIYEdit](https://gbatemp.net/threads/warioware-d-i-y-editor.346953/) by bobmcjr for everything reverse-engineering related.  
+Relies on [DIYEdit](https://github.com/xperia64/DIYEdit) and [Mio-Micro](https://github.com/yeahross0/Mio-Micro).  
 Uses SQLite, materializeCSS and jQuery.  
 
 ## Features  

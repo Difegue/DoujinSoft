@@ -157,9 +157,10 @@
     }
 
     async function startMioPlayer(gameHash) {
+        $("#player-title").text("DoujinSoft Micro-Player");
         $('#game-modal').modal('open');
         mioData = await _fetch(`./download?type=game&id=${gameHash}`);
-        buildMidiData(mioData);
+        await buildMidiData(mioData);
         playGame(mioData);
     }
 
@@ -220,7 +221,7 @@
             // GAME_START
             currentSound = playerSounds[1].play();
             await playAnimation('animate__bounce');
-            buildMidiData(mioData);
+            await buildMidiData(mioData);
             await playAnimation('animate__bounceOutRight');
 
             if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
@@ -361,7 +362,7 @@
         return buf
     }
 
-    function buildMidiData(mioData) {
+    async function buildMidiData(mioData) {
         let loopTimes;
 
         if (mioData[0xE605] === 0) {
@@ -373,7 +374,7 @@
         }
         midiData = window.buildMidiFile(mioData, loopTimes);
 
-        player.load(midiData);
+        await player.load(midiData);
     }
 
     function playGame(mioData) {
@@ -443,6 +444,11 @@
         fontBitmap.src = 'img/miofont.png';
 
         mioPlayer.fontBitmap = fontBitmap;
+
+        let confettiBitmap = new Image();
+        confettiBitmap.src = 'img/confetti.png';
+
+        mioPlayer.confettiBitmap = confettiBitmap;
 
         isInitialised = true;
     }
