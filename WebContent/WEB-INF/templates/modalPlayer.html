@@ -181,6 +181,31 @@
         return currentAnimation;
     }
 
+    async function fetchGameFromCollection(gameHashes) {
+
+        let gameHash = gameHashes[Math.floor(Math.random() * gameHashes.length)];
+        console.log(`Fetching next game : ${gameHash}`);
+
+        // Check if the game is NSFW
+        let gameInfo = await _fetch(`./games?format=json&id=${gameHash}`);
+        isNsfw = gameInfo.items[0].isNsfw;
+
+        // If the user has disabled the NSFW check, play the game
+        if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck")) {
+            console.log("NSFW game up next, skipping");
+            // Otherwise, fetch a different game
+            return fetchGameFromCollection(gameHashes);
+        }
+
+        // Download the next game while the current one is playing
+        return _fetch(`./download?type=game&id=${gameHash}`).catch(e => {
+            console.log("Error fetching next game: " + e);
+            // Pick another hash and retry
+            return fetchGameFromCollection(gameHashes);
+        });
+
+    }
+
     async function startCollectionPlayer(gameHashes) {
 
         // Load sounds now since this is the first function called by player action
@@ -203,7 +228,7 @@
 
         let nextGame;
         let currentSound;
-        let firstGame = _fetch(`./download?type=game&id=${gameHashes[0]}`);
+        let firstGame = fetchGameFromCollection(gameHashes);
 
         // Intro animation while fetching first game
         currentSound = playerSounds[0].play();
@@ -229,20 +254,11 @@
 
             playGame(mioData); // Start playback so that mio loads during the animation
 
-            // Animate overlay away animate__flipOutX
+            // Animate overlay away 
             $("#animation-overlay").attr('class', 'animate__animated animate__backOutDown animate__faster');
 
-            // Pick a random hash
-            let gameHash = gameHashes[Math.floor(Math.random() * gameHashes.length)];
-
             // Download the next game while the current one is playing
-            console.log(`Fetching next game : ${gameHash}`);
-            nextGame = _fetch(`./download?type=game&id=${gameHash}`).catch(e => {
-                console.log("Error fetching next game: " + e);
-                // Pick another hash and retry
-                gameHash = gameHashes[Math.floor(Math.random() * gameHashes.length)];
-                nextGame = _fetch(`./download?type=game&id=${gameHash}`);
-            });
+            nextGame = fetchGameFromCollection(gameHashes);
 
             // Wait for mioPlayer's 'ended' event
             await new Promise(resolve => {
