@@ -187,8 +187,9 @@
         console.log(`Fetching next game : ${gameHash}`);
 
         // Check if the game is NSFW
-        let gameInfo = await _fetch(`./games?format=json&id=${gameHash}`);
-        isNsfw = gameInfo.items[0].isNsfw;
+        let response = await fetch(`./games?format=json&id=${gameHash}`);
+        let gameInfo = response.ok ? await response.json() : null;
+        isNsfw = gameInfo?.items[0].isNsfw;
 
         // If the user has disabled the NSFW check, play the game
         if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck")) {
