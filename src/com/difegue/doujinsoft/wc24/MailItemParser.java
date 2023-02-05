@@ -72,7 +72,7 @@ public class MailItemParser extends WC24Base {
         String delimiter = emailData.split("\\R", 2)[0];
         log.log(Level.INFO, "Delimiter for this maildata is " + delimiter);
 
-        String[] mailItems = emailData.split(delimiter);
+        String[] mailItems = emailData.split(Pattern.quote(delimiter));
 
         for (String content : mailItems) {
             try {
