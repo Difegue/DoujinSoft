@@ -12,30 +12,34 @@
   <meta name="theme-color" content="#ffffff">
   <title>DoujinSoft Store</title>
 
-  <!-- CSS  -->
+  <!-- CSS -->
   <link href="https://fonts.googleapis.com/css?family=Karla|Material+Icons" rel="stylesheet">
-  <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
-  <link href="css/jquery.fileupload.css" type="text/css" rel="stylesheet" media="screen,projection" />
-  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="css/vendor/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="css/vendor/jquery.fileupload.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="css/vendor/animate.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="css/style.css?v3" type="text/css" rel="stylesheet" media="screen,projection" />
 
   <style>
     body {
-      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.8) 100%),
+      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 100%),
       url('{% block background %}./img/bg_gam.png{% endblock %}');
-
     }
   </style>
 
-  <!--  Scripts-->
-  <script src="js/jquery-3.4.1.min.js"></script>
-  <script src="js/materialize.min.js"></script>
-  <script src='js/timidity/timidity.js'></script>
+  <!-- Scripts -->
+  <script src="js/vendor/jquery.min.js"></script>
+  <script src="js/vendor/materialize.min.js"></script>
+  <script src="js/vendor/jquery-ui.min.js"></script>
+  <script src="js/vendor/jquery.fileupload.js"></script>
+  <script src='js/vendor/timidity.js'></script>
+  <script src='js/vendor/mio-player.js'></script>
+  <script src='js/vendor/mio-midi.js'></script>
   <script src="js/jquery.simplePagination.js"></script>
-  <script src="js/jquery.ui.widget.js"></script>
-  <script src="js/jquery.fileupload.js"></script>
-  <script src="js/init.js"></script>
+  <script src="js/init.js?v3"></script>
 
   <script data-goatcounter="https://ohmy.tvc-16.science/count" async src="//ohmy.tvc-16.science/count.js"></script>
+
+  {% block meta %}
 
   {% if singleitem == true %}
   {% for item in items %}
@@ -52,63 +56,92 @@
   <meta property="og:title" content="DoujinSoft Store" />
   <meta property="og:type" content="website" />
   <meta property="og:description"
-    content="The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available for reading, listening, and transferring to your own copies of the game." />
-  <meta property="og:image" content="http://diy.tvc-16.science/android-chrome-512x512.png" />
+    content="The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available to play with and transfer to your own copies of the game." />
+  <meta property="og:image" content="http://diy.tvc-16.science/meta.jpg" />
   <!-- Hardcoding the URL kinda sucks here -->
   {% endif %}
+
+  {% endblock %}
 
 </head>
 
 <body>
 
-
   <div class="navbar-fixed">
     <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">
       <div class="nav-wrapper container">
 
-        <object data="./img/logo.svg" type="image/svg+xml" style="height:35px; margin-top:15px; margin-right: 10px">
+        <object data="./img/logo.svg" type="image/svg+xml" style="height:35px; margin-top:15px; margin-right: 10px;">
         </object>
-        <a id="logo-container" href="./" class="brand-logo hide-on-small-and-down">DoujinSoft Store</a>
+        <span id="logo-container" href="./" class="brand-logo hide-on-small-and-down"><a href="./">DoujinSoft Store</a>
+          <ul class="hide-on-med-and-down" style="margin-left: 16px;">
+            <li class="{% block gamepage %}{% endblock %}">
+              <a href="./games"> <object data="./img/fc-cart.svg" type="image/svg+xml"
+                  style="height:12px; margin-right:8px; filter: brightness(10);"></object>Games</a>
+            </li>
+            <li class="{% block recordpage %}{% endblock %}">
+              <a href="./records"><i style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                  class="material-icons white-text prefix">album</i> Records</a>
+            </li>
+            <li class="{% block comicpage %}{% endblock %}">
+              <a href="./comics"><i style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                  class="material-icons white-text prefix">local_library</i> Comics</a>
+            </li>
+          </ul>
+        </span>
+
         <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+
         <ul class="right hide-on-med-and-down">
-          <li class="{% block gamepage %}{% endblock %}">
-            <a href="./games">Games</a>
-          </li>
-          <li class="{% block recordpage %}{% endblock %}">
-            <a href="./records">Records</a>
-          </li>
-          <li class="{% block comicpage %}{% endblock %}">
-            <a href="./comics">Comics</a>
-          </li>
+
           <li class="{% block surveypage %}{% endblock %}">
             <a href="./surveys">Surveys</a>
           </li>
+
           <li class="{% block uploadpage %}{% endblock %}">
             <a href="./upload">Upload</a>
           </li>
+          <li>|</li>
           <li class="{% block cartpage %}{% endblock %}">
             <a href="./cart"><span class="cart-header">Cart</span></a>
+          </li>
+
+          <li class="{% block faqpage %}{% endblock %}">
+            <a href="./about"><i style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">help</i> Help</a>
           </li>
         </ul>
 
         <ul id="nav-mobile" class="sidenav {% block color %}indigo{% endblock %} darken-1">
           <li class="{% block gamepage %}{% endblock %}">
-            <a class=" white-text" href="./games">Games</a>
+            <a class="white-text" href="./games"> <object data="./img/fc-cart.svg" type="image/svg+xml"
+                style="height:12px; margin-right:8px; filter: brightness(10);"></object>Games</a>
           </li>
           <li class="{% block recordpage %}{% endblock %}">
-            <a class=" white-text" href="./records">Records</a>
+            <a class="white-text" href="./records"><i
+                style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">album</i> Records</a>
           </li>
           <li class="{% block comicpage %}{% endblock %}">
-            <a class=" white-text" href="./comics">Comics</a>
+            <a class="white-text" href="./comics"><i
+                style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">local_library</i> Comics</a>
           </li>
+
           <li class="{% block surveypage %}{% endblock %}">
-            <a class=" white-text" href="./surveys">Surveys</a>
+            <a class="white-text" href="./surveys">Surveys</a>
           </li>
           <li class="{% block uploadpage %}{% endblock %}">
-            <a class=" white-text" href="./upload">Upload your DIY Content</a>
+            <a class="white-text" href="./upload">Upload your DIY Content</a>
           </li>
           <li class="{% block cartpage %}{% endblock %}">
-            <a class=" white-text" href="./cart"><span class="cart-header">Cart</span></a>
+            <a class="white-text" href="./cart"><span class="cart-header">Cart</span></a>
+          </li>
+
+          <li class="{% block faqpage %}{% endblock %}">
+            <a class="white-text" href="./about"><i
+                style="font-size: 16px; display:inline; vertical-align:bottom; margin-right: 4px;"
+                class="material-icons white-text prefix">help</i> Help</a>
           </li>
         </ul>
 
@@ -135,6 +168,8 @@
     <div class="container">
       <div class="section">
 
+        {% block extradata %}{% endblock %}
+
         <!--   Content Section   -->
         <div class="row white-text" id="content">
           {% block content %} {% endblock %}
@@ -158,10 +193,11 @@
           <p class="grey-text text-lighten-4">The DoujinSoft Store is an archive of content created for the videogame
             WarioWare DIY/Made in Ore.
             <br /> We hope this archive can make people (re)discover content lost to the Nintendo WFC closure.
-            <br /> Thanks to the good folks at <a class="orange-text text-lighten-3"
-              href="https://rc24.xyz/">RiiConnect24</a>,
-            and <a class="orange-text text-lighten-3" href="https://twitter.com/andrewk1024">andrewk1024</a> for the
-            8-bit instrument samples.
+            <br /> Thanks to the folks at <a class="orange-text text-lighten-3"
+              href="https://rc24.xyz/">RiiConnect24</a>, <a class="orange-text text-lighten-3"
+              href="https://twitter.com/andrewk1024">andrewk1024</a> for the
+            8-bit instrument samples, <br>and <a class="orange-text text-lighten-3"
+              href="https://yeahross.itch.io/">yeahross0</a> for his amazing work on mio-micro.
             <br /> This website is not affiliated with Nintendo in any way.
           </p>
 
@@ -191,7 +227,7 @@
       <div class="container">
         All trademarks and copyrights on this page are owned by their respective parties.
         <br /> Powered by
-        <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>. Typefaces used:
+        <a class="orange-text text-lighten-3" href="https://materializecss.github.io">Materialize</a>. Typefaces used:
         <a class="orange-text text-lighten-3" href="https://fonts.google.com/specimen/Karla">Karla</a> and <a
           class="orange-text text-lighten-3"
           href="https://www.fontspace.com/warioware-mpg-font-f41326">WarioWareMPG</a>.

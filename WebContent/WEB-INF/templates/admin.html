@@ -5,75 +5,122 @@
 {% block title %}Admin{% endblock %}
 {% block desc %}
 Quick 'n dirty admin page powered by fat kongiku tiddies
-<br/><br/>
+<br /><br />
 Approving content moves it to the mio folder and triggers a folder scan.
 Unapproved .mios will be deleted.
-<br/><br/>
+<br /><br />
 
 <script>
 
-function approveAllAndAddTo(collection) {
-	var checkboxes = new Array(); 
-	checkboxes = document.getElementsByTagName('input');
+	async function testGame(id) {
+		$('#game-modal').modal('open');
 
-	for (var i=0; i<checkboxes.length; i++)  {
-		if (checkboxes[i].type == 'checkbox')   {
-		checkboxes[i].checked = true;
+		// encode id for url use
+		var encodedId = encodeURIComponent(id);
+
+		mioData = await _fetch(`./manage?preview=true&file=${encodedId}`);
+		buildMidiData(mioData);
+		playGame(mioData);
+	}
+
+	function easyFilter() {
+
+		var checkboxes = Array.prototype.slice.call(document.getElementsByTagName('input'));
+		var comboboxes = document.getElementsByTagName('select');
+		var ids = new Array();
+
+		checkboxes.shift(); checkboxes.shift(); checkboxes.shift();
+
+		// Get ID of every item
+		$('td:first-child').each(function () {
+			ids.push($(this).text());
+		});
+
+		for (var i = 0; i < checkboxes.length; i++) {
+
+			console.log(ids[i]);
+			var isTemplate = ids[i].includes("wari") || ids[i].includes("nint");
+			console.log(isTemplate);
+
+			if (checkboxes[i].type == 'checkbox') {
+				checkboxes[i].checked = !isTemplate;
+			}
+
+			if (ids[i].startsWith("G")) {
+				comboboxes[i].value = "e_rc24_hnewmio.json";
+				continue;
+			}
+
+
+			if (ids[i].startsWith("R")) {
+				comboboxes[i].value = "e_rc24_r.json";
+				continue;
+			}
+
+			if (ids[i].startsWith("M")) {
+				comboboxes[i].value = "e_rc24_m.json";
+				continue;
+			}
 		}
 	}
-
-	checkboxes = document.getElementsByTagName('select');
-
-	for (var i=0; i<checkboxes.length; i++)  {
-		checkboxes[i].value = collection;
-	}
-}
 
 </script>
 
 {% endblock %}
 
+{% block extradata %}
+{% include "./modalPlayer.html" %}
+{% endblock %}
 
 {% block content %}
 
-<input type="button" name="Approve All" onclick="approveAllAndAddTo($('#cname').val)"/>
-<input type="text" id="cname" />
+<div class="fixed-action-btn">
+	<a class="btn-floating btn-large red" style="width: 120px;" onclick="easyFilter()">
+		EZ-Filter™️
+	</a>
+</div>
 
 <form method="post">
-<input type="checkbox" name="approvedmios" checked/>
-<table style="width:100%">
-	<tr>
-		<th>ID</th>
-		<th>Name</th>
-		<th>Description</th>
-		<th>Creator</th>
-		<th>Created on</th>
-		<th>Approve</th>
-		<th>Add to Collection</th>
-	</tr>
-{% for entry in pendingMios %}
-	<tr>
-		<td>{{entry.value.mioID}} </td>
-		<td>{{entry.value.name}}</td>
-		<td>{{entry.value.mioDesc1}} {{entry.value.mioDesc2}}</td>
-		<td>{{entry.value.creator}}</td>
-		<td>{{entry.value.timestamp}}</td>
-		<td>
-			<label>
-				<input type="checkbox" name="approve-{{entry.key}}"/>
-				<span> </span>
-			</label>
-		</td>
-		<td> <select class="browser-default" name="collection-{{entry.key}}">
-			<option value="" selected >None</option>
-			{% for c in collections %}
-			<option value="{{c.key}}">{{c.value.collection_name}}</option>
-			{% endfor %}
-		</select> </td>
-	</tr>
-{% endfor %}
-</table>
-<input type="submit" value="Submit">
+	<input type="checkbox" name="approvedmios" checked />
+	<table style="width:100%">
+		<tr>
+			<th>ID</th>
+			<th>Action</th>
+			<th>Name</th>
+			<th>Hash</th>
+			<th>Description</th>
+			<th>Creator</th>
+			<th>Created on</th>
+			<th>Approve</th>
+			<th>Add to Collection</th>
+		</tr>
+		{% for entry in pendingMios %}
+		<tr>
+			<td>{{entry.value.mioID}} </td>
+			<td><a class="btn waves-effect" onclick="testGame('{{entry.key}}')">
+					Test
+				</a></td>
+			<td>{{entry.value.name}}</td>
+			<td>{{entry.value.hash}}</td>
+			<td>{{entry.value.mioDesc1}} {{entry.value.mioDesc2}}</td>
+			<td>{{entry.value.creator}}</td>
+			<td>{{entry.value.timestamp}}</td>
+			<td>
+				<label>
+					<input type="checkbox" name="approve-{{entry.key}}" />
+					<span> </span>
+				</label>
+			</td>
+			<td> <select class="browser-default" name="collection-{{entry.key}}">
+					<option value="" selected>None</option>
+					{% for c in collections %}
+					<option value="{{c.key}}">{{c.value.collection_name}}</option>
+					{% endfor %}
+				</select> </td>
+		</tr>
+		{% endfor %}
+	</table>
+	<input type="submit" value="Submit">
 </form>
 {% endblock %}
 
@@ -127,20 +174,35 @@ function approveAllAndAddTo(collection) {
 
 <h1 class="white-text">Send mail:</h1>
 <form method="post">
-	<input type="checkbox" name="sendmail" checked/>
+	<input type="checkbox" name="sendmail" checked />
 	<div class="input-field">
 		<input placeholder="Placeholder" id="wii_code" name="wii_code" type="text" class="white-text">
 		<label for="wii_code" class="white-text">Wii code(enter 0 to send to everyone)</label>
 	</div>
 
-	<textarea class="white-text" rows="10" cols="35" name="mail_content" style="font-family:monospace; width: 350px !important; height: 350px !important">
+	<textarea class="white-text" rows="10" cols="35" name="mail_content"
+		style="font-family:monospace; width: 350px !important; height: 350px !important">
 -----------------------------------
 Remember that Wii mails are 35-----
 columns wide! Well it's not exact--
 since it's not monospace but eh----
 -----------------------------------
 	</textarea>
+	<br />
+	<input type="submit" value="Submit">
+</form>
 
+<h1 class="white-text">Flag Games as NSFW:</h1>
+<form method="post">
+
+	<textarea class="white-text" rows="10" cols="35" name="nsfw_ids"
+		style="font-family:monospace; width: 350px !important; height: 350px !important">
+-----------------------------------
+Writes hashes of games to flag,
+one hash per line.
+-----------------------------------
+	</textarea>
+	<br />
 	<input type="submit" value="Submit">
 </form>
 

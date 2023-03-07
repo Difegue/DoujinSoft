@@ -3,14 +3,19 @@
 	 
 	$('.sidenav').sidenav();
 	$('select').formSelect();
-	$('.tooltipped').tooltip({enterDelay: 50});
+	$('.collapsible').collapsible();
 
+	updateTooltips();
 	updateCartCount();
 
-	// Due to quirks with libTimidity, the exact location of the folder containing the .wasm must be set here.
-	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/js/timidity".
-	player = window.timidity("js/timidity");
-    idPlaying = "";
+	// Remove nsfw blur if disabled by user
+	if (localStorage.hasOwnProperty("disabledNsfwCheck"))
+		$(".game-blur").remove();
+
+	// The exact location of the folder containing the .wasm must be set here.
+	// If running a dev tomcat with an URL like "http://localhost:8080/DoujinSoft-2.1.0/", this string must be set to "DoujinSoft-2.1.0/soundfont".
+	player = new window.timidity("soundfont");
+    currentlyPlayingMidi = "";
     
     $('.pagination').pagination({
         items: $("#total_items").html(),
@@ -67,6 +72,43 @@ function escapeHtml (string) {
   });
 }
 
+function truckClicked() {
+
+	// Play ogg file
+	var audio = new Audio('audio/cheering.ogg');
+	audio.play();
+
+	// One random message out of 9
+	var r_text = new Array();
+	r_text[0] = "Keep on trucking!";
+	r_text[1] = "You can use '%' at the start of a search query to find more results...but it'll be slower!";
+	r_text[2] = "Have you read the FAQ recently?";
+	r_text[3] = "You can play a game by clicking on its image...but did you know you can play entire collections?";
+	r_text[4] = "I'm a truck lol";
+	r_text[5] = "Check the Upload page if you want to know how to extract .mio files from your saves.";
+	r_text[6] = "bazinga";
+	r_text[7] = "wow this is just like the news channel cat except cheaper";
+	r_text[8] = "Stuff sent through DIY Showcase with RiiConnect24 is automatically approved!";
+	r_text[9] = 'The truck seems to have dropped...<a href="https://holopin.io/collect/clcv3bt7p577408l6cf44pbk6">something!</a>';
+	var i = Math.floor(10 * Math.random())
+
+	// Make sure the holopin message appears first if the user never saw it
+    	if (localStorage.getItem("truckClicked") == null) {
+		localStorage.setItem("truckClicked", "true");
+		i = 9;
+    	}
+	
+	popToast(r_text[i]);
+}
+
+function searchStore(category, name) {
+	// url encode name
+	name = encodeURIComponent(name);
+
+	const href=`./${category}?name=${name}`;
+	window.location.href = href;
+}
+
 function loadItems(pageNumber) {
 	
 	// Show a preloader
@@ -77,25 +119,41 @@ function loadItems(pageNumber) {
 	// Scroll up
 	window.scrollTo(0,0);  
 
+	// Strip "name" and "creator" from the URL's query params if they were set
+	var url = window.location.href;
+	url = url.replace(/name=[^&]*/g, "");
+	url = url.replace(/creator=[^&]*/g, "");
+
 	//Posts to itself -> one function for all three pages
-	$.post( window.location.href, { page: pageNumber, 
+	$.post( url, { page: pageNumber, 
 									name: $("#item_name").val(), 
 									creator: $("#maker_name").val(),
 									sort_by: $("#sort_by").val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
-			$('.tooltipped').tooltip({enterDelay: 50});
+			updateTooltips();
+
+			// Remove nsfw blur if disabled by user
+			if (localStorage.hasOwnProperty("disabledNsfwCheck"))
+				$(".game-blur").remove();
+
 			$('.pagination').pagination('updateItems', $("#total_items").html());
 			$('.pagination').pagination('drawPage', pageNumber);
 			$('.pagination-survey').pagination('updateItems', $("#total_items").html());
 			$('.pagination-survey').pagination('drawPage', pageNumber);
-			$("#"+idPlaying+"-record").addClass("playing");
+			$("#"+currentlyPlayingMidi+"-record").addClass("playing");
 		})
 		.fail(function() {
-			alert("Couldn't load items from DoujinSoft.");
+			popToast("Couldn't load items from DoujinSoft.");
 			return 0;
 		});
 
+}
+
+function updateTooltips() {
+	// Don't use jQuery for tooltips, looks like that's broken
+	var elems = document.querySelectorAll('.tooltipped');
+	M.Tooltip.init(elems, { enterDelay: 50 });
 }
 
 function clearSearch() {
@@ -166,9 +224,9 @@ function playMidi(id) {
 	$("#toast-container .toast").remove();
 	$(".playing").removeClass("playing");
 
-	if (id != idPlaying) {
+	if (id != currentlyPlayingMidi) {
 	
-		idPlaying=id;
+		currentlyPlayingMidi=id;
 		popToast("Playing MIDI for id "+id);
 		
 		$("#"+id+"-record").addClass("playing");
@@ -177,7 +235,7 @@ function playMidi(id) {
 	}
 	else {
 		player.pause();
-		idPlaying = "";
+		currentlyPlayingMidi = "";
 		popToast("Playback Stopped.");
 	}
 }
@@ -186,25 +244,13 @@ function copyShareLink(type, id) {
 
 	str = "https://"+window.location.hostname+"/"+type+"?id="+id;
 
-	// A minimal polyfill for `navigator.clipboard.writeText()` that works most of the time in most modern browsers.
-	return new Promise(function(resolve, reject) {
-	  var success = false;
-	  function listener(e) {
-		e.clipboardData.setData("text/plain", str);
-		e.preventDefault();
-		success = true;
-	  }
-	  document.addEventListener("copy", listener);
-	  document.execCommand("copy");
-	  document.removeEventListener("copy", listener);
-	  success ? resolve(): reject();
-
-	  if (success) 
+	navigator.clipboard.writeText(str)
+	.then(() => {
 		popToast("Link copied to your clipboard!");
-	  else
-	    popToast("Couldn't copy link to your clipboard.");
+	})
+	.catch(() => {
+		popToast("Couldn't copy link to your clipboard.");
 	});
-
 }
 
 function addToCart(type, id) {

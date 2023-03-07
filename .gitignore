@@ -3,6 +3,10 @@ target/*
 DoujinSoft.iml
 node_modules
 package-lock.json
-.settings/org.eclipse.m2e.core.prefs
+WebContent/soundfont/libtimidity.wasm
+WebContent/js/vendor/*
+WebContent/css/vendor/*
+.settings/*
 DoujinSoft.ipr
 DoujinSoft.iws
+.project

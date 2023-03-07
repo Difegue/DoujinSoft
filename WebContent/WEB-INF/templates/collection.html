@@ -1,32 +1,42 @@
 {% extends "./base.html" %}
 
+{% block meta %}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="{{ collection.collection_name }} on the DoujinSoft Store" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="{{ collection.collection_desc }} {{ collection.collection_desc2 }}" />
+<meta property="og:image" content="http://diy.tvc-16.science/{{ collection.background_pic }}" />
+
+{% endblock %}
+
 {% block background %}{{ collection.background_pic }}{% endblock %}
 {% block color %}{{ collection.collection_color }}{% endblock %}
 {% block title %}{{ collection.collection_name }}{% endblock %}
 {% block desc %}
-{{ collection.collection_desc }}<br/><br/>
-{{ collection.collection_desc2 }}<br/><br/>
+{{ collection.collection_desc }}<br /><br />
+{{ collection.collection_desc2 }}<br /><br />
 
 <div id="game-search">
-	
+
 	<div style="height: 50px; width: 300px;" class="chip">
-	      <div class="input-field" style="margin-top:-5px; margin-left: -10px;">
-	          <i style="margin-top: 5px;" class="material-icons prefix">account_circle</i>
-	          <input id="maker_name" class="validate" type="text">
-	          <label class="" for="maker_name"  style="margin-top:-5px">Creator Name</label>
-	        </div>
+		<div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+			<i style="margin-top: 5px;" class="material-icons prefix">account_circle</i>
+			<input id="maker_name" class="validate" type="text">
+			<label class="" for="maker_name" style="margin-top:-5px">Creator Name</label>
+		</div>
 	</div>
 
 	<div style="height: 50px; width: 300px" class="chip">
-        <div class="input-field" style="margin-top:-5px; margin-left: -10px;">
-            <i style="margin-top: 5px;" class="material-icons prefix">videogame_asset</i>
-            <input id="item_name" type="text">
-            <label class="" for="item_name"  style="margin-top:-5px">Item Name</label>
-          </div>
-	  </div>
-	  
+		<div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+			<i style="margin-top: 5px;" class="material-icons prefix">videogame_asset</i>
+			<input id="item_name" type="text">
+			<label class="" for="item_name" style="margin-top:-5px">Item Name</label>
+		</div>
+	</div>
+
 	<div style="height: 50px; width: 150px" class="chip">
-        <div class="input-field white-text" style="margin-top: -10px; padding-top:5px">
+		<div class="input-field white-text" style="margin-top: -10px; padding-top:5px">
 			<select id="sort_by" onchange="loadItems(1)">
 				<option value="name">Name</option>
 				<option value="date" selected>Most Recent</option>
@@ -35,40 +45,75 @@
 		</div>
 	</div>
 
-    <br/>  <br/>   
-  	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
-  		<i class="material-icons left">search</i>Search
-  	</a>
-  	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
-  		<i class="material-icons left">clear</i>Clear
-  	</a>
+	<br /> <br />
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
+		<i class="material-icons left">search</i>Search
+	</a>
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
+		<i class="material-icons left">clear</i>Clear
+	</a>
 
 </div>
-<br/>
+<br />
 <div id="pagination-top" class="pagination-wrapper chip">
-  <ul class="pagination"></ul>
+	<ul class="pagination"></ul>
+</div>
+
+<div class="fixed-action-btn">
+	<!-- style="scale: 2;margin-right: 12px;margin-bottom: 24px;"-->
+	<a id="playbtn" class="waves-effect waves-light btn btn-floating tooltipped" data-tooltip="Play!"
+		data-position="top" onclick="startCollectionPlayer(collectionHashes)">
+		<i class="material-icons">play_arrow</i></a>
+</div>
+<div class="tap-target" data-target="playbtn">
+	<div class="tap-target-content">
+		<h5 style="font-family: warioware;">Fancy a game?</h5>
+		<p>You can play all the games in this collection randomly thrown at you, (mostly*) just like the real thing.
+			<br>4 lives and you're out!
+			<br><sub>* Some games may be unwinnable or behave weirdly.</sub>
+		</p>
+	</div>
 </div>
 
 {% endblock %}
 
+{% block extradata %}
+
+<!-- ew -->
+{% if collection.collection_type equals "manga" %}
+{% elseif collection.collection_type equals "record" %}
+{% else %}
+{% include "./modalPlayer.html" %}
+<script>
+	// Keep track of all the hashes in this collection
+	const collectionHashes = [{% for hash in collection.mios %} "{{hash}}", {% endfor %} ];
+	let tapTarget = $('.tap-target').tapTarget({
+		onClose: () => localStorage.sawCollectionInfo = true
+	});
+
+	//if (localStorage.getItem("sawCollectionInfo") === null) {
+	tapTarget.tapTarget('open');
+	//}
+</script>
+{% endif %}
+{% endblock %}
 
 {% block content %}
 
-	{% if collection.collection_type equals "manga" %}
-		{% include "./mangaDetail.html" %}
-	{% elseif collection.collection_type equals "record" %}
-		{% include "./recordsDetail.html" %}	
-	{% else %}
-		{% include "./gameDetail.html" %}
-	{% endif %}
-	
-	
+{% if collection.collection_type equals "manga" %}
+{% include "./mangaDetail.html" %}
+{% elseif collection.collection_type equals "record" %}
+{% include "./recordsDetail.html" %}
+{% else %}
+{% include "./gameDetail.html" %}
+{% endif %}
+
 {% endblock %}
 
 {% block footdata %}
 
 <div id="pagination-bottom" class="pagination-wrapper chip">
-  <ul class="pagination"></ul>
+	<ul class="pagination"></ul>
 </div>
 
 <img class="materialboxed" height="513">

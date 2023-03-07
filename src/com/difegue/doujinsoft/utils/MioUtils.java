@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 
 import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;
+import com.xperia64.diyedit.metadata.Metadata;
 
 /*
  * Static class containing base methods for interacting with .mio files.
@@ -25,7 +26,7 @@ import com.xperia64.diyedit.editors.MangaEdit;
 public class MioUtils {
 
   // Constants for timestamp printing
-  private static final ZonedDateTime date = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
+  static final ZonedDateTime DIY_TIMESTAMP_ORIGIN = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
   // Basic enum to distinguish mio files quickly.
@@ -42,8 +43,35 @@ public class MioUtils {
    * Returns a readable date from DIY's weird timestamp ints.
    */
   public static String getTimeString(int timestamp) {
-    ZonedDateTime dateMio = date.plusDays(timestamp);
+    ZonedDateTime dateMio = DIY_TIMESTAMP_ORIGIN.plusDays(timestamp);
     return dateMio.format(formatter);
+  }
+
+  /*
+   * Craft ID from .mio metadata.
+   */
+  public static String computeMioID(Metadata mio) {
+    return mio.getSerial1() + "-" + mio.getSerial2() + "-" + mio.getSerial3();
+  }
+
+  /*
+   * Craft unique player ID from .mio metadata for Doujinsoft cataloging purposes.
+   */
+  public static String computeCreatorID(Metadata mio) {
+    String uniquePlayerID1, uniquePlayerID2;
+
+    uniquePlayerID1 = byteArrayToString(mio.getUniquePlayerID1());
+    uniquePlayerID2 = byteArrayToString(mio.getUniquePlayerID2());
+
+    return uniquePlayerID1 + "-" + uniquePlayerID2;
+  }
+
+  private static String byteArrayToString(byte[] bytes) {
+    String hexString = "";
+    for (byte i : bytes)
+      hexString += String.format("%02X", i);
+
+    return hexString;
   }
 
   /*

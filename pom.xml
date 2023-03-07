@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>DoujinSoft</groupId>
   <artifactId>DoujinSoft</artifactId>
-  <version>3.1.0</version>
+  <version>3.5.2</version>
   <packaging>war</packaging>
   <name>DoujinSoft Store</name>
   <build>
@@ -70,7 +70,7 @@
   	<dependency>
   		<groupId>io.pebbletemplates</groupId>
   		<artifactId>pebble</artifactId>
-  		<version>3.1.5</version>
+  		<version>3.1.6</version>
   	</dependency>
 	<dependency>
       <groupId>org.xerial</groupId>
