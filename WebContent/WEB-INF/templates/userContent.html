@@ -1,11 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User Content</title>
-  <!-- TODO -->
-</head>
-<body>
+{% extends "./base.html" %}
 
-</body>
-</html>
+{% block gamepage %}active{% endblock %}
+{% block background %}./img/bg_gam.png{% endblock %}
+{% block color %}green{% endblock %}
+
+{% block title %}
+{% if singleitem != true %}
+User Content
+{% else %}
+{% for item in items %}
+{{ item.name }} by {{ item.creator }}
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block type %}game{% endblock %}
+{% block desc %}
+Browse the content created by this DIY creator!
+<br /><br />
+You can download .mio files directly or make a selection to import into a save later.
+<br /><br />
+
+<div id="game-search">
+
+	<div style="height: 50px; width: 300px;" class="chip">
+		<div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+			<i style="margin-top: 5px;" class="material-icons prefix">account_circle</i>
+			<input id="maker_name" type="text" value="{{creatorSearch}}">
+			<label class="" for="maker_name" style="margin-top:-5px">Creator Name</label>
+		</div>
+	</div>
+
+	<div style="height: 50px; width: 300px" class="chip">
+		<div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+			<i style="margin-top: 5px;" class="material-icons prefix">videogame_asset</i>
+			<input id="item_name" type="text" value="{{nameSearch}}">
+			<label class="" for="item_name" style="margin-top:-5px">Game Name</label>
+		</div>
+	</div>
+
+	<div style="height: 50px; width: 150px" class="chip">
+		<div class="input-field white-text" style="margin-top: -10px; padding-top:5px">
+			<select id="sort_by" onchange="loadItems(1)">
+				<option value="name" selected>Name</option>
+				<option value="date">Most Recent</option>
+			</select>
+			<label style="margin-top: -2px;">Sort By</label>
+		</div>
+	</div>
+
+	<br /> <br />
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
+		<i class="material-icons left">search</i>Search
+	</a>
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
+		<i class="material-icons left">clear</i>Clear
+	</a>
+</div>
+<br />
+<div id="pagination-top" class="pagination-wrapper chip">
+	<ul class="pagination"></ul>
+</div>
+
+{% endblock %}
+
+{% block extradata %}
+{% include "./modalPlayer.html" %}
+{% endblock %}
+
+{% block content %}
+
+{% include "./mioDetail.html" %}
+
+{% endblock %}
+
+{% block footdata %}
+
+<div id="pagination-bottom" class="pagination-wrapper chip">
+	<ul class="pagination"></ul>
+</div>
+
+{% endblock %}
