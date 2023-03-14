@@ -39,7 +39,8 @@ public class BaseMio {
 		}
 
 		mioID += MioUtils.computeMioID(m);
-		creatorID = MioUtils.computeCreatorID(m);
+		creatorId = m.getCreatorId();
+		cartridgeId = m.getCartridgeId();
 
 		if (m.getDescription().length() > 19) {
 			mioDesc1 = m.getDescription().substring(0, 18);
@@ -67,19 +68,8 @@ public class BaseMio {
 		hash = result.getString("hash");
 		brand = result.getString("brand");
 		creator = result.getString("creator");
-
-		//TODO var creatorID may be deleted
-		creatorID = result.getString("creatorID");
-
-		if (creatorID.length() >= 16)
-			creatorId1 = creatorID.substring(0, 15);
-		else
-			creatorId1 = "";
-
-		if (creatorId2.length() >= 49)
-			creatorId2 = creatorId2.substring(17, 48);
-		else
-			creatorId2 = "";
+		creatorId = result.getString("creatorID");
+		cartridgeId = result.getString("cartridgeID");
 
 		if (desc.length() > 18) {
 			mioDesc1 = desc.substring(0, 18);
@@ -109,7 +99,7 @@ public class BaseMio {
 
 	public String name, timestamp, mioID, hash, brand, creator,
 			mioDesc1, mioDesc2, colorLogo, colorCart, specialBrand,
-			creatorID, creatorId1, creatorId2; //TODO var creatorID may be deleted
+			creatorId, cartridgeId;
 	public int logo;
 
 }

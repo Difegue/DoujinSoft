@@ -48,34 +48,6 @@ public class MioStorage {
         return sb.toString();
     }
 
-    /*
-     * Craft serial number ID from .mio metadata.
-     */
-    public static String computeMioID(Metadata mio) {
-        return mio.getSerial1() + "-" + mio.getSerial2() + "-" + mio.getSerial3();
-    }
-
-    /*
-     * Craft unique player ID from .mio metadata for Doujinsoft cataloging purposes.
-     */
-    public static String computeCreatorID(Metadata mio)
-    {
-        String uniquePlayerID1, uniquePlayerID2;
-        uniquePlayerID1 = byteArrayToString(mio.getUniquePlayerID1());
-        uniquePlayerID2 = byteArrayToString(mio.getUniquePlayerID2());
-
-        return uniquePlayerID1 + "-" + uniquePlayerID2;
-    }
-
-    private static String byteArrayToString(byte[] bytes)
-    {
-        String hexString = "";
-        for (byte i : bytes)
-            hexString += String.format("%02X", i);
-
-        return hexString;
-    }
-
     public static void ScanForNewMioFiles(String dataDir, Logger logger) throws SQLException {
         File[] files = new File(dataDir + "/mio/").listFiles();
 
@@ -87,9 +59,10 @@ public class MioStorage {
                     Metadata metadata = new Metadata(mioData);
                     String hash = MioStorage.computeMioHash(mioData);
                     String ID = MioUtils.computeMioID(metadata);
-                    String creatorID = MioUtils.computeCreatorID(metadata);
+                    String creatorId = metadata.getCreatorId();
+                    String cartridgeId = metadata.getCartridgeId();
                     int type = mioData.length;
-                    PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, creatorID, connection, type);
+                    PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, creatorId, connection, type);
 
                     // The file is game, manga or record, depending on its size.
                     if (mioData.length == MioUtils.Types.GAME) {
@@ -101,8 +74,9 @@ public class MioStorage {
                         insertQuery.setString(10, MioUtils.mapColorByte(game.getLogoColor()));
                         insertQuery.setInt(11, game.getLogo());
                         insertQuery.setString(12, MioUtils.getBase64GamePreview(mioData));
-                        insertQuery.setString(13, creatorID);
+                        insertQuery.setString(13, creatorId);
                         insertQuery.setBoolean(14, false);
+                        insertQuery.setString(15, cartridgeId);
 
                         logger.log(Level.INFO, "Game;" + hash + ";" + ID + ";" + game.getName() + "\n");
                     }
@@ -118,7 +92,8 @@ public class MioStorage {
                         insertQuery.setString(13, MioUtils.getBase64Manga(mioData, 1));
                         insertQuery.setString(14, MioUtils.getBase64Manga(mioData, 2));
                         insertQuery.setString(15, MioUtils.getBase64Manga(mioData, 3));
-                        insertQuery.setString(16, creatorID);
+                        insertQuery.setString(16, creatorId);
+                        insertQuery.setString(17, cartridgeId);
 
                         logger.log(Level.INFO, "Manga;" + hash + ";" + ID + ";" + manga.getName() + "\n");
                     }
@@ -129,7 +104,8 @@ public class MioStorage {
                         insertQuery.setString(9, MioUtils.mapColorByte(record.getRecordColor()));
                         insertQuery.setString(10, MioUtils.mapColorByte(record.getLogoColor()));
                         insertQuery.setInt(11, record.getLogo());
-                        insertQuery.setString(12, creatorID);
+                        insertQuery.setString(12, creatorId);
+                        insertQuery.setString(13, cartridgeId);
 
                         logger.log(Level.INFO, "Record;" + hash + ";" + ID + ";" + record.getName() + "\n");
                     }
@@ -166,13 +142,13 @@ public class MioStorage {
 
         switch (type) {
             case MioUtils.Types.GAME:
-                query = "INSERT INTO Games VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                query = "INSERT INTO Games VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 break;
             case MioUtils.Types.MANGA:
-                query = "INSERT INTO Manga VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                query = "INSERT INTO Manga VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 break;
             case MioUtils.Types.RECORD:
-                query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 break;
         }
 
@@ -241,4 +217,70 @@ public class MioStorage {
             return false;
         }
     }
+
+    /*
+     * Test method to update files in /mio directory with creatorIDs.
+     * This is split into subdirectories (games, manga, and records) due to the size of the return string.
+     */
+    public static String SetCreatorIds(String dataDir, Logger logger, String subdirectory) throws SQLException {
+        File[] gameFiles = new File(dataDir + "/mio/" + subdirectory).listFiles();
+        
+        String query = "";
+        logger.log(Level.INFO, "SetCreatorIDs: Looping Files - " + subdirectory);
+        for (File f : gameFiles) {
+            if (!f.isDirectory()) {
+                try
+                {
+                    File uncompressedFile = MioCompress.uncompressMio(f);
+                    byte[] mioData = FileByteOperations.read(uncompressedFile.getAbsolutePath());
+    
+                    Metadata metadata = new Metadata(mioData);
+                    String hash = MioStorage.computeMioHash(mioData);
+                    String creatorId = metadata.getCreatorId();
+                    String cartridgeId = metadata.getCartridgeId();
+    
+                    int type = mioData.length;
+    
+                    query += UpdateCreatorIdQuery(hash, creatorId, cartridgeId, type);
+                    uncompressedFile.delete();
+                }
+                catch (Exception e)
+                {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    continue;
+                }
+            }
+        }
+
+        return query;
+    }
+
+    /*
+     * Test method to get SQL statement to update creator ID
+     */
+    private static String UpdateCreatorIdQuery(String hash, String creatorId, String cartridgeId, int type) throws Exception
+    {
+        String update = "";
+    
+        switch (type) {
+            case MioUtils.Types.GAME:
+            update = "UPDATE Games ";
+                break;
+            case MioUtils.Types.MANGA:
+            update = "UPDATE Manga ";
+                break;
+            case MioUtils.Types.RECORD:
+            update = "UPDATE Records ";
+                break;
+            default:
+            throw new Exception("Invalid file size");
+        }
+
+        String setWhere =
+          "SET creatorID = '" + creatorId + "', cartridgeID = '" + cartridgeId + "' "
+        + "WHERE hash = '" + hash + "'; ";
+
+        return update + setWhere;
+    }
+            
 }
