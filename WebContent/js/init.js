@@ -119,15 +119,19 @@ function loadItems(pageNumber) {
 	// Scroll up
 	window.scrollTo(0,0);  
 
-	// Strip "name" and "creator" from the URL's query params if they were set
+	// Strip "name" and "creator" as well as creator ID info from the URL's query params if they were set
 	var url = window.location.href;
 	url = url.replace(/name=[^&]*/g, "");
 	url = url.replace(/creator=[^&]*/g, "");
+	url = url.replace(/cartridge_id=[^&]*/g, "");
+	url = url.replace(/creator_id=[^&]*/g, "");
 
 	//Posts to itself -> one function for all three pages
 	$.post( url, { page: pageNumber, 
 									name: $("#item_name").val(), 
 									creator: $("#maker_name").val(),
+									cartridge_id: $("#cartridge_id").val(),
+									creator_id: $("#creator_id").val(),
 									sort_by: $("#sort_by").val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
@@ -164,10 +168,13 @@ function clearSearch() {
 	loadItems(1);
 }
 
-function searchForUser(creator) {
+function searchForUser(creator, cartridgeId, creatorId) {
 	
 	$("#item_name").val("");
-	$("#maker_name").val(creator);
+	//$("#maker_name").val(creator);
+	$("#maker_name").val("");
+	$("#cartridge_id").val(cartridgeId);
+	$("#creator_id").val(creatorId);
 	M.updateTextFields();
 	loadItems(1);
 	

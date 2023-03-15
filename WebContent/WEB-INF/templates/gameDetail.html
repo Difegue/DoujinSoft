@@ -33,7 +33,7 @@
           <div class="game-creator black white-text">
             Made By
             <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer"
-              onclick="searchForUser('{{ game.creator }}')">
+              onclick="searchForUser('{{ game.creator }}', '{{ game.cartridgeId }}', '{{ game.creatorId }}')">
               {{ game.creator }}
             </div>
           </div>
@@ -41,7 +41,7 @@
         </div>
 
         <div class="game-preview z-depth-1 waves-effect tooltipped" data-tooltip="Play!"
-          onclick="createModal('{{ game.hash }}', {{game.isNsfw}})"
+          onclick="createModal('{{ game.hash }}', '{{game.isNsfw}}')"
           style="background-image: url('{{ game.preview }}');">
           {% if game.isNsfw %}
           <span class="game-blur">

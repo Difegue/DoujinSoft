@@ -24,6 +24,10 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
+//TODO delete this
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /*
  * This class contains generic get/search methods used across all three major servlets
  * (Games, Comics and Records)
@@ -39,7 +43,14 @@ public class TemplateBuilder {
 	protected HttpServletRequest request;
 
 	protected String tableName, dataDir;
-	protected boolean isNameSearch, isCreatorSearch, isSortedBy;
+
+	/*
+	 *  isContentNameSearch: Search by title name of the game, comic, or record
+	 *  isCreatorNameSearch: Search by author's name of the game, comic, or record
+	 *  isContentCreatorSearch: Search by cartridge ID or creator ID of the game, comic, or record
+	 *  isSortedBy: Sort content flag
+	 */
+	protected boolean isContentNameSearch, isCreatorNameSearch, isContentCreatorSearch, isSortedBy;
 
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
@@ -86,9 +97,11 @@ public class TemplateBuilder {
 			templatePath += "Detail";
 		}
 
-		isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
-		isCreatorSearch = request.getParameterMap().containsKey("creator")
+		isContentNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+		isCreatorNameSearch = request.getParameterMap().containsKey("creator")
 				&& !request.getParameter("creator").isEmpty();
+		isContentCreatorSearch = (request.getParameterMap().containsKey("cartridge_id") && !request.getParameter("cartridge_id").isEmpty())
+		|| (request.getParameterMap().containsKey("creator_id") && !request.getParameter("creator_id").isEmpty());
 		isSortedBy = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
 
 		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath + ".html"));
@@ -130,7 +143,10 @@ public class TemplateBuilder {
 			result.close();
 			context.put("items", items);
 			statement.close();
-		} else {
+		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
+			performCreatorSearchQuery();
+		}
+		else {
 			performSearchQuery();
 		}
 
@@ -153,7 +169,10 @@ public class TemplateBuilder {
 
 		initializeTemplate(type, true);
 
-		performSearchQuery();
+		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch)
+			performCreatorSearchQuery();
+		else
+			performSearchQuery();
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -169,7 +188,7 @@ public class TemplateBuilder {
 
 		// Build both data and count queries
 		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
+		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
 		queryBase += "id NOT LIKE '%them%'";
 
 		// Default orderBy
@@ -187,8 +206,8 @@ public class TemplateBuilder {
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
 		// Those filters go in the LIKE parts of the query
-		String name = isNameSearch ? request.getParameter("name") + "%" : "%";
-		String creator = isCreatorSearch ? request.getParameter("creator") + "%" : "%";
+		String name = isContentNameSearch ? request.getParameter("name") + "%" : "%";
+		String creator = isCreatorNameSearch ? request.getParameter("creator") + "%" : "%";
 
 		// Remove last char for context display
 		context.put("nameSearch", name.substring(0, name.length() - 1));
@@ -198,7 +217,7 @@ public class TemplateBuilder {
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
 
-		if (isNameSearch || isCreatorSearch) {
+		if (isContentNameSearch || isCreatorNameSearch) {
 			ret.setString(1, name);
 			ret.setString(2, creator);
 			retCount.setString(1, name);
@@ -206,6 +225,64 @@ public class TemplateBuilder {
 			ret.setInt(3, page * 15 - 15);
 		} else
 			ret.setInt(1, page * 15 - 15);
+
+		ResultSet result = ret.executeQuery();
+
+		while (result.next())
+			items.add(classConstructor.newInstance(result));
+
+		result.close();
+		ret.close();
+
+		context.put("items", items);
+		context.put("totalitems", retCount.executeQuery().getInt(1));
+		retCount.close();
+	}
+
+	private void performCreatorSearchQuery() throws Exception {
+		// Get creatorId and cartridgeId for search query
+		String creatorId = request.getParameter("creator_id");
+		String cartridgeId = request.getParameter("cartridge_id");
+		boolean isNullCartridgeId = false;
+
+		if (cartridgeId.equals("00000000000000000000000000000000"))
+			isNullCartridgeId = true;
+
+		// Build both data and count queries
+		String queryBase = "FROM " + tableName + " WHERE ";
+		queryBase += "creatorID = ? ";
+		queryBase += !isNullCartridgeId ? " OR cartridgeID = ? " : "";
+
+		// Default orderBy
+		String orderBy = "normalizedName ASC";
+
+		// Order by Date if the parameter was given
+		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
+			orderBy = "timeStamp DESC";
+		}
+
+		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
+		String queryCount = "SELECT COUNT(id) " + queryBase;
+
+		PreparedStatement ret = connection.prepareStatement(query);
+		PreparedStatement retCount = connection.prepareStatement(queryCount);
+
+		int page = 1;
+		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
+			page = Integer.parseInt(request.getParameter("page"));
+
+		// Set values for prepared statement
+		ret.setString(1, creatorId);
+		retCount.setString(1, creatorId);
+
+		if (isNullCartridgeId)
+			ret.setInt(2, page * 15 - 15);
+		else
+		{
+			ret.setString(2, cartridgeId);
+			retCount.setString(2, cartridgeId);
+			ret.setInt(3, page * 15 - 15);
+		}
 
 		ResultSet result = ret.executeQuery();
 
