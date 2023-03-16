@@ -1,8 +1,35 @@
 {% if displaycreatordetails == true %}
-<a href="./games?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of Games: {{ creatordetails.totalGames }} <br/></a>
-<a href="./records?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of Records: {{ creatordetails.totalRecords }} <br/></a>
-<a href="./comics?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of Manga: {{ creatordetails.totalManga }} <br/></a>
-# Reset: {{ creatordetails.timesReset }} <br/>
-This creator has gone by {{ creatordetails.creatorNames }}, <br/>
+
+<b>The following are details of a DIY content creator based on what has been uploaded to DoujinSoft. </b>
+*In rare circumstances, different players will share the same player data.
+<br/> <br/>
+
+This creator has gone by {{ creatordetails.creatorNames }} <br/>
 and published content through these brands: {{ creatordetails.brandNames }} <br/>
+and reset their save file {{ creatordetails.timesReset }} time(s). <br/>
+{% if creatordetails.legitCart == true %}
+Their content was created on genuine DS cartridges.
+{% endif %}
+
+<ul class="collection black-text" style="text-align:left" id="total-content-created">
+    <li class="collection-item avatar cart-item" id="total-games" type="game" >
+        <i class="material-icons green-text cart-icon">videogame_asset</i>
+        <span class="title">
+            <a href="./games?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of games uploaded: {{ creatordetails.totalGames }}</a>
+        </span>
+    </li>
+    <li class="collection-item avatar cart-item" id="total-manga" type="manga">
+        <i class="material-icons blue-text cart-icon">local_library</i>
+        <span class="title">
+            <a href="./comics?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of comics uploaded: {{ creatordetails.totalManga }}</a>
+        </span>
+    </li>
+    <li class="collection-item avatar cart-item" id="total-records" type="record">
+        <i class="material-icons pink-text cart-icon">album</i>
+        <span class="title">
+            <a href="./records?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of records uploaded: {{ creatordetails.totalRecords }}</a>
+        </span>
+    </li>
+</ul>
+
 {% endif %}

@@ -135,7 +135,6 @@ function loadItems(pageNumber) {
 									sort_by: $("#sort_by").val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
-			//$("#creatordetails").html(data);
 			updateTooltips();
 
 			// Remove nsfw blur if disabled by user
@@ -169,10 +168,8 @@ function clearSearch() {
 	loadItems(1);
 }
 
-function searchForUser(creator, cartridgeId, creatorId) {
-	//TODO creator parameter can be removed laterHO
+function searchForUser(cartridgeId, creatorId) {
 	$("#item_name").val("");
-	//$("#maker_name").val(creator);
 	$("#maker_name").val("");
 	$("#cartridge_id").val(cartridgeId);
 	$("#creator_id").val(creatorId);
@@ -182,8 +179,7 @@ function searchForUser(creator, cartridgeId, creatorId) {
 }
 
 function loadCreatorInfo() {
-	 $("#creatorinfo").html("WHOOAAA! This creator has {{totalgames}} games, {{totalmanga}} comics, {{totalrecords}} and records uploaded to DoujinSoft.");
-
+	//TODO: How do we load the creator info 1 time instead of each time we click through pages and sort by?
 }
 
 function drawManga(page1, page2, page3, page4) {

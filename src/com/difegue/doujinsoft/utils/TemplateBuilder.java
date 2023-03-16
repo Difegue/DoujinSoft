@@ -216,6 +216,10 @@ public class TemplateBuilder {
 		context.put("nameSearch", name.substring(0, name.length() - 1));
 		context.put("creatorSearch", creator.substring(0, creator.length() - 1));
 
+		// Remove creator and cartridge IDs from context
+		context.remove("creatorIdSearch");
+		context.remove("cartridgeIdSearch");
+
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
@@ -246,15 +250,15 @@ public class TemplateBuilder {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
 		String cartridgeId = request.getParameter("cartridge_id");
-		boolean isNullCartridgeId = false;
+		boolean isLegitCart = false;
 
-		if (cartridgeId.equals("00000000000000000000000000000000"))
-			isNullCartridgeId = true;
+		if (!cartridgeId.equals("00000000000000000000000000000000"))
+			isLegitCart = true;
 
 		// Build both data and count queries
 		String queryBase = "FROM " + tableName + " WHERE ";
 		queryBase += "creatorID = ? ";
-		queryBase += !isNullCartridgeId ? " OR cartridgeID = ? " : "";
+		queryBase += isLegitCart ? " OR cartridgeID = ? " : "";
 
 		// Default orderBy
 		String orderBy = "normalizedName ASC";
@@ -270,6 +274,14 @@ public class TemplateBuilder {
 		PreparedStatement ret = connection.prepareStatement(query);
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
+		// Add creator and cartridge IDs to context
+		context.put("creatorIdSearch", creatorId);
+		context.put("cartridgeIdSearch", cartridgeId);
+
+		// remove name and creator search fields from context
+		context.remove("nameSearch");
+		context.remove("creatorSearch");
+
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
@@ -278,14 +290,13 @@ public class TemplateBuilder {
 		ret.setString(1, creatorId);
 		retCount.setString(1, creatorId);
 
-		if (isNullCartridgeId)
-			ret.setInt(2, page * 15 - 15);
-		else
-		{
+		if (isLegitCart) {
 			ret.setString(2, cartridgeId);
 			retCount.setString(2, cartridgeId);
 			ret.setInt(3, page * 15 - 15);
 		}
+		else
+			ret.setInt(2, page * 15 - 15);
 
 		ResultSet result = ret.executeQuery();
 
@@ -306,15 +317,8 @@ public class TemplateBuilder {
 		String cartridgeId = request.getParameter("cartridge_id");
 
 		CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId, cartridgeId);
-//TODO: maybe just put the actual object here instead of individual attributes?
+		
 		context.put("displaycreatordetails", true);
 		context.put("creatordetails", creatorDetails);
-		// context.put("totalgames", creatorDetails.totalGames);
-		// context.put("totalmanga", creatorDetails.totalManga);
-		// context.put("totalrecords", creatorDetails.totalRecords);
-		// context.put("timesreset", creatorDetails.timesReset);
-		// context.put("creatornames", creatorDetails.creatorNames);
-		// context.put("brandnames", creatorDetails.brandNames);
 	}
-
 }
