@@ -145,6 +145,7 @@ public class TemplateBuilder {
 			statement.close();
 		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
 			performCreatorSearchQuery();
+			GetCreatorInfo();
 		}
 		else {
 			performSearchQuery();
@@ -169,8 +170,10 @@ public class TemplateBuilder {
 
 		initializeTemplate(type, true);
 
-		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch)
+		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
 			performCreatorSearchQuery();
+			GetCreatorInfo();
+		}
 		else
 			performSearchQuery();
 
@@ -294,7 +297,23 @@ public class TemplateBuilder {
 
 		context.put("items", items);
 		context.put("totalitems", retCount.executeQuery().getInt(1));
+		
 		retCount.close();
+	}
+
+	private void GetCreatorInfo() throws Exception {
+		String creatorId = request.getParameter("creator_id");
+		String cartridgeId = request.getParameter("cartridge_id");
+
+		CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId, cartridgeId);
+//TODO: maybe just put the actual object here instead of individual attributes?
+		context.put("displaycreatorinfo", true);
+		context.put("totalgames", creatorDetails.totalGames);
+		context.put("totalmanga", creatorDetails.totalManga);
+		context.put("totalrecords", creatorDetails.totalRecords);
+		context.put("timesreset", creatorDetails.timesReset);
+		context.put("creatornames", creatorDetails.creatorNames);
+		context.put("brandnames", creatorDetails.brandNames);
 	}
 
 }
