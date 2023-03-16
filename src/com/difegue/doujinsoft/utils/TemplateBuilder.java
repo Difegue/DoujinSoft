@@ -24,10 +24,6 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
-//TODO delete this
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /*
  * This class contains generic get/search methods used across all three major servlets
  * (Games, Comics and Records)
@@ -187,6 +183,9 @@ public class TemplateBuilder {
 		return writeToTemplate();
 	}
 
+	/*
+	 * Default query or search by creator name and/or content name
+	 */
 	private void performSearchQuery() throws Exception {
 
 		// Build both data and count queries
@@ -246,6 +245,9 @@ public class TemplateBuilder {
 		retCount.close();
 	}
 
+	/*
+	 * Query search by creator ID or cartridge ID
+	 */
 	private void performCreatorSearchQuery() throws Exception {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
