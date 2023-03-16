@@ -135,6 +135,7 @@ function loadItems(pageNumber) {
 									sort_by: $("#sort_by").val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
+			//$("#creatordetails").html(data);
 			updateTooltips();
 
 			// Remove nsfw blur if disabled by user
@@ -169,7 +170,7 @@ function clearSearch() {
 }
 
 function searchForUser(creator, cartridgeId, creatorId) {
-	
+	//TODO creator parameter can be removed laterHO
 	$("#item_name").val("");
 	//$("#maker_name").val(creator);
 	$("#maker_name").val("");
@@ -177,7 +178,12 @@ function searchForUser(creator, cartridgeId, creatorId) {
 	$("#creator_id").val(creatorId);
 	M.updateTextFields();
 	loadItems(1);
-	
+	loadCreatorInfo();
+}
+
+function loadCreatorInfo() {
+	 $("#creatorinfo").html("WHOOAAA! This creator has {{totalgames}} games, {{totalmanga}} comics, {{totalrecords}} and records uploaded to DoujinSoft.");
+
 }
 
 function drawManga(page1, page2, page3, page4) {

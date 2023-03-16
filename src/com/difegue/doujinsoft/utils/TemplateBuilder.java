@@ -307,13 +307,14 @@ public class TemplateBuilder {
 
 		CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId, cartridgeId);
 //TODO: maybe just put the actual object here instead of individual attributes?
-		context.put("displaycreatorinfo", true);
-		context.put("totalgames", creatorDetails.totalGames);
-		context.put("totalmanga", creatorDetails.totalManga);
-		context.put("totalrecords", creatorDetails.totalRecords);
-		context.put("timesreset", creatorDetails.timesReset);
-		context.put("creatornames", creatorDetails.creatorNames);
-		context.put("brandnames", creatorDetails.brandNames);
+		context.put("displaycreatordetails", true);
+		context.put("creatordetails", creatorDetails);
+		// context.put("totalgames", creatorDetails.totalGames);
+		// context.put("totalmanga", creatorDetails.totalManga);
+		// context.put("totalrecords", creatorDetails.totalRecords);
+		// context.put("timesreset", creatorDetails.timesReset);
+		// context.put("creatornames", creatorDetails.creatorNames);
+		// context.put("brandnames", creatorDetails.brandNames);
 	}
 
 }

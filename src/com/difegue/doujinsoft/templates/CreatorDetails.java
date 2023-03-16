@@ -25,8 +25,6 @@ public class CreatorDetails {
     public int totalGames, totalManga, totalRecords;
     public int timesReset;
 
-    //HashSet<String> creatorIds;
-    //HashSet<String> creatorNames, brandNames;
     public String creatorNames, brandNames;
 
     public CreatorDetails(Connection connection, String creatorId, String cartridgeId) throws SQLException
@@ -41,19 +39,18 @@ public class CreatorDetails {
         else
             legitCart = false;
         
-        this.totalGames = getContentCount(statement, "Games");
-        this.totalManga = getContentCount(statement, "Manga");
-        this.totalRecords = getContentCount(statement, "Records");
+        this.totalGames = contentCount(statement, "Games");
+        this.totalManga = contentCount(statement, "Manga");
+        this.totalRecords = contentCount(statement, "Records");
 
-        this.timesReset = getResetCount(statement);
+        this.timesReset = resetCount(statement);
 
-        this.creatorNames = getCreatorNames(statement);
-        this.brandNames = getBrandNames(statement);
+        setCreatorAndBrandNames(statement);
 
         statement.close();
     }
 
-    private int getContentCount(Statement statement, String tableName) throws SQLException
+    private int contentCount(Statement statement, String tableName) throws SQLException
     {
         int count = 0;
 
@@ -67,7 +64,7 @@ public class CreatorDetails {
         return count;
     }
 
-    private int getResetCount(Statement statement) throws SQLException
+    private int resetCount(Statement statement) throws SQLException
     {
         int count = 0;
 
@@ -83,21 +80,12 @@ public class CreatorDetails {
         return count;
     }
 
-    //TODO can be refactored with getBrandNames
-    private String getCreatorNames(Statement statement) throws SQLException
+    private void setCreatorAndBrandNames(Statement statement) throws SQLException
     {
-        ArrayList<String> creatorNamesList = new ArrayList<String>();
+        HashSet<String> creatorNames = new HashSet<String>();
+        HashSet<String> brandNames = new HashSet<String>();
 
-        // SELECT creator FROM Games
-        // WHERE creatorID = ? OR cartridgeID = ?
-        // UNION
-        // SELECT creator FROM Records
-        // WHERE creatorID = ? OR cartridgeID = ?
-        // UNION
-        // SELECT creator FROM Manga
-        // WHERE creatorID = ? OR cartridgeID = ?
-
-        String selectFromStatement = "SELECT creator FROM ";
+        String selectFromStatement = "SELECT creator, brand FROM ";
         String unionStatement = "UNION ";
         String whereStatement = "WHERE creatorID = '" + creatorId + "' ";
         whereStatement += legitCart ? "OR cartridgeID = '" + cartridgeId + "' " : "";
@@ -111,41 +99,12 @@ public class CreatorDetails {
         ResultSet resultSet = statement.executeQuery(query);
 
         while(resultSet.next())
-            creatorNamesList.add(resultSet.getString(1));
+        {
+            creatorNames.add(resultSet.getString(1));
+            brandNames.add(resultSet.getString(2));
+        }
 
-        return creatorNamesList.toString();
-    }
-
-    //TODO can be refactored with getCreatorNames
-    private String getBrandNames(Statement statement) throws SQLException
-    {
-        ArrayList<String> brandNamesList = new ArrayList<String>();
-
-        // SELECT brand FROM Games
-        // WHERE creatorID = ? OR cartridgeID = ?
-        // UNION
-        // SELECT brand FROM Records
-        // WHERE creatorID = ? OR cartridgeID = ?
-        // UNION
-        // SELECT brand FROM Manga
-        // WHERE creatorID = ? OR cartridgeID = ?
-
-        String selectFromStatement = "SELECT brand FROM ";
-        String unionStatement = "UNION ";
-        String whereStatement = "WHERE creatorID = '" + creatorId + "' ";
-        whereStatement += legitCart ? "OR cartridgeID = '" + cartridgeId + "' " : "";
-
-        String query = selectFromStatement + "Games " + whereStatement + 
-        unionStatement +
-        selectFromStatement + "Records " + whereStatement + 
-        unionStatement +
-        selectFromStatement + "Manga " + whereStatement;
-
-        ResultSet resultSet = statement.executeQuery(query);
-
-        while(resultSet.next())
-            brandNamesList.add(resultSet.getString(1));
-
-        return brandNamesList.toString();
+        this.creatorNames = creatorNames.toString();
+        this.brandNames = brandNames.toString();
     }
 }

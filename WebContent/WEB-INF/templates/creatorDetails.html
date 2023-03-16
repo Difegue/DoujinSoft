@@ -1,8 +1,8 @@
-{% if displaycreatorinfo == true %}
-# of Games: {{ totalgames }} <br/>
-# of Manga: {{ totalmanga }} <br/>
-# of Records: {{ totalrecords }} <br/>
-# Reset: {{ timesreset }} <br/>
-{{ creatornames }} <br/>
-{{ brandnames }} <br/>
+{% if displaycreatordetails == true %}
+<a href="./games?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of Games: {{ creatordetails.totalGames }} <br/></a>
+<a href="./records?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of Records: {{ creatordetails.totalRecords }} <br/></a>
+<a href="./comics?cartridge_id={{ creatordetails.cartridgeId }}&creator_id={{ creatordetails.creatorId }}"># of Manga: {{ creatordetails.totalManga }} <br/></a>
+# Reset: {{ creatordetails.timesReset }} <br/>
+This creator has gone by {{ creatordetails.creatorNames }}, <br/>
+and published content through these brands: {{ creatordetails.brandNames }} <br/>
 {% endif %}
