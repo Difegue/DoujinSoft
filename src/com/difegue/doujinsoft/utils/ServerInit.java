@@ -96,17 +96,15 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             SQLog.log(Level.INFO, "Looking for new .mio files...");
             MioStorage.ScanForNewMioFiles(dataDir, SQLog);
 
-            // SQLog.log(Level.INFO, "(re)setting creatorIDs for all .mio files...");
+            // Set/reset creator and cartridge IDs
+            // SQLog.log(Level.INFO, "Setting creatorIDs for all .mio files...");
             // String updateIDgames = MioStorage.SetCreatorIds(dataDir, SQLog, "game");
-            // SQLog.log(Level.INFO, updateIDgames);
             // statement.executeUpdate(updateIDgames);
 
             // String updateIDmanga = MioStorage.SetCreatorIds(dataDir, SQLog, "manga");
-            // SQLog.log(Level.INFO, updateIDmanga);
             // statement.executeUpdate(updateIDmanga);
 
             // String updateIDrecords = MioStorage.SetCreatorIds(dataDir, SQLog, "record");
-            // SQLog.log(Level.INFO, updateIDrecords);
             // statement.executeUpdate(updateIDrecords);
 
             statement.executeUpdate("PRAGMA journal_mode=WAL;");
@@ -122,6 +120,12 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx3;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx3;");
             statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx3;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx4;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx4;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx4;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx5;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx5;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx5;");
 
             // Rebuild indexes
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
@@ -136,6 +140,14 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Games_search_idx3 ON Games (timeStamp);");
             statement.executeUpdate("CREATE INDEX Manga_search_idx3 ON Manga (timeStamp);");
             statement.executeUpdate("CREATE INDEX Record_search_idx3 ON Records (timeStamp);");
+            
+            statement.executeUpdate("CREATE INDEX Games_search_idx4 ON Games (cartridgeID);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx4 ON Manga (cartridgeID);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx4 ON Records (cartridgeID);");
+
+            statement.executeUpdate("CREATE INDEX Games_search_idx5 ON Games (creatorID);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx5 ON Manga (creatorID);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx5 ON Records (creatorID);");
 
             statement.close();
         } catch (Exception e) {

@@ -315,12 +315,17 @@ public class TemplateBuilder {
 	}
 
 	private void GetCreatorInfo() throws Exception {
-		String creatorId = request.getParameter("creator_id");
-		String cartridgeId = request.getParameter("cartridge_id");
+		/*  TODO:
+		 *  This method is fully functional but is commented out so that it
+		 *  will not go into the current release to prevent unnecessary DB calls
+		 */ 
 
-		CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId, cartridgeId);
+		// String creatorId = request.getParameter("creator_id");
+		// String cartridgeId = request.getParameter("cartridge_id");
+
+		// CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId, cartridgeId);
 		
-		context.put("displaycreatordetails", true);
-		context.put("creatordetails", creatorDetails);
+		// context.put("displaycreatordetails", true);
+		// context.put("creatordetails", creatorDetails);
 	}
 }

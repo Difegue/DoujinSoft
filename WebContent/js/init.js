@@ -154,6 +154,25 @@ function loadItems(pageNumber) {
 
 }
 
+function loadCreatorInfo() {
+	//TODO: Load creator info ONCE instead of repeated DB calls
+
+	// // Show a preloader
+	// $("#creatordetails").html('<center><div class="preloader-wrapper big active"><div class="spinner-layer"><div class="circle-clipper left">'+
+	// '<div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div>'+
+	// '</div></div></div></center>');
+	// //Scroll up
+	// window.scrollTo(0,0);  
+	
+	// // Strip "name" and "creator" as well as creator ID info from the URL's query params if they were set
+	// var url = window.location.href;
+	// url = url.replace(/name=[^&]*/g, "");
+	// url = url.replace(/creator=[^&]*/g, "");
+	// url = url.replace(/cartridge_id=[^&]*/g, "");
+	// url = url.replace(/creator_id=[^&]*/g, "");
+
+}
+
 function updateTooltips() {
 	// Don't use jQuery for tooltips, looks like that's broken
 	var elems = document.querySelectorAll('.tooltipped');
@@ -178,8 +197,12 @@ function searchForUser(cartridgeId, creatorId) {
 	loadCreatorInfo();
 }
 
-function loadCreatorInfo() {
-	//TODO: How do we load the creator info 1 time instead of each time we click through pages and sort by?
+$('#creator-modal').modal({
+	dismissible: true
+});
+
+function createCreatorDetailsModal(cartridgeId, creatorId) {
+	$('#creator-modal').modal('open');
 }
 
 function drawManga(page1, page2, page3, page4) {
