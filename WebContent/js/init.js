@@ -197,14 +197,6 @@ function searchForUser(cartridgeId, creatorId) {
 	loadCreatorInfo();
 }
 
-$('#creator-modal').modal({
-	dismissible: true
-});
-
-function createCreatorDetailsModal(cartridgeId, creatorId) {
-	$('#creator-modal').modal('open');
-}
-
 function drawManga(page1, page2, page3, page4) {
 
 	  M.Materialbox.init($('.materialboxed')[0], {onOpenEnd: function(){
