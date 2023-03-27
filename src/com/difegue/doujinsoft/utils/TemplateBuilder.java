@@ -252,10 +252,7 @@ public class TemplateBuilder {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
 		String cartridgeId = request.getParameter("cartridge_id");
-		boolean isLegitCart = false;
-
-		if (!cartridgeId.equals("00000000000000000000000000000000"))
-			isLegitCart = true;
+		boolean isLegitCart = !cartridgeId.equals("00000000000000000000000000000000");
 
 		// Build both data and count queries
 		String queryBase = "FROM " + tableName + " WHERE ";

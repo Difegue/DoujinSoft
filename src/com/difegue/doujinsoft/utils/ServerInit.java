@@ -96,17 +96,6 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             SQLog.log(Level.INFO, "Looking for new .mio files...");
             MioStorage.ScanForNewMioFiles(dataDir, SQLog);
 
-            // Set/reset creator and cartridge IDs
-            // SQLog.log(Level.INFO, "Setting creatorIDs for all .mio files...");
-            // String updateIDgames = MioStorage.SetCreatorIds(dataDir, SQLog, "game");
-            // statement.executeUpdate(updateIDgames);
-
-            // String updateIDmanga = MioStorage.SetCreatorIds(dataDir, SQLog, "manga");
-            // statement.executeUpdate(updateIDmanga);
-
-            // String updateIDrecords = MioStorage.SetCreatorIds(dataDir, SQLog, "record");
-            // statement.executeUpdate(updateIDrecords);
-
             statement.executeUpdate("PRAGMA journal_mode=WAL;");
             statement.executeUpdate("DROP INDEX IF EXISTS Games_idx;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_idx;");

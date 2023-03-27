@@ -33,11 +33,8 @@ public class CreatorDetails {
 
         this.creatorId = creatorId;
         this.cartridgeId = cartridgeId;
-
-        if (!cartridgeId.equals("00000000000000000000000000000000"))
-            legitCart = true;
-        else
-            legitCart = false;
+        
+        this.legitCart = !cartridgeId.equals("00000000000000000000000000000000");
         
         this.totalGames = contentCount(statement, "Games");
         this.totalManga = contentCount(statement, "Manga");

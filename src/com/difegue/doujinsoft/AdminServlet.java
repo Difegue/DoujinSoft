@@ -242,6 +242,32 @@ public class AdminServlet extends HttpServlet {
             }
         }
 
+                    // Set/reset creator and cartridge IDs
+        if (req.getParameterMap().containsKey("set_creator_ids"))
+        {
+
+            try (Connection connection = DriverManager
+            .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+
+                Statement statement = connection.createStatement();
+                statement.setQueryTimeout(30); // set timeout to 30 sec.
+
+                ServletLog.log(Level.INFO, "Setting creatorIDs for all .mio files...");
+                String updateIDgames = MioStorage.SetCreatorIds(dataDir, ServletLog, "game");
+                statement.executeUpdate(updateIDgames);
+
+                String updateIDmanga = MioStorage.SetCreatorIds(dataDir, ServletLog, "manga");
+                statement.executeUpdate(updateIDmanga);
+
+                String updateIDrecords = MioStorage.SetCreatorIds(dataDir, ServletLog, "record");
+                statement.executeUpdate(updateIDrecords);
+
+            } catch (Exception e) {
+                ServletLog.log(Level.SEVERE, e.getMessage());
+                output = e.getMessage();
+            }
+        }
+
         // Output is dumb HTML
         res.setContentType("text/html; charset=UTF-8");
         res.getWriter().append(output);
