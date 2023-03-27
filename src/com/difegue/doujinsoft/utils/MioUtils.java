@@ -55,26 +55,6 @@ public class MioUtils {
   }
 
   /*
-   * Craft unique player ID from .mio metadata for Doujinsoft cataloging purposes.
-   */
-  public static String computeCreatorID(Metadata mio) {
-    String uniquePlayerID1, uniquePlayerID2;
-
-    uniquePlayerID1 = byteArrayToString(mio.getUniquePlayerID1());
-    uniquePlayerID2 = byteArrayToString(mio.getUniquePlayerID2());
-
-    return uniquePlayerID1 + "-" + uniquePlayerID2;
-  }
-
-  private static String byteArrayToString(byte[] bytes) {
-    String hexString = "";
-    for (byte i : bytes)
-      hexString += String.format("%02X", i);
-
-    return hexString;
-  }
-
-  /*
    * Returns color strings matching the bytes used in .mio files.
    * The strings match the colors used by MaterializeCSS.
    */

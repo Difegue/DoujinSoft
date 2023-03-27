@@ -119,15 +119,19 @@ function loadItems(pageNumber) {
 	// Scroll up
 	window.scrollTo(0,0);  
 
-	// Strip "name" and "creator" from the URL's query params if they were set
+	// Strip "name" and "creator" as well as creator ID info from the URL's query params if they were set
 	var url = window.location.href;
 	url = url.replace(/name=[^&]*/g, "");
 	url = url.replace(/creator=[^&]*/g, "");
+	url = url.replace(/cartridge_id=[^&]*/g, "");
+	url = url.replace(/creator_id=[^&]*/g, "");
 
 	//Posts to itself -> one function for all three pages
 	$.post( url, { page: pageNumber, 
 									name: $("#item_name").val(), 
 									creator: $("#maker_name").val(),
+									cartridge_id: $("#cartridge_id").val(),
+									creator_id: $("#creator_id").val(),
 									sort_by: $("#sort_by").val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
@@ -150,6 +154,25 @@ function loadItems(pageNumber) {
 
 }
 
+function loadCreatorInfo() {
+	//TODO: Load creator info ONCE instead of repeated DB calls
+
+	// // Show a preloader
+	// $("#creatordetails").html('<center><div class="preloader-wrapper big active"><div class="spinner-layer"><div class="circle-clipper left">'+
+	// '<div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div>'+
+	// '</div></div></div></center>');
+	// //Scroll up
+	// window.scrollTo(0,0);  
+	
+	// // Strip "name" and "creator" as well as creator ID info from the URL's query params if they were set
+	// var url = window.location.href;
+	// url = url.replace(/name=[^&]*/g, "");
+	// url = url.replace(/creator=[^&]*/g, "");
+	// url = url.replace(/cartridge_id=[^&]*/g, "");
+	// url = url.replace(/creator_id=[^&]*/g, "");
+
+}
+
 function updateTooltips() {
 	// Don't use jQuery for tooltips, looks like that's broken
 	var elems = document.querySelectorAll('.tooltipped');
@@ -164,13 +187,14 @@ function clearSearch() {
 	loadItems(1);
 }
 
-function searchForUser(creator) {
-	
+function searchForUser(cartridgeId, creatorId) {
 	$("#item_name").val("");
-	$("#maker_name").val(creator);
+	$("#maker_name").val("");
+	$("#cartridge_id").val(cartridgeId);
+	$("#creator_id").val(creatorId);
 	M.updateTextFields();
 	loadItems(1);
-	
+	loadCreatorInfo();
 }
 
 function drawManga(page1, page2, page3, page4) {

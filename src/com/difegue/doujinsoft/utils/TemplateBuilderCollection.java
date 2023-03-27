@@ -58,7 +58,7 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 		initializeTemplate(c.getType(), true);
 		
 	    String queryBase = "FROM "+tableName+" WHERE hash IN "+c.getMioSQL();
-	    queryBase += (isNameSearch || isCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
+	    queryBase += (isContentNameSearch || isContentCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
 		
 		// Default orderBy - 
 		// Unlike the regular pages, ordering by timestamp is the default for collections
@@ -76,14 +76,14 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
 		//Those filters go in the LIKE parts of the query
-		String name    = isNameSearch ? "%"+request.getParameter("name")+"%" : "%";
-		String creator = isCreatorSearch ? "%"+request.getParameter("creator")+"%" : "%";
+		String name    = isContentNameSearch ? "%"+request.getParameter("name")+"%" : "%";
+		String creator = isCreatorNameSearch ? "%"+request.getParameter("creator")+"%" : "%";
 
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
 		
-		if (isNameSearch || isCreatorSearch) {
+		if (isContentNameSearch || isCreatorNameSearch) {
 			ret.setString(1, name);
 			ret.setString(2, creator);
 			retCount.setString(1, name);

@@ -39,7 +39,14 @@ public class TemplateBuilder {
 	protected HttpServletRequest request;
 
 	protected String tableName, dataDir;
-	protected boolean isNameSearch, isCreatorSearch, isSortedBy;
+
+	/*
+	 *  isContentNameSearch: Search by title name of the game, comic, or record
+	 *  isCreatorNameSearch: Search by author's name of the game, comic, or record
+	 *  isContentCreatorSearch: Search by cartridge ID or creator ID of the game, comic, or record
+	 *  isSortedBy: Sort content flag
+	 */
+	protected boolean isContentNameSearch, isCreatorNameSearch, isContentCreatorSearch, isSortedBy;
 
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
@@ -86,9 +93,11 @@ public class TemplateBuilder {
 			templatePath += "Detail";
 		}
 
-		isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
-		isCreatorSearch = request.getParameterMap().containsKey("creator")
+		isContentNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+		isCreatorNameSearch = request.getParameterMap().containsKey("creator")
 				&& !request.getParameter("creator").isEmpty();
+		isContentCreatorSearch = (request.getParameterMap().containsKey("cartridge_id") && !request.getParameter("cartridge_id").isEmpty())
+		|| (request.getParameterMap().containsKey("creator_id") && !request.getParameter("creator_id").isEmpty());
 		isSortedBy = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
 
 		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath + ".html"));
@@ -130,7 +139,11 @@ public class TemplateBuilder {
 			result.close();
 			context.put("items", items);
 			statement.close();
-		} else {
+		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
+			performCreatorSearchQuery();
+			GetCreatorInfo();
+		}
+		else {
 			performSearchQuery();
 		}
 
@@ -153,7 +166,12 @@ public class TemplateBuilder {
 
 		initializeTemplate(type, true);
 
-		performSearchQuery();
+		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
+			performCreatorSearchQuery();
+			GetCreatorInfo();
+		}
+		else
+			performSearchQuery();
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -165,11 +183,14 @@ public class TemplateBuilder {
 		return writeToTemplate();
 	}
 
+	/*
+	 * Default query or search by creator name and/or content name
+	 */
 	private void performSearchQuery() throws Exception {
 
 		// Build both data and count queries
 		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += (isNameSearch || isCreatorSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
+		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
 		queryBase += "id NOT LIKE '%them%'";
 
 		// Default orderBy
@@ -187,18 +208,22 @@ public class TemplateBuilder {
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
 		// Those filters go in the LIKE parts of the query
-		String name = isNameSearch ? request.getParameter("name") + "%" : "%";
-		String creator = isCreatorSearch ? request.getParameter("creator") + "%" : "%";
+		String name = isContentNameSearch ? request.getParameter("name") + "%" : "%";
+		String creator = isCreatorNameSearch ? request.getParameter("creator") + "%" : "%";
 
 		// Remove last char for context display
 		context.put("nameSearch", name.substring(0, name.length() - 1));
 		context.put("creatorSearch", creator.substring(0, creator.length() - 1));
 
+		// Remove creator and cartridge IDs from context
+		context.remove("creatorIdSearch");
+		context.remove("cartridgeIdSearch");
+
 		int page = 1;
 		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
 			page = Integer.parseInt(request.getParameter("page"));
 
-		if (isNameSearch || isCreatorSearch) {
+		if (isContentNameSearch || isCreatorNameSearch) {
 			ret.setString(1, name);
 			ret.setString(2, creator);
 			retCount.setString(1, name);
@@ -220,4 +245,84 @@ public class TemplateBuilder {
 		retCount.close();
 	}
 
+	/*
+	 * Query search by creator ID or cartridge ID
+	 */
+	private void performCreatorSearchQuery() throws Exception {
+		// Get creatorId and cartridgeId for search query
+		String creatorId = request.getParameter("creator_id");
+		String cartridgeId = request.getParameter("cartridge_id");
+		boolean isLegitCart = !cartridgeId.equals("00000000000000000000000000000000");
+
+		// Build both data and count queries
+		String queryBase = "FROM " + tableName + " WHERE ";
+		queryBase += "creatorID = ? ";
+		queryBase += isLegitCart ? " OR cartridgeID = ? " : "";
+
+		// Default orderBy
+		String orderBy = "normalizedName ASC";
+
+		// Order by Date if the parameter was given
+		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
+			orderBy = "timeStamp DESC";
+		}
+
+		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
+		String queryCount = "SELECT COUNT(id) " + queryBase;
+
+		PreparedStatement ret = connection.prepareStatement(query);
+		PreparedStatement retCount = connection.prepareStatement(queryCount);
+
+		// Add creator and cartridge IDs to context
+		context.put("creatorIdSearch", creatorId);
+		context.put("cartridgeIdSearch", cartridgeId);
+
+		// remove name and creator search fields from context
+		context.remove("nameSearch");
+		context.remove("creatorSearch");
+
+		int page = 1;
+		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
+			page = Integer.parseInt(request.getParameter("page"));
+
+		// Set values for prepared statement
+		ret.setString(1, creatorId);
+		retCount.setString(1, creatorId);
+
+		if (isLegitCart) {
+			ret.setString(2, cartridgeId);
+			retCount.setString(2, cartridgeId);
+			ret.setInt(3, page * 15 - 15);
+		}
+		else
+			ret.setInt(2, page * 15 - 15);
+
+		ResultSet result = ret.executeQuery();
+
+		while (result.next())
+			items.add(classConstructor.newInstance(result));
+
+		result.close();
+		ret.close();
+
+		context.put("items", items);
+		context.put("totalitems", retCount.executeQuery().getInt(1));
+		
+		retCount.close();
+	}
+
+	private void GetCreatorInfo() throws Exception {
+		/*  TODO:
+		 *  This method is fully functional but is commented out so that it
+		 *  will not go into the current release to prevent unnecessary DB calls
+		 */ 
+
+		// String creatorId = request.getParameter("creator_id");
+		// String cartridgeId = request.getParameter("cartridge_id");
+
+		// CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId, cartridgeId);
+		
+		// context.put("displaycreatordetails", true);
+		// context.put("creatordetails", creatorDetails);
+	}
 }

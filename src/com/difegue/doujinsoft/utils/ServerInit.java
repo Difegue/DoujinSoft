@@ -109,6 +109,12 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx3;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx3;");
             statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx3;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx4;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx4;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx4;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx5;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx5;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx5;");
 
             // Rebuild indexes
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
@@ -123,6 +129,14 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Games_search_idx3 ON Games (timeStamp);");
             statement.executeUpdate("CREATE INDEX Manga_search_idx3 ON Manga (timeStamp);");
             statement.executeUpdate("CREATE INDEX Record_search_idx3 ON Records (timeStamp);");
+            
+            statement.executeUpdate("CREATE INDEX Games_search_idx4 ON Games (cartridgeID);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx4 ON Manga (cartridgeID);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx4 ON Records (cartridgeID);");
+
+            statement.executeUpdate("CREATE INDEX Games_search_idx5 ON Games (creatorID);");
+            statement.executeUpdate("CREATE INDEX Manga_search_idx5 ON Manga (creatorID);");
+            statement.executeUpdate("CREATE INDEX Record_search_idx5 ON Records (creatorID);");
 
             statement.close();
         } catch (Exception e) {
