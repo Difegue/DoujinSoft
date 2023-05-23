@@ -31,15 +31,15 @@ public class ServerInit implements javax.servlet.ServletContextListener {
     private void databaseDefinition(Statement statement) throws SQLException {
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Games "
                 + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
-                + "previewPic TEXT, creatorID TEXT, isNsfw BOOLEAN DEFAULT 0, PRIMARY KEY(`hash`) )");
+                + "previewPic TEXT, creatorID TEXT, isNsfw BOOLEAN DEFAULT 0, cartridgeID TEXT, PRIMARY KEY(`hash`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Manga "
                 + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
-                + "frame0 TEXT, frame1 TEXT, frame2 TEXT, frame3 TEXT, creatorID TEXT, PRIMARY KEY(`hash`) )");
+                + "frame0 TEXT, frame1 TEXT, frame2 TEXT, frame3 TEXT, creatorID TEXT, cartridgeID TEXT, PRIMARY KEY(`hash`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Records "
                 + "(hash TEXT, id TEXT, name TEXT, normalizedName TEXT, creator TEXT, brand TEXT, description TEXT, timeStamp INTEGER, color TEXT, colorLogo TEXT, logo INTEGER, "
-                + "creatorID TEXT, PRIMARY KEY(`hash`) )");
+                + "creatorID TEXT, cartridgeID TEXT, PRIMARY KEY(`hash`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Surveys "
                 + "(timestamp INTEGER, type INTEGER, name TEXT, stars INTEGER, commentId INTEGER, "
