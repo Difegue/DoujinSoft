@@ -242,7 +242,7 @@ public class AdminServlet extends HttpServlet {
             }
         }
 
-                    // Set/reset creator and cartridge IDs
+        // Set/reset creator and cartridge IDs
         if (req.getParameterMap().containsKey("set_creator_ids"))
         {
 

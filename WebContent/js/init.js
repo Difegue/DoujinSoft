@@ -183,6 +183,8 @@ function clearSearch() {
 	
 	$("#item_name").val("");
 	$("#maker_name").val("");
+	$("#cartridge_id").val("");
+	$("#creator_id").val("");
 	M.updateTextFields();
 	loadItems(1);
 }
