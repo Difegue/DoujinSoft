@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import com.google.gson.Gson;
 
 import com.difegue.doujinsoft.templates.*;
 
@@ -56,54 +57,25 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 	public String doSearchCollection(Collection c) throws Exception {
 		
 		initializeTemplate(c.getType(), true);
-		
-	    String queryBase = "FROM "+tableName+" WHERE hash IN "+c.getMioSQL();
-	    queryBase += (isContentNameSearch || isContentCreatorSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
-		
-		// Default orderBy - 
-		// Unlike the regular pages, ordering by timestamp is the default for collections
-		String orderBy = "timeStamp DESC";
 
-		// Order by Date if the parameter was given
-		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
-			orderBy = "normalizedName ASC";
+		String queryBase = "FROM "+tableName+" WHERE hash IN "+c.getMioSQL();
+	    queryBase += (isContentNameSearch || isCreatorNameSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
+
+		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
+			performCreatorSearchQuery(queryBase, "timeStamp DESC");
+			GetCreatorInfo();
+		}
+		else {
+			// Unlike the regular pages, ordering by timestamp is the default for collections
+			performSearchQuery(queryBase, "timeStamp DESC");
 		}
 
-		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
-	    String queryCount = "SELECT COUNT(hash) " + queryBase;
-	    
-		PreparedStatement ret = connection.prepareStatement(query);
-		PreparedStatement retCount = connection.prepareStatement(queryCount);
+		// JSON hijack if specified in the parameters
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
+			Gson gson = new Gson();
+			return gson.toJson(context);
+		}
 
-		//Those filters go in the LIKE parts of the query
-		String name    = isContentNameSearch ? "%"+request.getParameter("name")+"%" : "%";
-		String creator = isCreatorNameSearch ? "%"+request.getParameter("creator")+"%" : "%";
-
-		int page = 1;
-		if (request.getParameterMap().containsKey("page") && !request.getParameter("page").isEmpty())
-			page = Integer.parseInt(request.getParameter("page"));
-		
-		if (isContentNameSearch || isCreatorNameSearch) {
-			ret.setString(1, name);
-			ret.setString(2, creator);
-			retCount.setString(1, name);
-		    retCount.setString(2, creator);
-			ret.setInt(3, page*15-15);
-		} else 
-			ret.setInt(1, page*15-15);
-		
-		ResultSet result = ret.executeQuery();
-		
-	    while(result.next()) 
-			items.add(classConstructor.newInstance(result));
-		
-		result.close();
-		ret.close();
-
-		context.put("items", items);
-		context.put("totalitems", retCount.executeQuery().getInt(1));
-		
-		retCount.close();
 		connection.close();
 		return writeToTemplate();
 	}

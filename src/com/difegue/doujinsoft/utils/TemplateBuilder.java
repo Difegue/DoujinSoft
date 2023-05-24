@@ -119,6 +119,7 @@ public class TemplateBuilder {
 	public String doStandardPageGeneric(int type) throws Exception {
 
 		initializeTemplate(type, false);
+		String queryBase = "FROM " + tableName + " WHERE id NOT LIKE '%them%'";
 
 		// Specific hash request
 		if (request.getParameterMap().containsKey("id")) {
@@ -140,11 +141,11 @@ public class TemplateBuilder {
 			context.put("items", items);
 			statement.close();
 		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery();
+			performCreatorSearchQuery(queryBase, "normalizedName ASC");
 			GetCreatorInfo();
 		}
 		else {
-			performSearchQuery();
+			performSearchQuery(queryBase, "normalizedName ASC");
 		}
 
 		// JSON hijack if specified in the parameters
@@ -166,12 +167,17 @@ public class TemplateBuilder {
 
 		initializeTemplate(type, true);
 
+		// Build both data and count queries
+		String queryBase = "FROM " + tableName + " WHERE ";
+		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
+		queryBase += "id NOT LIKE '%them%'";
+
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery();
+			performCreatorSearchQuery(queryBase, "normalizedName ASC");
 			GetCreatorInfo();
 		}
 		else
-			performSearchQuery();
+			performSearchQuery(queryBase, "normalizedName ASC");
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -186,19 +192,17 @@ public class TemplateBuilder {
 	/*
 	 * Default query or search by creator name and/or content name
 	 */
-	private void performSearchQuery() throws Exception {
+	protected void performSearchQuery(String queryBase, String defaultOrderBy) throws Exception {
 
-		// Build both data and count queries
-		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
-		queryBase += "id NOT LIKE '%them%'";
+		String orderBy = defaultOrderBy;
 
-		// Default orderBy
-		String orderBy = "normalizedName ASC";
-
-		// Order by Date if the parameter was given
+		// Change order if the parameter was given
 		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
 			orderBy = "timeStamp DESC";
+		}
+
+		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
+			orderBy = "normalizedName ASC";
 		}
 
 		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
@@ -208,7 +212,7 @@ public class TemplateBuilder {
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
 		// Those filters go in the LIKE parts of the query
-		String name = isContentNameSearch ? request.getParameter("name") + "%" : "%";
+		String name    = isContentNameSearch ? request.getParameter("name") + "%" : "%";
 		String creator = isCreatorNameSearch ? request.getParameter("creator") + "%" : "%";
 
 		// Remove last char for context display
@@ -248,23 +252,26 @@ public class TemplateBuilder {
 	/*
 	 * Query search by creator ID or cartridge ID
 	 */
-	private void performCreatorSearchQuery() throws Exception {
+	protected void performCreatorSearchQuery(String queryBase, String defaultOrderBy) throws Exception {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
 		String cartridgeId = request.getParameter("cartridge_id");
 		boolean isLegitCart = !cartridgeId.equals("00000000000000000000000000000000");
 
-		// Build both data and count queries
-		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += "creatorID = ? ";
+		// Add creator/cartID checks to query
+		queryBase += " AND creatorID = ? ";
 		queryBase += isLegitCart ? " OR cartridgeID = ? " : "";
 
 		// Default orderBy
-		String orderBy = "normalizedName ASC";
+		String orderBy = defaultOrderBy;
 
-		// Order by Date if the parameter was given
+		// Change order if the parameter was given
 		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
 			orderBy = "timeStamp DESC";
+		}
+
+		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
+			orderBy = "normalizedName ASC";
 		}
 
 		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
@@ -311,7 +318,7 @@ public class TemplateBuilder {
 		retCount.close();
 	}
 
-	private void GetCreatorInfo() throws Exception {
+	protected void GetCreatorInfo() throws Exception {
 		/*  TODO:
 		 *  This method is fully functional but is commented out so that it
 		 *  will not go into the current release to prevent unnecessary DB calls
