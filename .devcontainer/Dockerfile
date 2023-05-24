@@ -20,4 +20,6 @@ RUN cd /tmp && wget https://tvc-16.science/dsoft-backup.zip && unzip dsoft-backu
 
 USER codespace
 
+# Default admin password is test:test
+ENV DSOFT_PASS="test:test"
 
