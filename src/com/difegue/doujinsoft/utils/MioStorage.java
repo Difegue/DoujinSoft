@@ -222,11 +222,11 @@ public class MioStorage {
      * Test method to update files in /mio directory with creatorIDs.
      * This is split into subdirectories (games, manga, and records) due to the size of the return string.
      */
-    public static String SetCreatorIds(String dataDir, Logger logger, String subdirectory) throws SQLException {
+    public static void UpdateMetadata(Connection connection, String dataDir, Logger logger, String subdirectory) throws SQLException {
         File[] gameFiles = new File(dataDir + "/mio/" + subdirectory).listFiles();
         
-        String query = "";
-        logger.log(Level.INFO, "SetCreatorIDs: Looping Files - " + subdirectory);
+        PreparedStatement query = null;
+        logger.log(Level.INFO, "Mio metadata update: Looping Files - " + subdirectory);
         for (File f : gameFiles) {
             if (!f.isDirectory()) {
                 try
@@ -236,12 +236,17 @@ public class MioStorage {
     
                     Metadata metadata = new Metadata(mioData);
                     String hash = MioStorage.computeMioHash(mioData);
+                    String name = metadata.getName();
+                    String desc = metadata.getDescription();
                     String creatorId = metadata.getCreatorId();
                     String cartridgeId = metadata.getCartridgeId();
     
                     int type = mioData.length;
     
-                    query += UpdateCreatorIdQuery(hash, creatorId, cartridgeId, type);
+                    // Log and execute query
+                    query = UpdateMetadataQuery(connection, type, hash, name, desc, creatorId, cartridgeId);
+                    logger.log(Level.INFO, query.toString());
+                    query.executeUpdate();
                     uncompressedFile.delete();
                 }
                 catch (Exception e)
@@ -251,36 +256,39 @@ public class MioStorage {
                 }
             }
         }
-
-        return query;
     }
 
     /*
      * Test method to get SQL statement to update creator ID
      */
-    private static String UpdateCreatorIdQuery(String hash, String creatorId, String cartridgeId, int type) throws Exception
+    private static PreparedStatement UpdateMetadataQuery(Connection co, int type, String hash, String name, String desc, String creatorId, String cartridgeId) throws Exception
     {
+        PreparedStatement ret = null;
         String update = "";
     
         switch (type) {
             case MioUtils.Types.GAME:
-            update = "UPDATE Games ";
+            update = "UPDATE Games SET name = ?, description = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?; ";
                 break;
             case MioUtils.Types.MANGA:
-            update = "UPDATE Manga ";
+            update = "UPDATE Manga SET name = ?, description = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?;";
                 break;
             case MioUtils.Types.RECORD:
-            update = "UPDATE Records ";
+            update = "UPDATE Records SET name = ?, description = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?;";
                 break;
             default:
             throw new Exception("Invalid file size");
         }
 
-        String setWhere =
-          "SET creatorID = '" + creatorId + "', cartridgeID = '" + cartridgeId + "' "
-        + "WHERE hash = '" + hash + "'; ";
+        ret = co.prepareStatement(update);
 
-        return update + setWhere;
+        ret.setString(1, name);
+        ret.setString(2, desc);
+        ret.setString(3, creatorId);
+        ret.setString(4, cartridgeId);
+        ret.setString(5, hash);
+
+        return ret;
     }
             
 }

@@ -249,18 +249,10 @@ public class AdminServlet extends HttpServlet {
             try (Connection connection = DriverManager
             .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
-                Statement statement = connection.createStatement();
-                statement.setQueryTimeout(30); // set timeout to 30 sec.
-
-                ServletLog.log(Level.INFO, "Setting creatorIDs for all .mio files...");
-                String updateIDgames = MioStorage.SetCreatorIds(dataDir, ServletLog, "game");
-                statement.executeUpdate(updateIDgames);
-
-                String updateIDmanga = MioStorage.SetCreatorIds(dataDir, ServletLog, "manga");
-                statement.executeUpdate(updateIDmanga);
-
-                String updateIDrecords = MioStorage.SetCreatorIds(dataDir, ServletLog, "record");
-                statement.executeUpdate(updateIDrecords);
+                ServletLog.log(Level.INFO, "Updating metadata for all .mio files...");
+                MioStorage.UpdateMetadata(connection, dataDir, ServletLog, "game");
+                MioStorage.UpdateMetadata(connection, dataDir, ServletLog, "manga");
+                MioStorage.UpdateMetadata(connection, dataDir, ServletLog, "record");
 
             } catch (Exception e) {
                 ServletLog.log(Level.SEVERE, e.getMessage());
