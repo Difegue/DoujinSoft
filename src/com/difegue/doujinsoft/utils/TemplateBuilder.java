@@ -119,7 +119,9 @@ public class TemplateBuilder {
 	public String doStandardPageGeneric(int type) throws Exception {
 
 		initializeTemplate(type, false);
-		String queryBase = "FROM " + tableName + " WHERE id NOT LIKE '%them%'";
+		String queryBase = "FROM " + tableName + " WHERE ";
+		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
+		queryBase += "id NOT LIKE '%them%'";
 
 		// Specific hash request
 		if (request.getParameterMap().containsKey("id")) {
