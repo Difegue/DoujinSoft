@@ -23,11 +23,12 @@ Unapproved .mios will be deleted.
 		playGame(mioData);
 	}
 
-	function easyFilter() {
+	function easyFilter(default_game_collection = "e_rc24_hnewmio.json") {
 
 		var checkboxes = Array.prototype.slice.call(document.getElementsByTagName('input'));
 		var comboboxes = document.getElementsByTagName('select');
 		var ids = new Array();
+		var names = new Array();
 
 		checkboxes.shift();
 
@@ -36,21 +37,30 @@ Unapproved .mios will be deleted.
 			ids.push($(this).text());
 		});
 
+		// Get name of every item
+		$('td:nth-child(3)').each(function () {
+			names.push($(this).text());
+		});
+
 		for (var i = 0; i < checkboxes.length; i++) {
 
-			console.log(ids[i]);
-			var isTemplate = ids[i].includes("wari") || ids[i].includes("nint");
-			console.log(isTemplate);
+			var isTemplate = ids[i].includes("wari") || ids[i].includes("nint") || ids[i].includes("them");
+			var isWarioQuest = names[i].includes("WarioQuest") || names[i].includes("ワリオクエスト");
+			console.log(ids[i] + "-" + names[i] + "- isTemplate:" + isTemplate + "- isWarioQuest:" + isWarioQuest);
 
 			if (checkboxes[i].type == 'checkbox') {
-				checkboxes[i].checked = !isTemplate;
+				checkboxes[i].checked = !isTemplate || isWarioQuest;
 			}
 
-			if (ids[i].startsWith("G")) {
-				comboboxes[i].value = "e_rc24_hnewmio.json";
+			if (ids[i].startsWith("G") && isWarioQuest) {
+				comboboxes[i].value = "warioquest.json";
 				continue;
 			}
 
+			if (ids[i].startsWith("G")) {
+				comboboxes[i].value = default_game_collection;
+				continue;
+			}
 
 			if (ids[i].startsWith("R")) {
 				comboboxes[i].value = "e_rc24_r.json";
@@ -209,7 +219,7 @@ one hash per line.
 <h1 class="white-text">Update Metadata(Name/Creator/Cartridge IDs) for entire DB:</h1>
 <form method="post">
 	<br />
-	<input type="submit" name = "set_creator_ids" value="Submit">
+	<input type="submit" name="set_creator_ids" value="Submit">
 </form>
 
 {% endblock %}
