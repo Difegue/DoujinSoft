@@ -1,7 +1,11 @@
 MAIL FROM: w{{mail.sender}}@{{mail.wc24Server}}
+
 RCPT TO: w{{mail.recipient}}@{{mail.wc24Server}}
+
 DATA
+
 From: w{{mail.sender}}@{{mail.wc24Server}}
+
 To: w{{mail.recipient}}@{{mail.wc24Server}}
 
 Subject: WC24 Cmd Message
