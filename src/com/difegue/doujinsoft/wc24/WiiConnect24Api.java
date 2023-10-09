@@ -39,7 +39,7 @@ public class WiiConnect24Api extends WC24Base {
         Logger log = Logger.getLogger("WC24");
 
         HttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost("https://mtw." + wc24Server + "/cgi-bin/send.cgi");
+        HttpPost httppost = new HttpPost("http://mtw." + wc24Server + "/cgi-bin/send.cgi");
 
         // Request parameters and other properties.
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -97,7 +97,7 @@ public class WiiConnect24Api extends WC24Base {
         // parameters.
         String authString = "mlid=w" + sender + "&passwd=" + wc24Pass;
         HttpPost request = new HttpPost(
-                "https://mtw." + wc24Server + "/cgi-bin/receive.cgi?" + authString + "&maxsize=2000000");
+                "http://mtw." + wc24Server + "/cgi-bin/receive.cgi?" + authString + "&maxsize=2000000");
 
         // Execute and get the response.
         HttpResponse response = httpclient.execute(request);
