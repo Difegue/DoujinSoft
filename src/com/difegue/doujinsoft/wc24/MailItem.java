@@ -165,8 +165,13 @@ public class MailItem {
             throw new Exception("Invalid Wii Friend Code.");
 
         sender = System.getenv("WII_NUMBER");
-        wc24Server = System.getenv("WC24_SERVER");
         recipient = recipientCode;
+        
+        // Handle specific servers having a mail subdomain or not
+        if (System.getenv("WC24_SERVER") == "rc24.xyz")
+            wc24Server = System.getenv("WC24_SERVER");
+        else
+            wc24Server = "mail." + System.getenv("WC24_SERVER");
     }
 
     private boolean validateFriendCode(String code) {
