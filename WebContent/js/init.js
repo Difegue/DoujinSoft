@@ -88,7 +88,7 @@ function truckClicked() {
 	r_text[5] = "Check the Upload page if you want to know how to extract .mio files from your saves.";
 	r_text[6] = "bazinga";
 	r_text[7] = "wow this is just like the news channel cat except cheaper";
-	r_text[8] = "Stuff sent through DIY Showcase with RiiConnect24 is automatically approved!";
+	r_text[8] = "Stuff sent through DIY Showcase with WiiLink24 is automatically approved!";
 	r_text[9] = 'The truck seems to have dropped...<a href="https://holopin.io/collect/clcv3bt7p577408l6cf44pbk6">something!</a>';
 	var i = Math.floor(10 * Math.random())
 

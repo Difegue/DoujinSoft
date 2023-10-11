@@ -178,7 +178,7 @@ public class MailItemParser extends WC24Base {
         String subdomain = "mail.";
         if (wc24Server == "rc24.xyz")
             subdomain = "";
-        
+
         // Other emails...
         // Change From: and To: to the server's wii address and the backup wii address
         // respectively
@@ -289,13 +289,13 @@ public class MailItemParser extends WC24Base {
         String collectionFile = dataDir + "/collections/";
         switch (type) {
             case "G":
-                collectionFile += "e_rc24_g";
+                collectionFile += "e_wl24_g";
                 break;
             case "RR":
-                collectionFile += "e_rc24_r";
+                collectionFile += "e_wl24_r";
                 break;
             case "MMM":
-                collectionFile += "e_rc24_m";
+                collectionFile += "e_wl24_m";
                 break;
         }
 

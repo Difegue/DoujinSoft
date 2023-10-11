@@ -194,7 +194,7 @@ public class MailItem {
 
     private static String RECAP_FOOTER =
         "~~~~~ Service provided for fun ~~~~~\n" +
-        "~~~~~   by RiiConnect24 and  ~~~~~\n" +
+        "~~~~~   by WiiLink24 and  ~~~~~\n" +
         "~~~~~    Difegue @ TVC-16    ~~~~~";
 
     private static String[] LETTERHEAD_MIIS = {

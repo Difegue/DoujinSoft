@@ -10,7 +10,7 @@ Ship out content to your game, (nearly) all handled by us.
 <br><br>
 You can upload a Wii/NDS save here, and we'll import the games/comics/records you've chosen into it.
 <br>
-Alternatively, if your Wii console is using <a href="http://rc24.xyz">RiiConnect24</a>, we can send stuff directly to
+Alternatively, if your Wii console is using <a href="http://wiilink24.com">WiiLink24</a>, we can send stuff directly to
 it. No save export/import needed! <br>
 {% endblock %}
 
@@ -28,7 +28,7 @@ it. No save export/import needed! <br>
 			<label>
 				<input class="with-gap" name="method" type="radio" id="wc24-radio" value="wc24" checked
 					onclick="updateShipping('wc24')">
-				<span>RiiConnect24</span>
+				<span>WiiLink24</span>
 			</label>
 
 			<label>
@@ -56,7 +56,7 @@ it. No save export/import needed! <br>
 			<i class="material-icons prefix">contact_mail</i>
 			<input id="recipient" name="recipient" type="text" class="validate white-text" data-length="16">
 			<label for="recipient" class="">Wii Friend Code</label>
-			This will send the content to your Wii through RiiConnect24. <br /> Make sure you're <a href="#regmodal"
+			This will send the content to your Wii through WiiLink24. <br /> Make sure you're <a href="#regmodal"
 				class="modal-trigger">friends</a> with us before using this!
 		</div>
 
@@ -83,7 +83,7 @@ it. No save export/import needed! <br>
 	<div class="modal-content black-text">
 		<h4>Register your Wii with DoujinSoft</h4>
 		<p>
-			In order to use RiiConnect24 to receive games from DoujinSoft, you must first register your Wii Friend Code.
+			In order to use WiiLink24 to receive games from DoujinSoft, you must first register your Wii Friend Code.
 			<br>
 			Add our <b>Friend Code</b> to your Wii first:
 		</p>
@@ -99,7 +99,7 @@ it. No save export/import needed! <br>
 			<a class="waves-effect waves-light btn" onclick="registerFriendCode()">Add me!</a> <span id="regresult"
 				style="margin-left:10px"> </span>
 			<br><br><br>
-			If you don't want to use RiiConnect24, just close this popup and we won't ask again! 🙏
+			If you don't want to use WiiLink24, just close this popup and we won't ask again! 🙏
 
 		</p>
 	</div>
@@ -118,7 +118,12 @@ it. No save export/import needed! <br>
 	var record = JSON.parse(localStorage.getItem("record"));
 
 	if (games === null && manga === null && record === null)
-		$("#cart-content").html('<h5 class="white-text center">...But your cart seems to be empty right now.</h5> <br/> <br/>  <span class="white-text" style="font-size:10vw">¯\\_(ツ)_/¯</span>   ');
+		$("#cart-content").html(`
+			<h5 class="white-text center">...But your cart seems to be empty right now.</h5> 
+			<br/> <br/>  
+			<span class="white-text" style="font-size:10vw">¯\\_(ツ)_/¯</span> 
+			<br/>
+			<span class="white-text">Need to register your Wii Friend Code? <a href="#regmodal" class="modal-trigger">Click here.</a></span>`);
 
 	if (games != null)
 		for (i = 0; i < games.length; i++)
