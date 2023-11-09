@@ -67,6 +67,17 @@
 
 <body>
 
+  <script type="module">
+    import init, { play_sound, stop_sound } from "./js/vendor/synth_wasm/synth_wasm.js";
+
+    init().then(() => {
+      window.synth_wasm = {
+        play_sound,
+        stop_sound,
+      }
+    });
+  </script>
+
   <div class="navbar-fixed">
     <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">
       <div class="nav-wrapper container">

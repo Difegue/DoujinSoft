@@ -22,4 +22,4 @@ cp WebContent/soundfont/freepats.cfg node_modules/timidity/freepats.cfg
 
 browserify -r timidity -o WebContent/js/vendor/timidity.js -s timidity
 browserify -r mio-player -o WebContent/js/vendor/mio-player.js -s mio
-browserify -r mio-midi -o WebContent/js/vendor/mio-midi.js -s buildMidiFile
+browserify -r mio-midi -o WebContent/js/vendor/mio-midi.js -s mio_midi

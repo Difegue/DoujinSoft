@@ -65,7 +65,6 @@
     var score;
     var isPlayingCollection = false;
     var currentCollectionIteration = 0;
-    var hasTrackEnded = false;
     var lostLastGame = false;
     var isBossGame = false;
     var tempHash = null;
@@ -80,11 +79,15 @@
     var sounds = [];
     var playerSounds = [];
 
+    var sf2Data = null;
+    (async () => {
+    sf2Data = await _fetch('./soundfont/WarioWare_D.I.Y._Soundfont.sf2')
+    })();
+
     $('#game-modal').modal({
         dismissible: true,
         onCloseEnd: function () {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            player.pause();
             mioPlayer.stop();
 
             // Stop all sounds
@@ -389,9 +392,7 @@
         } else {
             loopTimes = 11; // boss length (11 is a completely arbitrary number)
         }
-        midiData = window.buildMidiFile(mioData, loopTimes);
-
-        await player.load(midiData);
+        midiData = window.mio_midi.buildMidiFile(mioData, loopTimes);
     }
 
     function playGame(mioData) {
@@ -444,17 +445,11 @@
         canvas.addEventListener('touchstart', handleTouchStart, false);
         document.addEventListener('touchend', handleTouchEnd, false);
 
-        player.on('ended', () => { hasTrackEnded = true; });
-
         mioPlayer.musicPlayer = {
             playMusic: () => {
-                player.pause();
-                player.seek(0);
-                player.play();
-                hasTrackEnded = false;
+                window.synth_wasm.play_sound(sf2Data, midiData)
             },
-            pauseMusic: () => player.pause(),
-            hasTrackEnded: () => hasTrackEnded,
+            stopMusic: () => window.synth_wasm.stop_sound(),
         };
 
         let fontBitmap = new Image();
@@ -479,8 +474,7 @@
         }
 
         // Single game replay
-        player.pause();
-        player.load(midiData);
+        window.synth_wasm.play_sound(sf2Data, midiData)
         mioPlayer.loadAndStart(mioData);
     }
 
