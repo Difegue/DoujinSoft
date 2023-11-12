@@ -364,24 +364,6 @@
         mioPlayer.withdrawTouchFromScreen();
     }
 
-    // _fetch function taken from timidity by Feross Aboukhadijeh
-    // https://github.com/feross/timidity
-    async function _fetch(url) {
-        const opts = {
-            mode: 'cors',
-            credentials: 'same-origin'
-        }
-        const response = await window.fetch(url, opts)
-        if (response.status !== 200) {
-            popToast(`Could not load ${url}`);
-            throw new Error(`Could not load ${url}`)
-        };
-
-        const arrayBuffer = await response.arrayBuffer()
-        const buf = new Uint8Array(arrayBuffer)
-        return buf
-    }
-
     async function buildMidiData(mioData) {
         let loopTimes;
 
@@ -447,9 +429,15 @@
 
         mioPlayer.musicPlayer = {
             playMusic: () => {
-                window.synth_wasm.play_sound(sf2Data, midiData)
+                if (window.synth_wasm) {
+                    window.synth_wasm.play_sound(sf2Data, midiData)
+                }
             },
-            stopMusic: () => window.synth_wasm.stop_sound(),
+            stopMusic: () => {
+                if (window.synth_wasm) {
+                    window.synth_wasm.stop_sound()
+                }
+            },
         };
 
         let fontBitmap = new Image();
@@ -474,7 +462,9 @@
         }
 
         // Single game replay
-        window.synth_wasm.play_sound(sf2Data, midiData)
+        if (window.synth_wasm) {
+            window.synth_wasm.play_sound(sf2Data, midiData);
+        }
         mioPlayer.loadAndStart(mioData);
     }
 

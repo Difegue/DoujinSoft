@@ -245,10 +245,33 @@ function popToast(message) {
 	M.toast({html:message, displayLength: 4000, classes: 'rounded grey lighten-4 black-text'});
 }
 
-function playMidi(id) {
+
+// _fetch function taken from timidity by Feross Aboukhadijeh
+// https://github.com/feross/timidity
+async function _fetch(url) {
+	const opts = {
+		mode: 'cors',
+		credentials: 'same-origin'
+	}
+	const response = await window.fetch(url, opts)
+	if (response.status !== 200) {
+		popToast(`Could not load ${url}`);
+		throw new Error(`Could not load ${url}`)
+	};
+
+	const arrayBuffer = await response.arrayBuffer()
+	const buf = new Uint8Array(arrayBuffer)
+	return buf
+}
+
+async function playMidi(id) {
 	
 	$("#toast-container .toast").remove();
 	$(".playing").removeClass("playing");
+
+	if (!window.sf2Data) {
+		window.sf2Data = await _fetch('./soundfont/WarioWare_D.I.Y._Soundfont.sf2')
+	}
 
 	if (id != currentlyPlayingMidi) {
 	
@@ -256,11 +279,14 @@ function playMidi(id) {
 		popToast("Playing MIDI for id "+id);
 		
 		$("#"+id+"-record").addClass("playing");
-		player.load('../../midi?id='+id);
-		player.play();
+		let mioData = await _fetch('/download?type=record&id='+id);
+
+		let midiData = window.mio_midi.buildMidiRecordFile(mioData);
+
+		window.synth_wasm.play_sound(window.sf2Data, midiData);
 	}
 	else {
-		player.pause();
+		window.synth_wasm.stop_sound();
 		currentlyPlayingMidi = "";
 		popToast("Playback Stopped.");
 	}
