@@ -23,7 +23,7 @@ Unapproved .mios will be deleted.
 		playGame(mioData);
 	}
 
-	function easyFilter(default_game_collection = "e_rc24_hnewmio.json") {
+	function easyFilter(default_game_collection = "d_newmio.json") {
 
 		var checkboxes = Array.prototype.slice.call(document.getElementsByTagName('input'));
 		var comboboxes = document.getElementsByTagName('select');
@@ -63,12 +63,12 @@ Unapproved .mios will be deleted.
 			}
 
 			if (ids[i].startsWith("R")) {
-				comboboxes[i].value = "e_rc24_r.json";
+				comboboxes[i].value = "d_newmio_r.json";
 				continue;
 			}
 
 			if (ids[i].startsWith("M")) {
-				comboboxes[i].value = "e_rc24_m.json";
+				comboboxes[i].value = "d_newmio_m.json";
 				continue;
 			}
 		}
