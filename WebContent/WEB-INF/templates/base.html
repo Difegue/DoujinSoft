@@ -35,7 +35,7 @@
   <script src='js/vendor/mio-player.js'></script>
   <script src='js/vendor/mio-midi.js'></script>
   <script src="js/jquery.simplePagination.js"></script>
-  <script src="js/init.js?v3.6"></script>
+  <script src="js/init.js?v3.7"></script>
 
   <script data-goatcounter="https://ohmy.tvc-16.science/count" async src="//ohmy.tvc-16.science/count.js"></script>
 
@@ -66,6 +66,17 @@
 </head>
 
 <body>
+
+  <script type="module">
+    import init, { play_sound, stop_sound } from "./js/vendor/synth-wasm/synth_wasm.js";
+
+    init().then(() => {
+      window.synth_wasm = {
+        play_sound,
+        stop_sound,
+      }
+    });
+  </script>
 
   <div class="navbar-fixed">
     <nav class="{% block color %}indigo{% endblock %} darken-3" role="navigation">

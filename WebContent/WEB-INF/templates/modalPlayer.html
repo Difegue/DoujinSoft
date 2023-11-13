@@ -65,7 +65,6 @@
     var score;
     var isPlayingCollection = false;
     var currentCollectionIteration = 0;
-    var hasTrackEnded = false;
     var lostLastGame = false;
     var isBossGame = false;
     var tempHash = null;
@@ -80,11 +79,15 @@
     var sounds = [];
     var playerSounds = [];
 
+    var sf2Data = null;
+    (async () => {
+    sf2Data = await _fetch('./soundfont/WarioWare_D.I.Y._Soundfont.sf2')
+    })();
+
     $('#game-modal').modal({
         dismissible: true,
         onCloseEnd: function () {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            player.pause();
             mioPlayer.stop();
 
             // Stop all sounds
@@ -361,24 +364,6 @@
         mioPlayer.withdrawTouchFromScreen();
     }
 
-    // _fetch function taken from timidity by Feross Aboukhadijeh
-    // https://github.com/feross/timidity
-    async function _fetch(url) {
-        const opts = {
-            mode: 'cors',
-            credentials: 'same-origin'
-        }
-        const response = await window.fetch(url, opts)
-        if (response.status !== 200) {
-            popToast(`Could not load ${url}`);
-            throw new Error(`Could not load ${url}`)
-        };
-
-        const arrayBuffer = await response.arrayBuffer()
-        const buf = new Uint8Array(arrayBuffer)
-        return buf
-    }
-
     async function buildMidiData(mioData) {
         let loopTimes;
 
@@ -389,9 +374,7 @@
         } else {
             loopTimes = 11; // boss length (11 is a completely arbitrary number)
         }
-        midiData = window.buildMidiFile(mioData, loopTimes);
-
-        await player.load(midiData);
+        midiData = window.mio_midi.buildMidiFile(mioData, loopTimes);
     }
 
     function playGame(mioData) {
@@ -444,17 +427,17 @@
         canvas.addEventListener('touchstart', handleTouchStart, false);
         document.addEventListener('touchend', handleTouchEnd, false);
 
-        player.on('ended', () => { hasTrackEnded = true; });
-
         mioPlayer.musicPlayer = {
             playMusic: () => {
-                player.pause();
-                player.seek(0);
-                player.play();
-                hasTrackEnded = false;
+                if (window.synth_wasm) {
+                    window.synth_wasm.play_sound(sf2Data, midiData)
+                }
             },
-            pauseMusic: () => player.pause(),
-            hasTrackEnded: () => hasTrackEnded,
+            stopMusic: () => {
+                if (window.synth_wasm) {
+                    window.synth_wasm.stop_sound()
+                }
+            },
         };
 
         let fontBitmap = new Image();
@@ -479,8 +462,9 @@
         }
 
         // Single game replay
-        player.pause();
-        player.load(midiData);
+        if (window.synth_wasm) {
+            window.synth_wasm.play_sound(sf2Data, midiData);
+        }
         mioPlayer.loadAndStart(mioData);
     }
 
