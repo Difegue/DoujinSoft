@@ -61,7 +61,7 @@
 	<ul class="pagination"></ul>
 </div>
 
-<div class="fixed-action-btn">
+<div class="fixed-action-btn" style="display:none">
 	<!-- style="scale: 2;margin-right: 12px;margin-bottom: 24px;"-->
 	<a id="playbtn" class="waves-effect waves-light btn btn-floating tooltipped" data-tooltip="Play!"
 		data-position="top" onclick="startCollectionPlayer(collectionHashes)">
@@ -92,6 +92,7 @@
 	let tapTarget = $('.tap-target').tapTarget({
 		onClose: () => localStorage.sawCollectionInfo = true
 	});
+	$('.fixed-action-btn').show();
 
 	//if (localStorage.getItem("sawCollectionInfo") === null) {
 	tapTarget.tapTarget('open');
