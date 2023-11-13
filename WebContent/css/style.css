@@ -238,8 +238,8 @@ label.active {
 }
 
 .game-text {
-
-    margin-bottom: -10px !important;
+    margin-top: 12px;
+    margin-bottom: -12px !important;
     font-size: 22px !important;
     display: inline-flex !important;
     height: 80px;
