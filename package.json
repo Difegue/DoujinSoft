@@ -25,8 +25,7 @@
     "jquery-ui": "^1.12.1",
     "mio-player": "1.0.0-beta.1",
     "mio-midi": "1.0.0-beta.8",
-    "synth-wasm": "0.1.0",
-    "timidity": "git://github.com/yeahross0/timidity#aa1b2e0"
+    "synth-wasm": "0.1.0"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

@@ -3,8 +3,6 @@ target/*
 DoujinSoft.iml
 node_modules
 package-lock.json
-WebContent/soundfont/libtimidity.wasm
-WebContent/soundfont/WarioWare_D.I.Y._Soundfont.sf2
 WebContent/js/vendor/*
 WebContent/css/vendor/*
 .settings/*
