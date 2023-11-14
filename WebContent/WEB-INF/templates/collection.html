@@ -87,13 +87,14 @@
 {% else %}
 {% include "./modalPlayer.html" %}
 <script>
+	$('.fixed-action-btn').show();
+
 	// Keep track of all the hashes in this collection
 	const collectionHashes = [{% for hash in collection.mios %} "{{hash}}", {% endfor %} ];
 	let tapTarget = $('.tap-target').tapTarget({
 		onClose: () => localStorage.sawCollectionInfo = true
 	});
-	$('.fixed-action-btn').show();
-
+	
 	//if (localStorage.getItem("sawCollectionInfo") === null) {
 	tapTarget.tapTarget('open');
 	//}
