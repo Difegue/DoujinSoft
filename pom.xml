@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>DoujinSoft</groupId>
   <artifactId>DoujinSoft</artifactId>
-  <version>3.7.0</version>
+  <version>3.8.0</version>
   <packaging>war</packaging>
   <name>DoujinSoft Store</name>
   <build>
@@ -48,6 +48,7 @@
   </build>
   
   <repositories>
+    <!-- For jfugue.jar, cursed with it as long as we build DIYEdit as-is -->
 	  <repository>
 	    <id>ProjectRepo</id>
 	    <name>ProjectRepo</name>
