@@ -238,13 +238,15 @@ public class MioStorage {
                     String hash = MioStorage.computeMioHash(mioData);
                     String name = metadata.getName();
                     String desc = metadata.getDescription();
+                    String brand = metadata.getBrand();
+                    String creator = metadata.getCreator();
                     String creatorId = metadata.getCreatorId();
                     String cartridgeId = metadata.getCartridgeId();
     
                     int type = mioData.length;
     
                     // Log and execute query
-                    query = UpdateMetadataQuery(connection, type, hash, name, desc, creatorId, cartridgeId);
+                    query = UpdateMetadataQuery(connection, type, hash, name, desc, brand, creator, creatorId, cartridgeId);
                     logger.log(Level.INFO, query.toString());
                     query.executeUpdate();
                     uncompressedFile.delete();
@@ -261,20 +263,20 @@ public class MioStorage {
     /*
      * Test method to get SQL statement to update creator ID
      */
-    private static PreparedStatement UpdateMetadataQuery(Connection co, int type, String hash, String name, String desc, String creatorId, String cartridgeId) throws Exception
+    private static PreparedStatement UpdateMetadataQuery(Connection co, int type, String hash, String name, String desc, String brand, String creator, String creatorId, String cartridgeId) throws Exception
     {
         PreparedStatement ret = null;
         String update = "";
     
         switch (type) {
             case MioUtils.Types.GAME:
-            update = "UPDATE Games SET name = ?, description = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?; ";
+            update = "UPDATE Games SET name = ?, description = ?, brand = ?, creator = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?; ";
                 break;
             case MioUtils.Types.MANGA:
-            update = "UPDATE Manga SET name = ?, description = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?;";
+            update = "UPDATE Manga SET name = ?, description = ?, brand = ?, creator = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?;";
                 break;
             case MioUtils.Types.RECORD:
-            update = "UPDATE Records SET name = ?, description = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?;";
+            update = "UPDATE Records SET name = ?, description = ?, brand = ?, creator = ?, creatorID = ?, cartridgeID = ? WHERE hash == ?;";
                 break;
             default:
             throw new Exception("Invalid file size");
@@ -284,9 +286,11 @@ public class MioStorage {
 
         ret.setString(1, name);
         ret.setString(2, desc);
-        ret.setString(3, creatorId);
-        ret.setString(4, cartridgeId);
-        ret.setString(5, hash);
+        ret.setString(3, brand);
+        ret.setString(4, creator);
+        ret.setString(5, creatorId);
+        ret.setString(6, cartridgeId);
+        ret.setString(7, hash);
 
         return ret;
     }
