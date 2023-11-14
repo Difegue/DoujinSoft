@@ -8,7 +8,7 @@ jobs:
     - uses: actions/checkout@master
     - name: Pull and organize front-end dependencies
       run: |
-        npm install
+        npm ci
         npm run install-front
     - name: Pull submodule
       run : |
