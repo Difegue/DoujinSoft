@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>DoujinSoft</groupId>
   <artifactId>DoujinSoft</artifactId>
-  <version>3.8.0</version>
+  <version>3.8.1</version>
   <packaging>war</packaging>
   <name>DoujinSoft Store</name>
   <build>
@@ -46,22 +46,8 @@
     </plugins>
     
   </build>
-  
-  <repositories>
-    <!-- For jfugue.jar, cursed with it as long as we build DIYEdit as-is -->
-	  <repository>
-	    <id>ProjectRepo</id>
-	    <name>ProjectRepo</name>
-	    <url>file://${project.basedir}/libs-ext</url>
-	  </repository>
-  </repositories>
 
   <dependencies>
-    <dependency>
-        <groupId>jfugue</groupId>
-        <artifactId>jfugue</artifactId>
-        <version>4.0.3</version>
-    </dependency>
     <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
