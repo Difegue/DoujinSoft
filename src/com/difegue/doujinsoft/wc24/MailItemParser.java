@@ -34,7 +34,7 @@ import com.difegue.doujinsoft.templates.Collection;
 
 public class MailItemParser extends WC24Base {
 
-    private final Pattern pattern = Pattern.compile("w([0-9]*)@.*" + Pattern.quote(wc24Server));
+    private final Pattern pattern = Pattern.compile("w([0-9]*)@" + Pattern.quote(wc24Server));
     private String dataDir;
     private String mailFallbackCode;
 

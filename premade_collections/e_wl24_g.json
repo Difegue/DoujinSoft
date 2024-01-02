@@ -2,7 +2,7 @@
     "collection_name": "Games from WiiLink",
     "collection_color": "green",
     "collection_icon": "local_convenience_store",
-    "background_pic": "https://www.wiilink24.com/Images/deliveruwu.png",
+    "background_pic": "./img/bg_wiilink.png",
     "collection_desc": "These Games have been sent directly from RiiConnect24 (A WiiLink™️ service) users.",
     "collection_desc2": "You can register your own Wii with DoujinSoft from the Cart and send/receive content directly with DIY Showcase!",
     "mios": []

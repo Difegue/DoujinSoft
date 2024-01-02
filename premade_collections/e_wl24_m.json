@@ -3,7 +3,7 @@
     "collection_name": "Comics from WiiLink",
     "collection_color": "blue",
     "collection_icon": "local_convenience_store",
-    "background_pic": "https://www.wiilink24.com/Images/deliveruwu.png",
+    "background_pic": "./img/bg_wiilink_blue.png",
     "collection_desc": "These Comics have been sent directly from RiiConnect24 (A WiiLink™️ service) users.",
     "collection_desc2": "You can register your own Wii with DoujinSoft from the Cart and send/receive content directly with DIY Showcase!",
     "mios": []
