@@ -174,19 +174,14 @@ public class MailItemParser extends WC24Base {
             return new MailItem(wiiCode, List.of(name), true);
         }
 
-        // Handle specific servers having a mail subdomain or not
-        String subdomain = "mail.";
-        if (wc24Server == "rc24.xyz")
-            subdomain = "";
-
         // Other emails...
         // Change From: and To: to the server's wii address and the backup wii address
         // respectively
-        message.setFrom(new InternetAddress("w" + sender + "@" + subdomain + wc24Server));
-        message.addHeader("MAIL FROM", "w" + sender + "@" + subdomain + wc24Server);
+        message.setFrom(new InternetAddress("w" + sender + "@" + wc24Server));
+        message.addHeader("MAIL FROM", "w" + sender + "@" + wc24Server);
         message.setRecipients(RecipientType.TO,
-                new Address[] { new InternetAddress("w" + mailFallbackCode + "@" + subdomain + wc24Server) });
-        message.addHeader("RCPT TO", "w" + mailFallbackCode + "@" + subdomain + wc24Server);
+                new Address[] { new InternetAddress("w" + mailFallbackCode + "@" + wc24Server) });
+        message.addHeader("RCPT TO", "w" + mailFallbackCode + "@" + wc24Server);
 
         // Add the original sender's Wii code as an AltName so it appears on the message
         // board

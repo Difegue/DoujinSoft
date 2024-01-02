@@ -53,6 +53,11 @@ public class Collection {
 		  if (mios == null)
 		  	mios = new String[0];
 
+		  // Check if the hash isn't already present 
+		  for (String mio : mios)
+			if (mio.equals(hash))
+				return;
+
 		  String[] newMios = Arrays.copyOf(mios, mios.length + 1);
 		  newMios[mios.length] = hash;
 		  mios = newMios;
