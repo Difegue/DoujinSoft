@@ -208,7 +208,7 @@ public class MailItem {
             "The following content has been sent  to your Wii alongside this message:\n\n";
 
     private static String RECAP_FOOTER = "~~~~~ Service provided for fun ~~~~~\n" +
-            "~~~~~   by WiiLink24 and  ~~~~~\n" +
+            "~~~~~     by WiiLink and     ~~~~~\n" +
             "~~~~~    Difegue @ TVC-16    ~~~~~";
 
     private static String[] LETTERHEAD_MIIS = {
