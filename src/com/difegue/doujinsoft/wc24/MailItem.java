@@ -183,6 +183,8 @@ public class MailItem {
 
         sender = System.getenv("WII_NUMBER");
         recipient = recipientCode;
+
+        wc24Server = System.getenv("WC24_SERVER");
     }
 
     private boolean validateFriendCode(String code) {

@@ -8,12 +8,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
@@ -67,6 +69,18 @@ public class WiiConnect24Api extends WC24Base {
         HttpEntity formDataEntity = builder.build();
         httppost.setEntity(formDataEntity);
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        builder.build().writeTo(baos);
+
+        try {
+            log.log(Level.INFO, "Executing request:" + System.lineSeparator() 
+            + httppost.getRequestLine() + System.lineSeparator()
+            + baos.toString());
+        }
+        catch (Exception e) {
+            log.log(Level.INFO, e.getMessage() );
+        }
+
         // Execute and get the response.
         HttpResponse response = httpclient.execute(httppost);
         HttpEntity entity = response.getEntity();
@@ -76,7 +90,7 @@ public class WiiConnect24Api extends WC24Base {
 
                 // Just return the server response as-is for the time being.
                 String wc24rep = new String(inStream.readAllBytes(), StandardCharsets.UTF_8);
-                log.log(Level.INFO, wc24rep);
+                log.log(Level.INFO, "Reply from WC24 server: " + wc24rep);
                 return wc24rep;
             }
         }
