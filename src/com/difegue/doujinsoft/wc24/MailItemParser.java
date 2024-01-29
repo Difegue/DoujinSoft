@@ -144,7 +144,12 @@ public class MailItemParser extends WC24Base {
             // 0x19 (25 bytes) for the title, a byte for the type, a byte for how many
             // stars, and a byte for the comment
             String title = new String(Arrays.copyOfRange(survey, 0, 24));
-            saveSurveyAnswer(survey[25], title, survey[26], survey[27]);
+
+            // Discard surveys with empty titles
+            if (title.isEmpty() || title.isBlank())
+                return null;
+
+            saveSurveyAnswer(wiiCode, survey[25], title, survey[26], survey[27]);
 
             log.log(Level.INFO, "Survey for " + title);
 
@@ -232,16 +237,17 @@ public class MailItemParser extends WC24Base {
         return Files.readAllBytes(new File(filePath + "d").toPath());
     }
 
-    private boolean saveSurveyAnswer(byte type, String title, byte stars, byte comment) {
+    private boolean saveSurveyAnswer(String sender, byte type, String title, byte stars, byte comment) {
 
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
-            PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?)");
+            PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?,?)");
             ret.setLong(1, System.currentTimeMillis());
             ret.setInt(2, type & 0xFF);
             ret.setString(3, title);
             ret.setInt(4, stars & 0xFF);
             ret.setInt(5, comment & 0xFF);
+            ret.setString(6, sender);
 
             ret.executeUpdate();
 
