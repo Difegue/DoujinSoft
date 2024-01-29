@@ -125,8 +125,8 @@ function loadItems(pageNumber) {
 
 	//Posts to itself -> one function for all three pages
 	$.post( url, { page: pageNumber, 
-									name: $("#item_name").val(), 
-									creator: $("#maker_name").val(),
+									name: $("#item_name").val().trim(), 
+									creator: $("#maker_name").val().trim(),
 									cartridge_id: $("#cartridge_id").val(),
 									creator_id: $("#creator_id").val(),
 									sort_by: $("#sort_by").val()} )
@@ -186,11 +186,24 @@ function clearSearch() {
 	loadItems(1);
 }
 
-function searchForUser(cartridgeId, creatorId) {
+function searchForUser(creatorName, cartridgeId, creatorId) {
+
 	$("#item_name").val("");
-	$("#maker_name").val("");
-	$("#cartridge_id").val(cartridgeId);
-	$("#creator_id").val(creatorId);
+
+	if (cartridgeId !== "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" && cartridgeId !== "00000000000000000000000000000000" && creatorId !== "FFFF0000FFFFFFFF") {
+		// IDs look legit
+		$("#maker_name").val("");
+		$("#cartridge_id").val(cartridgeId);
+		$("#creator_id").val(creatorId);
+	}
+	else {
+		// IDs are invalid, so we'll do a regular name search
+		$("#maker_name").val(creatorName);
+		$("#cartridge_id").val("");
+		$("#creator_id").val("");
+	}
+	
+	// Do search
 	M.updateTextFields();
 	loadItems(1);
 	loadCreatorInfo();
