@@ -121,17 +121,24 @@ public class MailItemParser extends WC24Base {
             log.log(Level.INFO, "Mail doesn't come from a Wii - Skipping.");
             return null;
         }
-        saveFriendCode(wiiCode);
 
         String subject = message.getSubject();
 
         if (subject == null) // The Wii doesn't care about the subject field
             subject = "";
 
-        // Friend request
-        if (subject.equals("WC24 Cmd Message")) {
-            log.log(Level.INFO, "Friend request from " + wiiCode);
-            return new MailItem(wiiCode);
+        if (!isFriendCodeSaved(wiiCode)) {
+
+            // If the mail is a friend request, handle it
+            if (subject.equals("WC24 Cmd Message")) {
+                log.log(Level.INFO, "Friend request from " + wiiCode);
+                saveFriendCode(wiiCode);
+                return new MailItem(wiiCode);
+            } else {
+                // Reject non-friend request mails that don't have a code stored in the Friends table
+                log.log(Level.INFO, "Mail from unregistered Friend Code - Skipping.");
+                return null;
+            }
         }
 
         // Survey box
@@ -271,6 +278,20 @@ public class MailItemParser extends WC24Base {
             connection.close();
             return true;
 
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    private boolean isFriendCodeSaved(String code) {
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+
+            PreparedStatement ret = connection.prepareStatement("select COUNT(*) from Friends WHERE friendcode = ?");
+            ret.setString(1, code);
+            
+            ResultSet result = ret.executeQuery();
+		    int res = result.getInt(1);
+            return (res == 1);
         } catch (SQLException e) {
             return false;
         }
