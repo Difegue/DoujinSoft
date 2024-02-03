@@ -123,13 +123,13 @@ function loadItems(pageNumber) {
 	url = url.replace(/cartridge_id=[^&]*/g, "");
 	url = url.replace(/creator_id=[^&]*/g, "");
 
-	//Posts to itself -> one function for all three pages
+	//Posts to itself -> one function for all three pages + surveys
 	$.post( url, { page: pageNumber, 
-									name: $("#item_name").val().trim(), 
-									creator: $("#maker_name").val().trim(),
-									cartridge_id: $("#cartridge_id").val(),
-									creator_id: $("#creator_id").val(),
-									sort_by: $("#sort_by").val()} )
+									name: $("#item_name").val()?.trim(), 
+									creator: $("#maker_name").val()?.trim(),
+									cartridge_id: $("#cartridge_id")?.val(),
+									creator_id: $("#creator_id")?.val(),
+									sort_by: $("#sort_by")?.val()} )
 		.done(function( data ) {		
 			$("#content").html(data);
 			updateTooltips();
