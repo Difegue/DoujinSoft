@@ -23,7 +23,7 @@
     "blueimp-file-upload": "^10.32.0",
     "jquery": "^3.6.0",
     "jquery-ui": "^1.12.1",
-    "mio-player": "1.0.0",
+    "mio-player": "1.1.0",
     "mio-midi": "1.0.0-beta.9",
     "synth-wasm": "0.1.0"
   },
