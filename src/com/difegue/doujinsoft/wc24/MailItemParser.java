@@ -78,6 +78,16 @@ public class MailItemParser extends WC24Base {
         for (String content : mailItems) {
             try {
 
+                if (content.contains("This part is ignored")) {
+                    // What it says on the tin!
+                    continue;
+                }
+
+                if (content.length() == 0) {
+                    // Skip empty items
+                    continue;
+                }
+
                 // Strip "Content-Type: text/plain" at the beginning of the item
                 content = content.substring(30);
                 MailItem toSend = analyzeMail(content);
@@ -136,7 +146,8 @@ public class MailItemParser extends WC24Base {
                 saveFriendCode(wiiCode);
                 return new MailItem(wiiCode);
             } else {
-                // Reject non-friend request mails that don't have a code stored in the Friends table
+                // Reject non-friend request mails that don't have a code stored in the Friends
+                // table
                 log.log(Level.INFO, "Mail from unregistered Friend Code - Skipping.");
                 return null;
             }
@@ -289,9 +300,9 @@ public class MailItemParser extends WC24Base {
 
             PreparedStatement ret = connection.prepareStatement("select COUNT(*) from Friends WHERE friendcode = ?");
             ret.setString(1, code);
-            
+
             ResultSet result = ret.executeQuery();
-		    int res = result.getInt(1);
+            int res = result.getInt(1);
             return (res == 1);
         } catch (SQLException e) {
             return false;
