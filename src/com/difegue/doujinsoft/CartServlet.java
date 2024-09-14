@@ -39,7 +39,6 @@ import com.xperia64.diyedit.editors.MangaEdit;
 import com.xperia64.diyedit.editors.RecordEdit;
 import com.xperia64.diyedit.saveutils.SaveHandler;
 
-
 /**
  * Servlet implementation class for the Cart.
  */
@@ -47,23 +46,23 @@ import com.xperia64.diyedit.saveutils.SaveHandler;
 @MultipartConfig
 public class CartServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    private Logger ServletLog;
-    
+	private Logger ServletLog;
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws  IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		response.setContentType("text/html; charset=UTF-8");
-		ServletContext application = getServletConfig().getServletContext();			
+		ServletContext application = getServletConfig().getServletContext();
 		String output = "";
-		
+
 		try {
-			
-	    	output = doStandardPage(application);
+
+			output = doStandardPage(application);
 			response.getWriter().append(output);
-				
+
 		} catch (PebbleException e) {
 			ServletLog.log(Level.SEVERE, e.getMessage());
 		}
@@ -71,14 +70,16 @@ public class CartServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		boolean gotFileContentType = false;
 		String output = "Invalid file.";
 
 		if (request.getParameter("method").equals("wc24")) {
-			//post contains a Wii number
+			// post contains a Wii number
 			try {
 				output = sendWC24(request, response);
 			} catch (Exception e) {
@@ -87,7 +88,7 @@ public class CartServlet extends HttpServlet {
 		}
 
 		if (request.getParameter("method").equals("savefile")) {
-			//post contains a gameSave
+			// post contains a gameSave
 			try {
 				gotFileContentType = injectMios(request, response);
 			} catch (Exception e) {
@@ -95,13 +96,12 @@ public class CartServlet extends HttpServlet {
 			}
 		}
 
-		//Output is CT text/html unless we're sending out a file
-		if (!gotFileContentType)
-		{
+		// Output is CT text/html unless we're sending out a file
+		if (!gotFileContentType) {
 			response.setContentType("text/html; charset=UTF-8");
 			response.getWriter().append(output);
 		}
-		
+
 	}
 
 	private String sendWC24(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -112,14 +112,15 @@ public class CartServlet extends HttpServlet {
 		Cart cartData = new Cart(request);
 		String recipientNumber = request.getParameter("recipient");
 
-		ServletLog.log(Level.INFO, "Cart has " + cartData.getGames().size() + " games, " + cartData.getRecords().size() + " records and " + cartData.getManga().size() + " manga.");
+		ServletLog.log(Level.INFO, "Cart has " + cartData.getGames().size() + " games, " + cartData.getRecords().size()
+				+ " records and " + cartData.getManga().size() + " manga.");
 		ServletLog.log(Level.INFO, "Checking out via WC24 mails to " + recipientNumber);
 		List<MailItem> mailsToSend = new ArrayList<>();
 
 		// DIY mails
 		List<String> contentNames = new ArrayList<>();
 
-		for( JsonElement o: cartData.getGames()) {
+		for (JsonElement o : cartData.getGames()) {
 
 			String hash = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/game/" + hash + ".miozip";
@@ -130,7 +131,7 @@ public class CartServlet extends HttpServlet {
 			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.GAME, application));
 		}
 
-		for( JsonElement o: cartData.getRecords()) {
+		for (JsonElement o : cartData.getRecords()) {
 
 			String hash = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/record/" + hash + ".miozip";
@@ -141,7 +142,7 @@ public class CartServlet extends HttpServlet {
 			mailsToSend.add(new MailItem(recipientNumber, data, MioUtils.Types.RECORD, application));
 		}
 
-		for( JsonElement o: cartData.getManga()) {
+		for (JsonElement o : cartData.getManga()) {
 
 			String hash = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/manga/" + hash + ".miozip";
@@ -158,140 +159,143 @@ public class CartServlet extends HttpServlet {
 		WiiConnect24Api wc24 = new WiiConnect24Api(application);
 		return wc24.sendMails(mailsToSend);
 	}
-    
-    private boolean injectMios(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		
-    	ServletContext application = getServletConfig().getServletContext();	
+
+	private boolean injectMios(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+
+		ServletContext application = getServletConfig().getServletContext();
 		String dataDir = application.getInitParameter("dataDirectory");
 
 		Cart cartData = new Cart(request);
 
-		//Call DIYEdit's SaveHandler on it, and it only does everything.
-		ServletLog.log(Level.INFO, "Cart has " + cartData.getGames().size() + " games, " + cartData.getRecords().size() + " records and " + cartData.getManga().size() + " manga.");
+		// Call DIYEdit's SaveHandler on it, and it only does everything.
+		ServletLog.log(Level.INFO, "Cart has " + cartData.getGames().size() + " games, " + cartData.getRecords().size()
+				+ " records and " + cartData.getManga().size() + " manga.");
 		ServletLog.log(Level.INFO, "Checking out to savefile.");
-        SaveHandler sHand = new SaveHandler(cartData.getSaveFile().getAbsolutePath());
-        
-        //Go through our arrays and inject mios from the DB
-        for( JsonElement o: cartData.getGames()) {
-        	
-        	String id = o.getAsJsonObject().get("id").getAsString();
+		SaveHandler sHand = new SaveHandler(cartData.getSaveFile().getAbsolutePath());
+
+		// Go through our arrays and inject mios from the DB
+		for (JsonElement o : cartData.getGames()) {
+
+			String id = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/game/" + id + ".miozip";
 			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
-        	
-        	int emptySlot = getEmptySlot(sHand, 0);
-        	
-        	//Abort in case of bad file, no need to waste time.
-        	if (emptySlot == -2)
-        		return false;
-        	
-        	if (emptySlot != -1)
+
+			int emptySlot = getEmptySlot(sHand, 0);
+
+			// Abort in case of bad file, no need to waste time.
+			if (emptySlot == -2)
+				return false;
+
+			if (emptySlot != -1)
 				sHand.setMio(uncompressedMio.getAbsolutePath(), emptySlot);
-        	
-        }
-        
-		for( JsonElement o: cartData.getRecords()) {
-		        	
-        	String id = o.getAsJsonObject().get("id").getAsString();
+
+		}
+
+		for (JsonElement o : cartData.getRecords()) {
+
+			String id = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/record/" + id + ".miozip";
 			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
-        	
-        	int emptySlot = getEmptySlot(sHand, 1);
-        	if (emptySlot != -1)
-				sHand.setMio(uncompressedMio.getAbsolutePath(), emptySlot);
-        	
-        }
 
-		for( JsonElement o: cartData.getManga()) {
-			
+			int emptySlot = getEmptySlot(sHand, 1);
+			if (emptySlot != -1)
+				sHand.setMio(uncompressedMio.getAbsolutePath(), emptySlot);
+
+		}
+
+		for (JsonElement o : cartData.getManga()) {
+
 			String id = o.getAsJsonObject().get("id").getAsString();
 			String mioPath = dataDir + "/mio/manga/" + id + ".miozip";
 			File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
-			
+
 			int emptySlot = getEmptySlot(sHand, 2);
 			if (emptySlot != -1)
 				sHand.setMio(uncompressedMio.getAbsolutePath(), emptySlot);
-			
+
 		}
-        
+
 		sHand.saveChanges();
-		
-	  	// gets MIME type of the file
+
+		// gets MIME type of the file
 		String mimeType = "application/octet-stream";
 		// Set response
 		response.setContentType(mimeType);
-			
-    	// forces download
+
+		// forces download
 		String headerKey = "Content-Disposition";
 		String headerValue = String.format("attachment; filename=\"%s\"", "DoujinSoft-imported.bin");
 		response.setHeader(headerKey, headerValue);
-		
+
 		// obtains response's output stream
 		OutputStream outStream = response.getOutputStream();
-		
+
 		byte[] buffer = new byte[4096];
 		int bytesRead = -1;
 		FileInputStream inStream = new FileInputStream(cartData.getSaveFile());
-		
+
 		while ((bytesRead = inStream.read(buffer)) != -1) {
 			outStream.write(buffer, 0, bytesRead);
 		}
-		
+
 		inStream.close();
 		outStream.close();
-    	cartData.getSaveFile().delete();
-    	
-    	return true;
+		cartData.getSaveFile().delete();
+
+		return true;
 	}
 
-    /*
-     * Go through the save for a given mode (0: games, 1: records, 2: manga) and return the first empty slot.
-     * Returns -1 if there are no slots available, -2 if the savefile is incorrect.
-     */
+	/*
+	 * Go through the save for a given mode (0: games, 1: records, 2: manga) and
+	 * return the first empty slot.
+	 * Returns -1 if there are no slots available, -2 if the savefile is incorrect.
+	 */
 	private int getEmptySlot(SaveHandler sHand, int mode) {
-		
+
 		ArrayList<byte[]> b = sHand.getMios(mode);
-		
-		if(b==null){
-    		return -2;
-    	}
-		
-    	//Returns the first null slot
-		for(byte[] mio: b) {
+
+		if (b == null) {
+			return -2;
+		}
+
+		// Returns the first null slot
+		for (byte[] mio : b) {
 			if (mio == null)
 				return b.indexOf(mio);
 		}
-		
+
 		return -1;
 	}
 
 	/**
-     * @see HttpServlet#HttpServlet()
-     */
-    public CartServlet() {
-        super(); 
-        ServletLog = Logger.getLogger("CartServlet");
-        ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));     
-    }
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public CartServlet() {
+		super();
+		ServletLog = Logger.getLogger("CartServlet");
+		ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
+	}
 
-    //Generates the regular landing page for the cart.
-    private String doStandardPage(ServletContext application) throws PebbleException, IOException {
-    	
-    	Map<String, Object> context = new HashMap<>();
-    	context.put("wiiNumber", System.getenv("WII_NUMBER"));
-		
-    	PebbleEngine engine = new PebbleEngine.Builder().build();
+	// Generates the regular landing page for the cart.
+	private String doStandardPage(ServletContext application) throws PebbleException, IOException {
+
+		Map<String, Object> context = new HashMap<>();
+		context.put("wiiNumber", System.getenv("WII_NUMBER"));
+
+		PebbleEngine engine = new PebbleEngine.Builder().build();
 		PebbleTemplate compiledTemplate;
 
-		//Getting base template
+		// Getting base template
 		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/cart.html"));
-		
-		//Output to client
+
+		// Output to client
 		Writer writer = new StringWriter();
 		compiledTemplate.evaluate(writer, context);
 		String output = writer.toString();
-		
+
 		return output;
-    	
-    }
+
+	}
 
 }

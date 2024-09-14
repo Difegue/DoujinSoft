@@ -4,11 +4,9 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
@@ -21,6 +19,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WiiConnect24Api extends WC24Base {
 
@@ -35,9 +34,30 @@ public class WiiConnect24Api extends WC24Base {
      * @param mails
      * @return
      * @throws IOException
+     * @throws InterruptedException
      */
-    public String sendMails(List<MailItem> mails) throws IOException {
+    public String sendMails(List<MailItem> mails) throws IOException, InterruptedException {
 
+        String output = "";
+
+        // If the mail list is too long it'll likely overload the WC24 endpoint
+        // Split the list into 15s (max amount) and perform an equal number of requests
+        final AtomicInteger counter = new AtomicInteger();
+        final java.util.Collection<List<MailItem>> chunkedMails = mails.stream()
+                .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / 15))
+                .values();
+
+        for (List<MailItem> chunk : chunkedMails) {
+            output += sendMailsInternal(chunk);
+            // Sleep between chunks to avoid murdering the RC24 server :|
+            Thread.sleep(1000);
+            output += "----------------\n";
+        }
+
+        return output;
+    }
+
+    private String sendMailsInternal(List<MailItem> mails) throws IOException {
         Logger log = Logger.getLogger("WC24");
 
         HttpClient httpclient = HttpClients.createDefault();
@@ -69,21 +89,19 @@ public class WiiConnect24Api extends WC24Base {
         HttpEntity formDataEntity = builder.build();
         httppost.setEntity(formDataEntity);
 
-        
         // Log full multipart request, if thou must
-        // It makes the logs gigantic 
+        // It makes the logs gigantic
         if (System.getenv().containsKey("WC24_DEBUG")) {
 
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 builder.build().writeTo(baos);
 
-                log.log(Level.INFO, "Executing request:" + System.lineSeparator() 
-                + httppost.getRequestLine() + System.lineSeparator()
-                + baos.toString());
-            }
-            catch (Exception e) {
-                log.log(Level.INFO, e.getMessage() );
+                log.log(Level.INFO, "Executing request:" + System.lineSeparator()
+                        + httppost.getRequestLine() + System.lineSeparator()
+                        + baos.toString());
+            } catch (Exception e) {
+                log.log(Level.INFO, e.getMessage());
             }
         }
 
