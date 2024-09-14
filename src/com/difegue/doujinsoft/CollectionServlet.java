@@ -59,7 +59,11 @@ public class CollectionServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		response.setContentType("text/html; charset=UTF-8");
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json"))
+			response.setContentType("application/json; charset=UTF-8");
+		else 
+			response.setContentType("text/html; charset=UTF-8");
+
 		ServletContext application = getServletConfig().getServletContext();
 		String output = "Collection doesn't exist!";
 

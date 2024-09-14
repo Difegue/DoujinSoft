@@ -48,6 +48,13 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 		result.close();
 		statement.close();
 		connection.close();
+
+		// JSON hijack if specified in the parameters
+		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
+			Gson gson = new Gson();
+			return gson.toJson(context);
+		}
+
 		return writeToTemplate();
     }
     
