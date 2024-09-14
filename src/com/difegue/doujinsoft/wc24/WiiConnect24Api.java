@@ -73,7 +73,7 @@ public class WiiConnect24Api extends WC24Base {
         // Log full multipart request, if thou must
         // It makes the logs gigantic 
         if (System.getenv().containsKey("WC24_DEBUG")) {
-            
+
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 builder.build().writeTo(baos);
@@ -123,16 +123,17 @@ public class WiiConnect24Api extends WC24Base {
         HttpResponse response = httpclient.execute(request);
         HttpEntity entity = response.getEntity();
 
-        if (System.getenv().containsKey("WC24_DEBUG")) {
-            Logger log = Logger.getLogger("WC24 Debug");
-            log.log(Level.INFO, responseText);
-        }
-
         if (entity != null)
             try (InputStream inStream = entity.getContent()) {
 
                 String responseText = new BufferedReader(new InputStreamReader(inStream)).lines()
                         .collect(Collectors.joining("\n"));
+
+                if (System.getenv().containsKey("WC24_DEBUG")) {
+                    Logger log = Logger.getLogger("WC24 Debug");
+                    log.log(Level.INFO, responseText);
+                }
+
                 new MailItemParser(application).consumeEmails(responseText);
             }
     }
