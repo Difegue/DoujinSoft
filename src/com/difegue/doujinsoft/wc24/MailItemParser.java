@@ -83,8 +83,10 @@ public class MailItemParser extends WC24Base {
                     continue;
                 }
 
-                if (content.length() == 0) {
-                    // Skip empty items
+                if (content.length() < 30) {
+                    // Skip empty (or mostly-empty) items
+                    // The mails end with "--202409141517/6360705--" whereas the delimiter is
+                    // "--202409141517/6360705" so you'll have some noise at the end
                     continue;
                 }
 
@@ -146,10 +148,15 @@ public class MailItemParser extends WC24Base {
                 saveFriendCode(wiiCode);
                 return new MailItem(wiiCode);
             } else {
-                // Reject non-friend request mails that don't have a code stored in the Friends
-                // table
-                log.log(Level.INFO, "Mail from unregistered Friend Code - Skipping.");
-                return null;
+                // Reject non-friend request mails that don't have their code stored in the DB
+                if (subject.equals("QUESTION") || subject.equals("G") || subject.equals("RR")
+                        || subject.equals("MMM")) {
+                    log.log(Level.INFO, "Unregistered Friend Code yet DIY content - Making an exception...");
+                } else {
+                    log.log(Level.INFO, "Mail from unregistered Friend Code - Skipping.");
+                    return null;
+                }
+
             }
         }
 

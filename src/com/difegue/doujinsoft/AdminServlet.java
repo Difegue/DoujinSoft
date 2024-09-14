@@ -229,6 +229,18 @@ public class AdminServlet extends HttpServlet {
             }
         }
 
+        if (req.getParameterMap().containsKey("fetchMails")) {
+
+            try {
+                output = "Queued up mail fetch from WC24.";
+                new WiiConnect24Api(application).receiveMails();
+            } catch (Exception e) {
+                ServletLog.log(Level.SEVERE, e.getMessage());
+                output = e.getMessage();
+            }
+
+        }
+
         // Set/reset creator and cartridge IDs
         if (req.getParameterMap().containsKey("set_creator_ids")) {
 
