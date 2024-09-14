@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 public class WC24Base {
 
     protected String sender, wc24Server, wc24Pass;
+    protected Boolean debugLogging;
     protected ServletContext application;
 
     public WC24Base(ServletContext application) throws Exception {
@@ -23,6 +24,11 @@ public class WC24Base {
         if (!System.getenv().containsKey("WC24_PASSWORD"))
             throw new Exception(
                     "WiiConnect24 account password not specified. Please set the WC24_PASSWORD environment variable.");
+
+        if (!System.getenv().containsKey("WC24_DEBUG"))
+            debugLogging = false;
+        else
+            debugLogging = Boolean.parseBoolean(System.getenv("DEBUG_LOGGING"));
 
         sender = System.getenv("WII_NUMBER");
         wc24Server = System.getenv("WC24_SERVER");
