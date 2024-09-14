@@ -59,7 +59,7 @@ public class MioCompress {
                 break;
             }
             FileOutputStream fos = new FileOutputStream(uncompressedMio);
-            logger.info("Uncompressing .mio to " + uncompressedMio.getAbsolutePath());
+            logger.trace("Uncompressing .mio to " + uncompressedMio.getAbsolutePath());
 
             int len;
             while ((len = zis.read(buffer)) > 0) {

@@ -132,12 +132,17 @@ public class UploadServlet extends HttpServlet {
                     fos.write(mioData);
                 }
 
-                // Trigger a webhook
-                if (System.getenv().containsKey("WEBHOOK_URL")) {
-                    HttpClient httpclient = HttpClients.createDefault();
-                    HttpPost httppost = new HttpPost(System.getenv("WEBHOOK_URL"));
-                    httpclient.execute(httppost);
+                try {
+                    // Trigger a webhook
+                    if (System.getenv().containsKey("WEBHOOK_URL")) {
+                        HttpClient httpclient = HttpClients.createDefault();
+                        HttpPost httppost = new HttpPost(System.getenv("WEBHOOK_URL"));
+                        httpclient.execute(httppost);
+                    }
+                } catch (Exception e) {
+                    ServletLog.log(Level.WARNING, "Couldn't hit upload webhook: " + e.getMessage());
                 }
+                
 
             }
 

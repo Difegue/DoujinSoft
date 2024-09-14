@@ -112,6 +112,8 @@ public class CartServlet extends HttpServlet {
 		Cart cartData = new Cart(request);
 		String recipientNumber = request.getParameter("recipient");
 
+		ServletLog.log(Level.INFO, "Cart has " + cartData.getGames().size() + " games, " + cartData.getRecords().size() + " records and " + cartData.getManga().size() + " manga.");
+		ServletLog.log(Level.INFO, "Checking out via WC24 mails to " + recipientNumber);
 		List<MailItem> mailsToSend = new ArrayList<>();
 
 		// DIY mails
@@ -165,6 +167,8 @@ public class CartServlet extends HttpServlet {
 		Cart cartData = new Cart(request);
 
 		//Call DIYEdit's SaveHandler on it, and it only does everything.
+		ServletLog.log(Level.INFO, "Cart has " + cartData.getGames().size() + " games, " + cartData.getRecords().size() + " records and " + cartData.getManga().size() + " manga.");
+		ServletLog.log(Level.INFO, "Checking out to savefile.");
         SaveHandler sHand = new SaveHandler(cartData.getSaveFile().getAbsolutePath());
         
         //Go through our arrays and inject mios from the DB
