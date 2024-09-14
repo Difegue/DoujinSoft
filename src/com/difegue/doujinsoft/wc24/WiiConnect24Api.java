@@ -69,21 +69,23 @@ public class WiiConnect24Api extends WC24Base {
         HttpEntity formDataEntity = builder.build();
         httppost.setEntity(formDataEntity);
 
-        /*
-        // Log full multipart request 
-        // Commented out as it makes the logs gigantic 
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            builder.build().writeTo(baos);
+        
+        // Log full multipart request, if thou must
+        // It makes the logs gigantic 
+        if (System.getenv().containsKey("WC24_DEBUG")) {
+            
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                builder.build().writeTo(baos);
 
-            log.log(Level.INFO, "Executing request:" + System.lineSeparator() 
-            + httppost.getRequestLine() + System.lineSeparator()
-            + baos.toString());
+                log.log(Level.INFO, "Executing request:" + System.lineSeparator() 
+                + httppost.getRequestLine() + System.lineSeparator()
+                + baos.toString());
+            }
+            catch (Exception e) {
+                log.log(Level.INFO, e.getMessage() );
+            }
         }
-        catch (Exception e) {
-            log.log(Level.INFO, e.getMessage() );
-        }
-        */
 
         // Execute and get the response.
         HttpResponse response = httpclient.execute(httppost);
@@ -120,6 +122,11 @@ public class WiiConnect24Api extends WC24Base {
         // Execute and get the response.
         HttpResponse response = httpclient.execute(request);
         HttpEntity entity = response.getEntity();
+
+        if (System.getenv().containsKey("WC24_DEBUG")) {
+            Logger log = Logger.getLogger("WC24 Debug");
+            log.log(Level.INFO, responseText);
+        }
 
         if (entity != null)
             try (InputStream inStream = entity.getContent()) {

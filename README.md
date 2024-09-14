@@ -28,6 +28,7 @@ Adding `&format=json` to most search pages in the webapp will give you a JSON eq
 * WII_FALLBACK: Wii Friend Code that will receive Wii Mail forwarded from DoujinSoft.
 * WC24_SERVER: WiiConnect24 server URL. Currently, there's only really `rc24.xyz`...
 * WC24_PASSWORD: Password for the DoujinSoft WiiConnect24 account
+* WC24_DEBUG: Add this variable to log additional Wii Mail data.  
 * DSOFT_PASS: Password for the Admin console.
 * WEBHOOK_URL: URL for a webhook. This hook is hit whenever new content is uploaded to DoujinSoft.
 
