@@ -48,5 +48,16 @@
 	"forwardPorts": [
 		8080
 	],
-	"postCreateCommand": "git submodule update --init --recursive"
+	"postCreateCommand": "git submodule update --init --recursive",
+	"customizations": {
+		"codespaces": {
+			"repositories": {
+				"Difegue/DIYEdit": {
+					"permissions": {
+						"issues": "write"
+					}
+				}
+			}
+		}
+	}
 }
