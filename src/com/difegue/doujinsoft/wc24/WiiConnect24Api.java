@@ -157,7 +157,7 @@ public class WiiConnect24Api extends WC24Base {
                 }
 
                 new MailItemParser(application).consumeEmails(responseText);
-                return responseText;
+                return "<pre>" + responseText + "</pre>";
             }
 
         return "No mails received.";
