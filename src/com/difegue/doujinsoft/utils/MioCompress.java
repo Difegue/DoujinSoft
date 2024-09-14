@@ -3,6 +3,7 @@ package com.difegue.doujinsoft.utils;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -59,7 +60,7 @@ public class MioCompress {
                 break;
             }
             FileOutputStream fos = new FileOutputStream(uncompressedMio);
-            logger.trace("Uncompressing .mio to " + uncompressedMio.getAbsolutePath());
+            logger.log(Level.FINE, "Uncompressing .mio to " + uncompressedMio.getAbsolutePath());
 
             int len;
             while ((len = zis.read(buffer)) > 0) {
