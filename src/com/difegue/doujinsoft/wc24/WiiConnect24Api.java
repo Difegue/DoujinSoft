@@ -127,7 +127,7 @@ public class WiiConnect24Api extends WC24Base {
      * 
      * @throws Exception
      */
-    public void receiveMails() throws Exception {
+    public String receiveMails() throws Exception {
 
         HttpClient httpclient = HttpClients.createDefault();
         HttpPost request = new HttpPost("http://mtw." + wc24Server + "/cgi-bin/receive.cgi");
@@ -157,6 +157,9 @@ public class WiiConnect24Api extends WC24Base {
                 }
 
                 new MailItemParser(application).consumeEmails(responseText);
+                return responseText;
             }
+
+        return "No mails received.";
     }
 }
