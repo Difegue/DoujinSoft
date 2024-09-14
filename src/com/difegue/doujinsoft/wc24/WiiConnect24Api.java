@@ -61,7 +61,7 @@ public class WiiConnect24Api extends WC24Base {
         Logger log = Logger.getLogger("WC24");
 
         HttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost("http://mtw." + wc24Server + "/cgi-bin/send.cgi");
+        HttpPost request = new HttpPost("http://mtw." + wc24Server + "/cgi-bin/send.cgi");
 
         // Request parameters and other properties.
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -87,7 +87,7 @@ public class WiiConnect24Api extends WC24Base {
         }
 
         HttpEntity formDataEntity = builder.build();
-        httppost.setEntity(formDataEntity);
+        request.setEntity(formDataEntity);
 
         // Log full multipart request, if thou must
         // It makes the logs gigantic
@@ -98,7 +98,7 @@ public class WiiConnect24Api extends WC24Base {
                 builder.build().writeTo(baos);
 
                 log.log(Level.INFO, "Executing request:" + System.lineSeparator()
-                        + httppost.getRequestLine() + System.lineSeparator()
+                        + request.getRequestLine() + System.lineSeparator()
                         + baos.toString());
             } catch (Exception e) {
                 log.log(Level.INFO, e.getMessage());
@@ -106,7 +106,7 @@ public class WiiConnect24Api extends WC24Base {
         }
 
         // Execute and get the response.
-        HttpResponse response = httpclient.execute(httppost);
+        HttpResponse response = httpclient.execute(request);
         HttpEntity entity = response.getEntity();
 
         if (entity != null) {
@@ -130,12 +130,16 @@ public class WiiConnect24Api extends WC24Base {
     public void receiveMails() throws Exception {
 
         HttpClient httpclient = HttpClients.createDefault();
+        HttpPost request = new HttpPost("http://mtw." + wc24Server + "/cgi-bin/receive.cgi");
 
-        // For receiving, the syntax is different and the mail/password are query
-        // parameters.
-        String authString = "mlid=w" + sender + "&passwd=" + wc24Pass;
-        HttpPost request = new HttpPost(
-                "http://mtw." + wc24Server + "/cgi-bin/receive.cgi?" + authString + "&maxsize=2000000");
+        // For receiving, the syntax is different and the creds are form parameters.
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addTextBody("mlid", "w" + sender);
+        builder.addTextBody("passwd", wc24Pass);
+        builder.addTextBody("maxsize", "2000000");
+
+        HttpEntity formDataEntity = builder.build();
+        request.setEntity(formDataEntity);
 
         // Execute and get the response.
         HttpResponse response = httpclient.execute(request);
@@ -149,7 +153,7 @@ public class WiiConnect24Api extends WC24Base {
 
                 if (debugLogging) {
                     Logger log = Logger.getLogger("WC24 Debug");
-                    log.log(Level.INFO, responseText);
+                    log.log(Level.INFO, "Reponse from WC24: \n" + responseText);
                 }
 
                 new MailItemParser(application).consumeEmails(responseText);

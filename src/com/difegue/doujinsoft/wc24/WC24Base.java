@@ -26,11 +26,9 @@ public class WC24Base {
                     "WiiConnect24 account password not specified. Please set the WC24_PASSWORD environment variable.");
 
         if (!System.getenv().containsKey("WC24_DEBUG")) {
-            System.out.println("WC24_DEBUG not set, defaulting to false.");
             debugLogging = false;
         } else {
             debugLogging = Boolean.parseBoolean(System.getenv("WC24_DEBUG"));
-            System.out.println("WC24_DEBUG set to " + debugLogging);
         }
 
         sender = System.getenv("WII_NUMBER");
