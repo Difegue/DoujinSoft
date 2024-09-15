@@ -232,7 +232,9 @@ public class AdminServlet extends HttpServlet {
         if (req.getParameterMap().containsKey("fetch_wc24_mail")) {
 
             try {
-                output = new WiiConnect24Api(application).receiveMails();
+                WiiConnect24Api wc24 = new WiiConnect24Api(application);
+                output = wc24.receiveMails();
+                wc24.deleteMails();
             } catch (Exception e) {
                 ServletLog.log(Level.SEVERE, e.getMessage());
                 output = e.getMessage();

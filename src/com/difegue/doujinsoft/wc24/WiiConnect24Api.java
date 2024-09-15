@@ -162,4 +162,40 @@ public class WiiConnect24Api extends WC24Base {
 
         return "No mails received.";
     }
+
+    /**
+     * Deletes all received mails from the WiiConnect24 server.
+     * 
+     * @throws Exception
+     */
+    public void deleteMails() throws Exception {
+
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpPost request = new HttpPost("http://mtw." + wc24Server + "/cgi-bin/delete.cgi");
+
+        // For receiving, the syntax is different and the creds are form parameters.
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addTextBody("mlid", "w" + sender);
+        builder.addTextBody("passwd", wc24Pass);
+        builder.addTextBody("delnum", "10"); // WiiLink's server doesn't care about this number but needs it
+
+        HttpEntity formDataEntity = builder.build();
+        request.setEntity(formDataEntity);
+
+        // Execute and get the response.
+        HttpResponse response = httpclient.execute(request);
+        HttpEntity entity = response.getEntity();
+
+        if (entity != null)
+            try (InputStream inStream = entity.getContent()) {
+
+                String responseText = new BufferedReader(new InputStreamReader(inStream)).lines()
+                        .collect(Collectors.joining("\n"));
+
+                if (debugLogging) {
+                    Logger log = Logger.getLogger("WC24 Debug");
+                    log.log(Level.INFO, "Reponse from WC24 deletion request: \n" + responseText);
+                }
+            }
+    }
 }

@@ -129,7 +129,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Games_search_idx3 ON Games (timeStamp);");
             statement.executeUpdate("CREATE INDEX Manga_search_idx3 ON Manga (timeStamp);");
             statement.executeUpdate("CREATE INDEX Record_search_idx3 ON Records (timeStamp);");
-            
+
             statement.executeUpdate("CREATE INDEX Games_search_idx4 ON Games (cartridgeID);");
             statement.executeUpdate("CREATE INDEX Manga_search_idx4 ON Manga (cartridgeID);");
             statement.executeUpdate("CREATE INDEX Record_search_idx4 ON Records (cartridgeID);");
@@ -168,7 +168,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             // Receive mails once per hour.
             try {
                 Logger.getLogger("WiiConnect24").info("Collecting mails from WiiConnect24 now.");
-                new WiiConnect24Api(application).receiveMails();
+                WiiConnect24Api wc24 = new WiiConnect24Api(application);
+                wc24.receiveMails();
+                wc24.deleteMails();
             } catch (Exception e) {
                 e.printStackTrace();
             }
