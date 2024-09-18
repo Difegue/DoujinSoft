@@ -143,7 +143,7 @@ public class MailItemParser extends WC24Base {
         if (!isFriendCodeSaved(wiiCode)) {
 
             // If the mail is a friend request, handle it
-            if (subject.equals("WC24 Cmd Message")) {
+            if (subject.contains("WC24 Cmd Message")) {
                 log.log(Level.INFO, "Friend request from " + wiiCode);
                 saveFriendCode(wiiCode);
                 return new MailItem(wiiCode);
