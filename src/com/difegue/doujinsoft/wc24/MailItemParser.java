@@ -148,7 +148,9 @@ public class MailItemParser extends WC24Base {
                 saveFriendCode(wiiCode);
                 return new MailItem(wiiCode);
             } else {
-                // Reject non-friend request mails that don't have their code stored in the DB
+                // Reject mails that don't have their code stored in the DB - with exceptions.
+                // Note - This was originally implemented to prevent survey spam, so it might be
+                // necessary to re-exclude QUESTION here if that happens again.
                 if (subject.equals("QUESTION") || subject.equals("G") || subject.equals("RR")
                         || subject.equals("MMM")) {
                     log.log(Level.INFO, "Unregistered Friend Code yet DIY content - Making an exception...");
