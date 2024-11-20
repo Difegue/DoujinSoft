@@ -335,6 +335,18 @@ label.active {
     transition: none !important;
 }
 
+.motionless__banner {
+    display: none;
+}
+
+/* Show the banner if the user disables animations in the OS level */
+@media (print),
+(prefers-reduced-motion: reduce) {
+    .motionless__banner {
+        display: block;
+    }
+}
+
 .score-counter {
     position: absolute;
     text-align: center;
