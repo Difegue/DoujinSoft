@@ -18,7 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.difegue.doujinsoft.templates.BaseMio;
 import com.difegue.doujinsoft.templates.Collection;
 import com.difegue.doujinsoft.utils.CollectionUtils;
+import com.difegue.doujinsoft.utils.MioCompress;
 import com.difegue.doujinsoft.utils.MioStorage;
+import com.difegue.doujinsoft.utils.MioUtils;
 import com.difegue.doujinsoft.wc24.MailItem;
 import com.difegue.doujinsoft.wc24.WiiConnect24Api;
 import com.google.gson.Gson;
@@ -27,6 +29,7 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import com.xperia64.diyedit.FileByteOperations;
+import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.metadata.Metadata;
 
 import org.apache.commons.codec.binary.Base64;
@@ -218,6 +221,43 @@ public class AdminServlet extends HttpServlet {
                     statement.close();
                 } else {
                     mails.add(new MailItem(code, message));
+                }
+
+                WiiConnect24Api wc24 = new WiiConnect24Api(application);
+                output = wc24.sendMails(mails);
+
+            } catch (Exception e) {
+                ServletLog.log(Level.SEVERE, e.getMessage());
+                output = e.getMessage();
+            }
+        }
+
+        if (req.getParameterMap().containsKey("sendgame")) {
+            // Send Wii mail through WC24
+            ArrayList<MailItem> mails = new ArrayList<>();
+
+            String hash = req.getParameter("game_hash");
+            String code = req.getParameter("wii_code");
+
+            String mioPath = dataDir + "/mio/game/" + hash + ".miozip";
+            File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
+            GameEdit data = new GameEdit(uncompressedMio.getAbsolutePath());
+
+            try (Connection connection = DriverManager
+                    .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+                if (code.equals("0")) {
+                    // Get all wii codes stored in the friends table and send a mail to each one
+                    Statement statement = connection.createStatement();
+                    statement.setQueryTimeout(30); // set timeout to 30 sec.
+                    ResultSet result = statement.executeQuery("select friendcode from Friends");
+
+                    while (result.next())
+                        mails.add(new MailItem(result.getString("friendcode"), data, MioUtils.Types.GAME, application));
+
+                    result.close();
+                    statement.close();
+                } else {
+                    mails.add(new MailItem(code, data, MioUtils.Types.GAME, application));
                 }
 
                 WiiConnect24Api wc24 = new WiiConnect24Api(application);
