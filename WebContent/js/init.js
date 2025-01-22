@@ -302,6 +302,18 @@ async function playMidi(id) {
 	}
 }
 
+function toggleiFrameMode() {
+	
+	$("#index-banner").remove();
+	$(".navbar-fixed").remove();
+	$(".page-footer").remove();
+	$(".container").width("100%");
+	$("#total_items").html("<center style='color:white'>WarioWare DIY Embed powered by the <a href='http://diy.tvc-16.science' target='_parent'>DoujinSoft Store</a>.</center>");
+	$("#total_items").show();
+	$(".cart-btn").hide();
+	$(".iframe-btn").show();
+}
+
 function copyShareLink(type, id) {
 
 	str = "https://"+window.location.hostname+"/"+type+"?id="+id;
