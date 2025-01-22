@@ -25,15 +25,18 @@
           {% if game.specialBrand != null %}
           <div class="brand {{ game.specialBrand }}-brand white-text"></div>
           {% else %}
-          <div class="brand game-brand white-text">
+          <div class="brand game-brand white-text tooltipped" 
+            data-position="left" data-delay="50" data-tooltip="Find other games by this unique cartridge ID"
+            onclick="searchForUser('{{ game.creator }}', '{{ game.cartridgeId }}', '{{ game.creatorId }}')">
             {{ game.brand }} <br />Software
           </div>
           {% endif %}
 
           <div class="game-creator black white-text">
             Made By
-            <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer"
-              onclick="searchForUser('{{ game.creator }}', '{{ game.cartridgeId }}', '{{ game.creatorId }}')">
+            <div class="white black-text tooltipped" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer"
+              data-position="left" data-delay="50" data-tooltip="Find other games by this creator"
+              onclick="searchForUser('{{ game.creator }}', '{{ game.cartridgeId }}', 'FFFF0000FFFFFFFF')">
               {{ game.creator }}
             </div>
           </div>
