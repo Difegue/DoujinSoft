@@ -28,7 +28,7 @@
                       {% if item.specialBrand != null %}
                       <div class="brand {{ item.specialBrand }}-brand white-text"></div> 
                       {% else %}
-                        <div class="brand manga-brand white-text tooltipped"
+                        <div class="brand manga-brand white-text tooltipped" style="cursor: pointer" 
                             data-position="left" data-delay="50" data-tooltip="Find other comics by this unique cartridge ID"
                             onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', '{{ item.creatorId }}')">
                         {{ item.brand }} <br/>Publishing

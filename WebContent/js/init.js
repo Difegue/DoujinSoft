@@ -203,6 +203,9 @@ function searchForUser(creatorName, cartridgeId, creatorId) {
 		$("#creator_id").val("");
 	}
 	
+	// Unfuck tooltips
+	$(".material-tooltip").attr("style","visibility:hidden");
+
 	// Do search
 	M.updateTextFields();
 	loadItems(1);
@@ -303,7 +306,7 @@ async function playMidi(id) {
 }
 
 function toggleiFrameMode() {
-	
+
 	$("#index-banner").remove();
 	$(".navbar-fixed").remove();
 	$(".page-footer").remove();
