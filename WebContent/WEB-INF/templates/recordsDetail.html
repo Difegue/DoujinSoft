@@ -26,7 +26,9 @@
                       {% if item.specialBrand != null %}
                         <div class="brand {{ item.specialBrand }}-brand white-text"></div> 
                       {% else %}
-                        <div class="brand record-brand white-text">
+                        <div class="brand record-brand white-text tooltipped"
+                            data-position="left" data-delay="50" data-tooltip="Find other records by this unique cartridge ID"
+                            onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', '{{ item.creatorId }}')">
                         {{ item.brand }} <br/>Music
                         </div>
                       {% endif %}
@@ -35,7 +37,9 @@
 
                       <div class="game-creator black white-text">
                         Artist
-                        <div class="white black-text" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" onclick="searchForUser('{{ item.cartridgeId }}', '{{ item.creatorId }}')">
+                        <div class="white black-text tooltipped" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" 
+                             data-position="left" data-delay="50" data-tooltip="Find other records by this creator"
+                             onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', 'FFFF0000FFFFFFFF')">
                           {{ item.creator }}
                           </div>
                       </div>
@@ -57,10 +61,10 @@
               <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=record&id={{ item.hash }}" style="width:31%" >
                 <i class="material-icons">file_download</i>
               </a>
-              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Get sharing link" onclick="copyShareLink('records','{{ item.hash }}')" style=" width:31%">
+              <a class="btn waves-effect tooltipped share-btn" data-position="top" data-tooltip="Get sharing link" onclick="copyShareLink('records','{{ item.hash }}')" style=" width:31%">
                 <i class="material-icons">share</i>
               </a>
-              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.hash }}')" style="width:31%">
+              <a class="btn waves-effect tooltipped cart-btn" data-position="top" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.hash }}')" style="width:31%">
                 <i class="material-icons">shopping_cart</i>
               </a>
             </div>
