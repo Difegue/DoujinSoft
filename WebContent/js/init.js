@@ -305,6 +305,8 @@ async function playMidi(id) {
 	}
 }
 
+// Remove parts of a singleitem page so that it can be embedded in an iframe
+// eg <iframe src="https://diy.tvc-16.science/games?id=a7f667db4362842bee783123cd235699" width="536" height="490"/>
 function toggleiFrameMode() {
 
 	$("#index-banner").remove();
@@ -315,6 +317,10 @@ function toggleiFrameMode() {
 	$("#total_items").show();
 	$(".cart-btn").hide();
 	$(".iframe-btn").show();
+
+	// Delete the first two .material-tooltip for the cart/creator searches (hacky but w/e)
+	$(".material-tooltip").first().remove();
+	$(".material-tooltip").first().remove();
 }
 
 function copyShareLink(type, id) {
