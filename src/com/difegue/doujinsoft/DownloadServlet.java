@@ -1,14 +1,23 @@
 package com.difegue.doujinsoft;
 
 import com.difegue.doujinsoft.utils.MioCompress;
-import com.difegue.doujinsoft.utils.MioUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Base64;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -34,7 +43,8 @@ public class DownloadServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
-	 *      Returns .mio files from the dataDirectory so they can be downloaded.
+	 *      Returns .mio files from the dataDirectory so they can be downloaded, or
+	 *      their image previews.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -49,52 +59,85 @@ public class DownloadServlet extends HttpServlet {
 			String type = request.getParameter("type");
 			boolean isImageOnly = request.getParameterMap().containsKey("preview");
 
-			String filePath = "";
+			boolean isGame = type.equals("game");
+			boolean isRecord = type.equals("record");
+			boolean isManga = type.equals("manga");
 
-			switch (type) {
-				case "game":
-					filePath = dataDir + "/mio/game/" + id + ".miozip";
-					break;
-				case "record":
-					filePath = dataDir + "/mio/record/" + id + ".miozip";
-					break;
-				case "manga":
-					filePath = dataDir + "/mio/manga/" + id + ".miozip";
-					break;
-				default:
-					filePath = null;
-					break;
-			}
+			// Only serve an image if that's what's asked
+			if (isImageOnly && (isGame || isManga)) {
 
-			if (filePath != null) {
+				String statement = isGame ? "SELECT previewPic, isNsfw FROM Games WHERE hash == ?"
+						: "SELECT frame0 FROM Manga WHERE hash == ?";
 
-				File downloadFile = MioCompress.uncompressMio(new File(filePath));
-				FileInputStream inStream = new FileInputStream(downloadFile);
+				try (Connection connection = DriverManager
+						.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
-				// Only serve an image if that's what's asked
-				if (isImageOnly) {
+					PreparedStatement ret = connection.prepareStatement(statement);
+					ret.setString(1, id);
+					ResultSet result = ret.executeQuery();
 
-					byte[] mioData = inStream.readAllBytes();
-					String base64ImageData = "";
+					String base64ImageData = result.getString(1).replace("data:image/png;base64,", "");
+					byte[] imageData = Base64.getDecoder().decode(base64ImageData);
 
-					if (type.equals("game"))
-						base64ImageData = MioUtils.getBase64GamePreview(mioData).replace("data:image/png;base64,", "");
+					if (isGame) {
+						boolean isNsfw = result.getBoolean(2);
+						if (isNsfw) {
+							// Replace the image with a NSFW warning
+							BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
+							Graphics2D g = image.createGraphics();
+							g.setColor(Color.RED);
+							g.setFont(new Font("Arial", Font.BOLD, 24));
+							g.drawString("NSFW", 10, 25);
+							g.dispose();
 
-					if (type.equals("manga"))
-						base64ImageData = MioUtils.getBase64Manga(mioData, 0).replace("data:image/png;base64,", "");
-
-					if (type.equals("record"))
-						base64ImageData = "";
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							ImageIO.write(image, "png", baos);
+							imageData = baos.toByteArray();
+						}
+					}
 
 					response.setContentType("image/png");
 					response.setCharacterEncoding("UTF-8");
 
 					OutputStream outStream = response.getOutputStream();
-					outStream.write(Base64.getDecoder().decode(base64ImageData));
+					outStream.write(imageData);
 					outStream.flush();
 					outStream.close();
 					return;
+
+				} catch (Exception e) {
+
 				}
+			}
+
+			// Record or failed game/manga fallback preview picture
+			if (isImageOnly) {
+
+				response.setContentType("image/jpg");
+				response.setCharacterEncoding("UTF-8");
+
+				FileInputStream inStream = new FileInputStream("./img/meta.jpg");
+				OutputStream outStream = response.getOutputStream();
+				outStream.write(inStream.readAllBytes());
+				inStream.close();
+				outStream.flush();
+				outStream.close();
+				return;
+			}
+
+			String filePath = null;
+
+			if (isGame)
+				filePath = dataDir + "/mio/game/" + id + ".miozip";
+			else if (isRecord)
+				filePath = dataDir + "/mio/record/" + id + ".miozip";
+			else if (isManga)
+				filePath = dataDir + "/mio/manga/" + id + ".miozip";
+
+			if (filePath != null) {
+
+				File downloadFile = MioCompress.uncompressMio(new File(filePath));
+				FileInputStream inStream = new FileInputStream(downloadFile);
 
 				// gets MIME type of the file
 				String mimeType = "application/octet-stream";
@@ -121,7 +164,6 @@ public class DownloadServlet extends HttpServlet {
 
 				inStream.close();
 				outStream.close();
-
 			}
 
 		}
