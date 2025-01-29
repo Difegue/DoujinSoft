@@ -103,6 +103,10 @@ Sad.
 <script>
   // Replace the placeholder with the actual URL
   $("#iframe-info pre").html($("#iframe-info pre").html().replace("PLACEHOLDER_URL", window.location.href));
+
+  // Delete the first two .material-tooltip for the cart/creator searches (hacky but w/e)
+	$(".material-tooltip").first().remove();
+	$(".material-tooltip").first().remove();
 </script>
 
 {% endif %}

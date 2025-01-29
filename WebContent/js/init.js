@@ -322,10 +322,6 @@ function toggleiFrameMode() {
 	$("#total_items").show();
 	$(".cart-btn").hide();
 	$(".iframe-btn").show();
-
-	// Delete the first two .material-tooltip for the cart/creator searches (hacky but w/e)
-	$(".material-tooltip").first().remove();
-	$(".material-tooltip").first().remove();
 }
 
 function copyShareLink(type, id) {
