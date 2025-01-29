@@ -8,75 +8,74 @@
     <div class="col s12 m12 l12"></div>
   {% endif %}
 
-          <div class="card {{ item.colorCart }} darken-2">
-            <div class="game-header {{ item.colorLogo }} accent-4">
-                <div class="chip game-title" id="{{ item.hash }}-name">
-                  {{ item.name }}
+  <div class="card {{ item.colorCart }} darken-2">
+    <div class="game-header {{ item.colorLogo }} accent-4">
+        <div class="chip game-title" id="{{ item.hash }}-name">
+          {{ item.name }}
+        </div>
+        <div class="game-metadata black-text">
+          Released {{ item.timestamp }}<br/>
+          MIO-ID: M-{{ item.mioID }}
+        </div>
+    </div>
+
+    <div class="card-content black-text">
+
+          <div class="game-data">
+
+            <div style="width:125px; float:left">
+
+              {% if item.specialBrand != null %}
+              <div class="brand {{ item.specialBrand }}-brand white-text"></div> 
+              {% else %}
+                <div class="brand manga-brand white-text tooltipped" style="cursor: pointer" 
+                    data-position="left" data-delay="50" data-tooltip="Find other comics by this unique cartridge ID"
+                    onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', '{{ item.creatorId }}')">
+                {{ item.brand }} <br/>Publishing
                 </div>
-                <div class="game-metadata black-text">
-                  Released {{ item.timestamp }}<br/>
-                  MIO-ID: M-{{ item.mioID }}
-                </div>
+              {% endif %}
+
+              <div class="game-creator black white-text">
+                Creator
+                <div class="white black-text tooltipped" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" 
+                      data-position="left" data-delay="50" data-tooltip="Find other comics by this creator"
+                      onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', 'FFFF0000FFFFFFFF')">
+                  {{ item.creator }}
+                  </div>
               </div>
-
-            <div class="card-content black-text">
-
-                  <div class="game-data">
-
-                    <div style="width:125px; float:left">
-
-                      {% if item.specialBrand != null %}
-                      <div class="brand {{ item.specialBrand }}-brand white-text"></div> 
-                      {% else %}
-                        <div class="brand manga-brand white-text tooltipped" style="cursor: pointer" 
-                            data-position="left" data-delay="50" data-tooltip="Find other comics by this unique cartridge ID"
-                            onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', '{{ item.creatorId }}')">
-                        {{ item.brand }} <br/>Publishing
-                        </div>
-                      {% endif %}
-
-                      <div class="game-creator black white-text">
-                        Creator
-                        <div class="white black-text tooltipped" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" 
-                             data-position="left" data-delay="50" data-tooltip="Find other comics by this creator"
-                             onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', 'FFFF0000FFFFFFFF')">
-                          {{ item.creator }}
-                          </div>
-                      </div>
-
-                  </div>
-
-					<a class="btn manga-preview z-depth-1 tooltipped waves-effect {{ item.colorLogo }}" data-tooltip="Read this" onclick="drawManga('{{ item.pages[0] }}','{{ item.pages[1] }}','{{ item.pages[2] }}','{{ item.pages[3] }}')" >
-					 	<img src="./img/icons/comic/comic_{{ item.logo }}.png" /> 
-					</a>
-
-                  </div>
-
-              <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
-            </div>
-
-            <div class="card-action center">
-              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=manga&id={{ item.hash }}" style="width:31%" >
-                <i class="material-icons">file_download</i>
-              </a>
-              <a class="btn waves-effect tooltipped copy-btn" data-position="top" data-tooltip="Get sharing link" onclick="copyShareLink('comics','{{ item.hash }}')" style="width:31%">
-                <i class="material-icons">share</i>
-              </a>
-              <a class="btn waves-effect tooltipped cart-btn" data-position="top" data-tooltip="Add to cart" onclick="addToCart('manga','{{ item.hash }}')" style="width:31%">
-                <i class="material-icons">shopping_cart</i>
-              </a>
-              <a class="btn waves-effect tooltipped iframe-btn" data-position="top" data-tooltip="View on DoujinSoft"
-                href="" target="_parent" style="width:31%; display:none" >
-                <object data="./img/logo.svg" type="image/svg+xml" style="height:24px; margin-top:5px;">
-                </object>
-              </a>
-            </div>
 
           </div>
 
-        </div>
+  <a class="btn manga-preview z-depth-1 tooltipped waves-effect {{ item.colorLogo }}" data-tooltip="Read this" onclick="drawManga('{{ item.pages[0] }}','{{ item.pages[1] }}','{{ item.pages[2] }}','{{ item.pages[3] }}')" >
+    <img src="./img/icons/comic/comic_{{ item.logo }}.png" /> 
+  </a>
+
+          </div>
+
+      <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
+    </div>
+
+    <div class="card-action center">
+      <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=manga&id={{ item.hash }}" style="width:31%" >
+        <i class="material-icons">file_download</i>
+      </a>
+      <a class="btn waves-effect tooltipped copy-btn" data-position="top" data-tooltip="Get sharing link" onclick="copyShareLink('comics','{{ item.hash }}')" style="width:31%">
+        <i class="material-icons">share</i>
+      </a>
+      <a class="btn waves-effect tooltipped cart-btn" data-position="top" data-tooltip="Add to cart" onclick="addToCart('manga','{{ item.hash }}')" style="width:31%">
+        <i class="material-icons">shopping_cart</i>
+      </a>
+      <a class="btn waves-effect tooltipped iframe-btn" data-position="top" data-tooltip="View on DoujinSoft"
+        href="" target="_parent" style="width:31%; display:none" >
+        <object data="./img/logo.svg" type="image/svg+xml" style="height:24px; margin-top:5px;">
+        </object>
+      </a>
+    </div>
+  </div>
+
+</div>
         
-   {% else %}
+{% else %}
    
 No more comics. <br/>
 Sad.
@@ -84,6 +83,21 @@ Sad.
 {% endfor %}
 	
 <span id="total_items" style="display:none">{{ totalitems }}</span>
+
+{% if singleitem == true %}
+
+<div class="white-text" id="iframe-info">
+  Want to embed this comic on your own webpage? Copy-paste the following:  
+  <pre>&lt;iframe src="PLACEHOLDER_URL#iframe" width="536" height="490"&gt;&lt;/iframe&gt;</pre>
+</div>
+
+<script>
+  // Replace the placeholder with the actual URL
+  $("#iframe-info pre").html($("#iframe-info pre").html().replace("PLACEHOLDER_URL", window.location.href));
+</script>
+
+{% endif %}
+
 
 <img class="materialboxed" height="513">
 

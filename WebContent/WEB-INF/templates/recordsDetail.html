@@ -6,82 +6,96 @@
   <div class="col s12 m12 l12"></div>
   {% endif %}
 
-          <div class="card {{ item.colorCart }} darken-2">
-            <div class="game-header {{ item.colorLogo }} accent-4">
-                <div class="chip game-title" id="{{ item.hash }}-name">
-                  {{ item.name }}
+  <div class="card {{ item.colorCart }} darken-2">
+    <div class="game-header {{ item.colorLogo }} accent-4">
+        <div class="chip game-title" id="{{ item.hash }}-name">
+          {{ item.name }}
+        </div>
+        <div class="game-metadata black-text">
+          Released {{ item.timestamp }}<br/>
+          MIO-ID: R-{{ item.mioID }}
+        </div>
+    </div>
+
+    <div class="card-content black-text">
+
+          <div class="game-data">
+
+            <div style="width:125px; float:left">
+
+              {% if item.specialBrand != null %}
+                <div class="brand {{ item.specialBrand }}-brand white-text"></div> 
+              {% else %}
+                <div class="brand record-brand white-text tooltipped" style="cursor: pointer" 
+                    data-position="left" data-delay="50" data-tooltip="Find other records by this unique cartridge ID"
+                    onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', '{{ item.creatorId }}')">
+                {{ item.brand }} <br/>Music
                 </div>
-                <div class="game-metadata black-text">
-                  Released {{ item.timestamp }}<br/>
-                  MIO-ID: R-{{ item.mioID }}
-                </div>
+              {% endif %}
+
+              
+
+              <div class="game-creator black white-text">
+                Artist
+                <div class="white black-text tooltipped" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" 
+                      data-position="left" data-delay="50" data-tooltip="Find other records by this creator"
+                      onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', 'FFFF0000FFFFFFFF')">
+                  {{ item.creator }}
+                  </div>
               </div>
 
-            <div class="card-content black-text">
+          </div>
+          
+            <div class="record-preview tooltipped" data-tooltip="Play/Stop" onclick="playMidi('{{ item.hash }}')">
+              <div class="record-image" id="{{ item.hash }}-record">
+      <img style="border-radius: 100px; left: 26%; top: 25%; height: 50%; padding: 7px;position: absolute;" class="{{ item.colorLogo }} darken-2" src="./img/icons/music/record_{{ item.logo }}.png" /> 
+    </div>
+  </div>
 
-                  <div class="game-data">
-
-                    <div style="width:125px; float:left">
-
-                      {% if item.specialBrand != null %}
-                        <div class="brand {{ item.specialBrand }}-brand white-text"></div> 
-                      {% else %}
-                        <div class="brand record-brand white-text tooltipped" style="cursor: pointer" 
-                            data-position="left" data-delay="50" data-tooltip="Find other records by this unique cartridge ID"
-                            onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', '{{ item.creatorId }}')">
-                        {{ item.brand }} <br/>Music
-                        </div>
-                      {% endif %}
-
-                      
-
-                      <div class="game-creator black white-text">
-                        Artist
-                        <div class="white black-text tooltipped" style="border-radius:0px 0px 10px 10px; font-size:15px; cursor: pointer" 
-                             data-position="left" data-delay="50" data-tooltip="Find other records by this creator"
-                             onclick="searchForUser('{{ item.creator }}', '{{ item.cartridgeId }}', 'FFFF0000FFFFFFFF')">
-                          {{ item.creator }}
-                          </div>
-                      </div>
-
-                  </div>
-                  
-                  	<div class="record-preview tooltipped" data-tooltip="Play/Stop" onclick="playMidi('{{ item.hash }}')">
-                  		<div class="record-image" id="{{ item.hash }}-record">
-						 	<img style="border-radius: 100px; left: 26%; top: 25%; height: 50%; padding: 7px;position: absolute;" class="{{ item.colorLogo }} darken-2" src="./img/icons/music/record_{{ item.logo }}.png" /> 
-						</div>
-					</div>
-
-                  </div>
-
-              <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
-            </div>
-
-            <div class="card-action center">
-              <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=record&id={{ item.hash }}" style="width:31%" >
-                <i class="material-icons">file_download</i>
-              </a>
-              <a class="btn waves-effect tooltipped copy-btn" data-position="top" data-tooltip="Get sharing link" onclick="copyShareLink('records','{{ item.hash }}')" style="width:31%">
-                <i class="material-icons">share</i>
-              </a>
-              <a class="btn waves-effect tooltipped cart-btn" data-position="top" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.hash }}')" style="width:31%">
-                <i class="material-icons">shopping_cart</i>
-              </a>
-              <a class="btn waves-effect tooltipped iframe-btn" data-position="top" data-tooltip="View on DoujinSoft"
-                href="" target="_parent" style="width:31%; display:none" >
-                <object data="./img/logo.svg" type="image/svg+xml" style="height:24px; margin-top:5px;">
-                </object>
-              </a>
-            </div>
           </div>
 
-        </div>
+      <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>          
+    </div>
+
+    <div class="card-action center">
+      <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Download" href="./download?type=record&id={{ item.hash }}" style="width:31%" >
+        <i class="material-icons">file_download</i>
+      </a>
+      <a class="btn waves-effect tooltipped copy-btn" data-position="top" data-tooltip="Get sharing link" onclick="copyShareLink('records','{{ item.hash }}')" style="width:31%">
+        <i class="material-icons">share</i>
+      </a>
+      <a class="btn waves-effect tooltipped cart-btn" data-position="top" data-tooltip="Add to cart" onclick="addToCart('record','{{ item.hash }}')" style="width:31%">
+        <i class="material-icons">shopping_cart</i>
+      </a>
+      <a class="btn waves-effect tooltipped iframe-btn" data-position="top" data-tooltip="View on DoujinSoft"
+        href="" target="_parent" style="width:31%; display:none" >
+        <object data="./img/logo.svg" type="image/svg+xml" style="height:24px; margin-top:5px;">
+        </object>
+      </a>
+    </div>
+  </div>
+
+</div>
         
-   {% else %}
+{% else %}
    
 No more records. <br/>
 Sad.
        
 {% endfor %}
+
+{% if singleitem == true %}
+
+<div class="white-text" id="iframe-info">
+  Want to embed this record on your own webpage? Copy-paste the following:  
+  <pre>&lt;iframe src="PLACEHOLDER_URL#iframe" width="536" height="490"&gt;&lt;/iframe&gt;</pre>
+</div>
+
+<script>
+  // Replace the placeholder with the actual URL
+  $("#iframe-info pre").html($("#iframe-info pre").html().replace("PLACEHOLDER_URL", window.location.href));
+</script>
+
+{% endif %}
 	
 <span id="total_items" style="display:none">{{ totalitems }}</span>

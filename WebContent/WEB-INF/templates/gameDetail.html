@@ -1,10 +1,11 @@
 {% for game in items %}
 
-{% if singleitem != true %}
-<div class="col s12 m6 l4">
+  {% if singleitem != true %}
+  <div class="col s12 m6 l4">
   {% else %}
   <div class="col s12 m12 l12"></div>
   {% endif %}
+
   <div class="card {{ game.colorCart }} darken-2">
     <div class="game-header {{ game.colorLogo }} accent-4">
       <div class="chip game-title" id="{{ game.hash }}-name">
@@ -91,3 +92,17 @@ Sad.
 {% endfor %}
 
 <span id="total_items" style="display:none">{{ totalitems }}</span>
+
+{% if singleitem == true %}
+
+<div class="white-text" id="iframe-info">
+  Want to embed this game on your own webpage? Copy-paste the following:  
+  <pre>&lt;iframe src="PLACEHOLDER_URL#iframe" width="536" height="490"&gt;&lt;/iframe&gt;</pre>
+</div>
+
+<script>
+  // Replace the placeholder with the actual URL
+  $("#iframe-info pre").html($("#iframe-info pre").html().replace("PLACEHOLDER_URL", window.location.href));
+</script>
+
+{% endif %}

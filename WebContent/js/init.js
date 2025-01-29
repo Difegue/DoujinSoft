@@ -47,6 +47,10 @@
 			loadItems(page);
         }
     });
+
+	if (window.location.hash === "#iframe") {
+		toggleiFrameMode();
+	}
     
   }); // end of document ready
 })(jQuery); // end of jQuery name space
@@ -306,7 +310,7 @@ async function playMidi(id) {
 }
 
 // Remove parts of a singleitem page so that it can be embedded in an iframe
-// eg <iframe src="https://diy.tvc-16.science/games?id=a7f667db4362842bee783123cd235699" width="536" height="490"/>
+// eg <iframe src="https://diy.tvc-16.science/games?id=a7f667db4362842bee783123cd235699#iframe" width="536" height="490"/>
 function toggleiFrameMode() {
 
 	$("#index-banner").remove();

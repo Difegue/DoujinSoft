@@ -17,6 +17,7 @@ Uses SQLite, materializeCSS and jQuery.
   - Midi files are played back using a custom soundfont based on [this one](https://musical-artifacts.com/artifacts/490).  
 * All the content available on the archive can be automatically inserted into a game save provided by the user.
 * Basic JSON API.
+* `iframe` support so you can embed WarioWare DIY content on your own webpage.  
 
 ## Using the API
 
