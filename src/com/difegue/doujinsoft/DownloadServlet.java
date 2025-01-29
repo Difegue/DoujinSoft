@@ -86,7 +86,7 @@ public class DownloadServlet extends HttpServlet {
 						if (isNsfw) {
 
 							// Blur most of the preview image
-							int radius = 11;
+							int radius = 5;
 							int size = radius * 2 + 1;
 							float weight = 1.0f / (size * size);
 							float[] data = new float[size * size];
@@ -130,7 +130,7 @@ public class DownloadServlet extends HttpServlet {
 				response.setContentType("image/jpg");
 				response.setCharacterEncoding("UTF-8");
 
-				application.getResourceAsStream("/img/meta.jpg").transferTo(response.getOutputStream());
+				application.getResourceAsStream("/meta.jpg").transferTo(response.getOutputStream());
 				return;
 			}
 
