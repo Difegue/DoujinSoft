@@ -18,6 +18,8 @@ import java.util.Base64;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import java.awt.image.Kernel;
+import java.awt.image.ConvolveOp;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -82,16 +84,24 @@ public class DownloadServlet extends HttpServlet {
 					if (isGame) {
 						boolean isNsfw = result.getBoolean(2);
 						if (isNsfw) {
-							// Replace the image with a NSFW warning
-							BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageData));
-							Graphics2D g = image.createGraphics();
-							g.setColor(Color.RED);
-							g.setFont(new Font("Arial", Font.BOLD, 24));
-							g.drawString("NSFW", 10, 25);
-							g.dispose();
+
+							// Blur most of the preview image
+							int radius = 11;
+							int size = radius * 2 + 1;
+							float weight = 1.0f / (size * size);
+							float[] data = new float[size * size];
+
+							for (int i = 0; i < data.length; i++) {
+								data[i] = weight;
+							}
+
+							Kernel kernel = new Kernel(size, size, data);
+							ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+							BufferedImage blurredImage = op.filter(ImageIO.read(new ByteArrayInputStream(imageData)),
+									null);
 
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
-							ImageIO.write(image, "png", baos);
+							ImageIO.write(blurredImage, "png", baos);
 							imageData = baos.toByteArray();
 						}
 					}
