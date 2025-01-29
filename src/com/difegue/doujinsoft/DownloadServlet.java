@@ -116,7 +116,11 @@ public class DownloadServlet extends HttpServlet {
 					return;
 
 				} catch (Exception e) {
+					response.setContentType("image/jpg");
+					response.setCharacterEncoding("UTF-8");
 
+					application.getResourceAsStream("/img/meta.jpg").transferTo(response.getOutputStream());
+					return;
 				}
 			}
 
@@ -126,12 +130,7 @@ public class DownloadServlet extends HttpServlet {
 				response.setContentType("image/jpg");
 				response.setCharacterEncoding("UTF-8");
 
-				FileInputStream inStream = new FileInputStream("./img/meta.jpg");
-				OutputStream outStream = response.getOutputStream();
-				outStream.write(inStream.readAllBytes());
-				inStream.close();
-				outStream.flush();
-				outStream.close();
+				application.getResourceAsStream("/img/meta.jpg").transferTo(response.getOutputStream());
 				return;
 			}
 
