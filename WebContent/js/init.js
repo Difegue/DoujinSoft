@@ -316,6 +316,7 @@ function toggleiFrameMode() {
 	$("#index-banner").remove();
 	$(".navbar-fixed").remove();
 	$(".page-footer").remove();
+	$("#iframe-info").remove();
 	$(".container").width("100%");
 	$("#total_items").html("<center style='color:white'>WarioWare DIY Embed powered by the <a href='http://diy.tvc-16.science' target='_parent'>DoujinSoft Store</a>.</center>");
 	$("#total_items").show();
