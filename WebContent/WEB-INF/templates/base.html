@@ -67,12 +67,22 @@
 <body>
 
   <script type="module">
-    import init, { play_sound, stop_sound } from "./js/vendor/synth-wasm/synth_wasm.js";
+    import synth_wasm_init, { play_sound, stop_sound } from "./js/vendor/synth-wasm/synth_wasm.js";
+    import wahdio_init, { play_music, stop_music } from "./js/vendor/wahdio/wahdio.js";
 
-    init().then(() => {
+    synth_wasm_init().then(() => {
       window.synth_wasm = {
         play_sound,
         stop_sound,
+      }
+    });
+
+    let master_volume = 1.5;
+
+    wahdio_init().then(() => {
+      window.wahdio = {
+        play_music: (mioData, musicSamples) => play_music(mioData, musicSamples, master_volume),
+        stop_music,
       }
     });
   </script>
