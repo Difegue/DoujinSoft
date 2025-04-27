@@ -286,8 +286,8 @@ async function playMidi(id) {
 	$("#toast-container .toast").remove();
 	$(".playing").removeClass("playing");
 
-	if (!window.sf2Data) {
-		window.sf2Data = await _fetch('./soundfont/WarioWare_D.I.Y._Soundfont.sf2')
+	if (!window.musicSamples) {
+		window.musicSamples = await _fetch('./soundfont/ram_slice.bin')
 	}
 
 	if (id != currentlyPlayingMidi) {
@@ -298,12 +298,10 @@ async function playMidi(id) {
 		$("#"+id+"-record").addClass("playing");
 		let mioData = await _fetch('/download?type=record&id='+id);
 
-		let midiData = window.mio_midi.buildMidiRecordFile(mioData);
-
-		window.synth_wasm.play_sound(window.sf2Data, midiData);
+		window.wahdio.play_music(mioData, window.musicSamples);
 	}
 	else {
-		window.synth_wasm.stop_sound();
+		window.wahdio.stop_music();
 		currentlyPlayingMidi = "";
 		popToast("Playback Stopped.");
 	}

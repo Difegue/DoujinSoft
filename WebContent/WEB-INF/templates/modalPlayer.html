@@ -79,9 +79,9 @@
     var sounds = [];
     var playerSounds = [];
 
-    var sf2Data = null;
+    var musicSamples = null;
     (async () => {
-    sf2Data = await _fetch('./soundfont/WarioWare_D.I.Y._Soundfont.sf2')
+        musicSamples = await _fetch('./soundfont/ram_slice.bin')
     })();
 
     $('#game-modal').modal({
@@ -163,7 +163,6 @@
         $("#player-title").text("DoujinSoft Micro-Player");
         $('#game-modal').modal('open');
         mioData = await _fetch(`./download?type=game&id=${gameHash}`);
-        await buildMidiData(mioData);
         playGame(mioData);
     }
 
@@ -250,7 +249,6 @@
             // GAME_START
             currentSound = playerSounds[1].play();
             await playAnimation('animate__bounce');
-            await buildMidiData(mioData);
             await playAnimation('animate__bounceOutRight');
 
             if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
@@ -364,19 +362,6 @@
         mioPlayer.withdrawTouchFromScreen();
     }
 
-    async function buildMidiData(mioData) {
-        let loopTimes;
-
-        if (mioData[0xE605] === 0) {
-            loopTimes = 0;
-        } else if (mioData[0xE605] === 1) {
-            loopTimes = 1; // double length
-        } else {
-            loopTimes = 11; // boss length (11 is a completely arbitrary number)
-        }
-        midiData = window.mio_midi.buildMidiFile(mioData, loopTimes);
-    }
-
     function playGame(mioData) {
         if (!isInitialised) {
             initializeMioPlayer();
@@ -429,13 +414,13 @@
 
         mioPlayer.musicPlayer = {
             playMusic: () => {
-                if (window.synth_wasm) {
-                    window.synth_wasm.play_sound(sf2Data, midiData)
+                if (window.wahdio) {
+                    window.wahdio.play_music(mioData, musicSamples)
                 }
             },
             stopMusic: () => {
-                if (window.synth_wasm) {
-                    window.synth_wasm.stop_sound()
+                if (window.wahdio) {
+                    window.wahdio.stop_music()
                 }
             },
         };
@@ -462,8 +447,8 @@
         }
 
         // Single game replay
-        if (window.synth_wasm) {
-            window.synth_wasm.play_sound(sf2Data, midiData);
+        if (window.wahdio) {
+            window.wahdio.play_music(mioData, musicSamples);
         }
         mioPlayer.loadAndStart(mioData);
     }
