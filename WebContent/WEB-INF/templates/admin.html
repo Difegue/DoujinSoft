@@ -19,7 +19,6 @@ Unapproved .mios will be deleted.
 		var encodedId = encodeURIComponent(id);
 
 		mioData = await _fetch(`./manage?preview=true&file=${encodedId}`);
-		buildMidiData(mioData);
 		playGame(mioData);
 	}
 
