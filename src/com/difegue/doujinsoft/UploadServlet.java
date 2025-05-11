@@ -180,7 +180,7 @@ public class UploadServlet extends HttpServlet {
                 HttpClient httpclient = HttpClients.createDefault();
 
                 HttpPost httppost = new HttpPost(System.getenv("WEBHOOK_URL"));
-                httppost.addHeader("Content-Type", "application/json");
+                httppost.addHeader("Content-Type", "application/json; charset=UTF-8");
                 httppost.addHeader("User-Agent", "DoujinSoft");
                 httppost.addHeader("Accept", "application/json");
 
