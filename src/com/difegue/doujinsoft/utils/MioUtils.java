@@ -93,7 +93,11 @@ public class MioUtils {
    * Parse a manga .mio and return the specified page in 1-bit Run-length encoding,
    * starting at white on every line.
    * 
-   * eg, "6,5,1,CR,1,3,2" means 6 white pixels, 5 black, 1 white, next line, 1 white, 3 black, 2 white, etc
+   * eg, "6W5BW\nW3B2W" means 6 white pixels, 5 black, 1 white, next line, 1 white, 3 black, 2 white, etc
+   * 
+   * @param mioFile The .mio file to parse
+   * @param page    The page to parse (0-3)
+   * @return The RLE string
    */
   public static String getRLEManga(byte[] mioFile, int page) {
 
@@ -113,8 +117,10 @@ public class MioUtils {
           i++;
         else {
           isWhite = true;
-          if (i > 0)
-            rleResult = rleResult + i + ",";
+          if (i == 1)
+            rleResult = rleResult + "B";
+          else if (i > 0)
+            rleResult = rleResult + i + "B";
           i = 1;
         }
       } else { // black pixel
@@ -122,7 +128,10 @@ public class MioUtils {
           i++;
         else {
           isWhite = false;
-          rleResult = rleResult + i + ",";
+          if (i == 1)
+            rleResult = rleResult + "W";
+          else if (i > 0)
+            rleResult = rleResult + i + "W";
           i = 1;
         }
       }
@@ -130,9 +139,17 @@ public class MioUtils {
       x++;
       if (x > 191) {
         y++;
-        x = 0;
+        if (i > 1)
+          rleResult = rleResult + i;
+        
+        if (isWhite)
+          rleResult = rleResult + "W\n";
+        else
+          rleResult = rleResult + "B\n";
+          
         isWhite = true;
-        rleResult = rleResult + "CR,";
+        x = 0;
+        i = 0;
       }
       if (y > 127) {
         done = true;
