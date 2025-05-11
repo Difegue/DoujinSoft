@@ -95,18 +95,22 @@ send us content.
                     the savefile. <br>
                     You can also try <a href="https://www.romhacking.net/utilities/1008/">DIYEdit</a> if you have Java.
                     <br>
-                    (To use DIYEdit, you will need to expand the savefile to be twice the size (32MB), which
+                    (To use DIYEdit, you will need to pad the savefile to be twice the size (32MB), which
                     can be done with a hex editor.)<br>
                 </span>
             </div>
         </li>
     </ul>
 
-    Drag and drop your .mio files below to get started. Files sent this way will have to be approved manually before
-    landing in the archive.<br><br>
+    Drag and drop your .mio files below to get started. Files sent this way will have to be <b>approved manually</b>!<br>
+    Please add in a brief description of the content you're uploading to make our lives easier.<br><br>
 
+    <div class="input-field col s12">
+        <textarea placeholder="" class="materialize-textarea white-text" id="uploadinfo"></textarea>
+        <label for="uploadinfo" class="active">Upload description</label>
+    </div>
 
-    <span style="line-height:20px; margin-left:40%" class="btn-large waves-effect fileinput-button">
+    <span style="line-height:20px; margin-left:40%" class="btn-large waves-effect fileinput-button disabled">
         <i style="padding-top:6px;" class="material-icons medium">cloud_upload</i><br>
         <span>Upload files</span>
         <input type="file" name="file" multiple="" id="fileupload">
@@ -115,7 +119,7 @@ send us content.
     <div class="progress" style="display:none">
         <div class="indeterminate amber"></div>
     </div>
-    <ul class="collection black-text" style="text-align:left" id="files">
+    <ul class="collection black-text" style="text-align:left; display:none" id="files">
     </ul>
 
 </div>
@@ -127,9 +131,24 @@ send us content.
 <script>
     function initUpload() {
 
+        // Remove the disabled class from the upload button when text is entered in uploadinfo
+        $('#uploadinfo').on('input', function () {
+            if ($(this).val().length > 0) {
+                $('.fileinput-button').removeClass('disabled');
+            } else {
+                $('.fileinput-button').addClass('disabled');
+            }
+        });
+
         //Handler for file uploading.
         $('#fileupload').fileupload({
             dataType: 'json',
+            formData: function (form) { 
+                return [{
+                    name: "description",
+                    value: $("#uploadinfo").val()
+                }];
+            },
             done: function (e, data) {
 
                 if (!data.result.success)
@@ -149,14 +168,19 @@ send us content.
             },
 
             fail: function (e, data) {
-                popToast("Upload failed! Is this file a .mio?");
+                if ($("#uploadinfo").val() === "") 
+                    popToast("Please add in a description before sending an upload.");
+                else
+                    popToast("Upload failed! Is this file a .mio?");
                 console.log(data.errorThrown);
                 $(".progress").hide();
+                $("#files").hide();
                 $(".fileinput-button").show();
             },
 
             start: function (e, data) {
                 $(".progress").show();
+                $("#files").show();
                 $(".fileinput-button").hide();
             },
 

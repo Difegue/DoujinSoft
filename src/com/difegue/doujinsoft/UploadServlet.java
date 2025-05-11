@@ -30,6 +30,7 @@ import com.xperia64.diyedit.metadata.Metadata;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.entity.StringEntity;
 
 /**
  * Servlet implementation class for Uploads.
@@ -87,7 +88,22 @@ public class UploadServlet extends HttpServlet {
             fileSaveDir.mkdir();
         }
 
+        String uploadSessionDesc = request.getParameter("description");
+        String uploadSessionFiles = "";
+        if (uploadSessionDesc == null || uploadSessionDesc.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing description");
+            return;
+        }
+
+        ServletLog.log(Level.INFO, "Upload session description: " + uploadSessionDesc);
+
+        // Treat files one by one
         for (Part part : request.getParts()) {
+
+            if (part.getName().equals("description")) {
+                continue;
+            }
+
             String fileName = extractFileName(part);
 
             // Check if this is a proper .mio through DIYEdit
@@ -126,23 +142,13 @@ public class UploadServlet extends HttpServlet {
             if (valid) {
                 // Refine the fileName in case it is an absolute path
                 fileName = new File(fileName).getName();
+                uploadSessionFiles += fileName + "; ";
+
                 // Save it to the pending directory
                 File mio = new File(savePath + File.separator + fileName);
                 try (FileOutputStream fos = new FileOutputStream(mio.getAbsolutePath())) {
                     fos.write(mioData);
                 }
-
-                try {
-                    // Trigger a webhook
-                    if (System.getenv().containsKey("WEBHOOK_URL")) {
-                        HttpClient httpclient = HttpClients.createDefault();
-                        HttpPost httppost = new HttpPost(System.getenv("WEBHOOK_URL"));
-                        httpclient.execute(httppost);
-                    }
-                } catch (Exception e) {
-                    ServletLog.log(Level.WARNING, "Couldn't hit upload webhook: " + e.getMessage());
-                }
-                
 
             }
 
@@ -165,6 +171,33 @@ public class UploadServlet extends HttpServlet {
             out.print(json.toString());
         }
 
+        ServletLog.log(Level.INFO, "Upload session files: " + uploadSessionFiles);
+
+        // Send webhook if enabled
+        try {
+            // Trigger a webhook
+            if (System.getenv().containsKey("WEBHOOK_URL")) {
+                HttpClient httpclient = HttpClients.createDefault();
+
+                HttpPost httppost = new HttpPost(System.getenv("WEBHOOK_URL"));
+                httppost.addHeader("Content-Type", "application/json");
+                httppost.addHeader("User-Agent", "DoujinSoft");
+                httppost.addHeader("Accept", "application/json");
+
+                // Create JSON payload
+                JsonObject json = new JsonObject();
+                json.addProperty("description", uploadSessionDesc);
+                json.addProperty("files", uploadSessionFiles);
+                json.addProperty("timestamp", System.currentTimeMillis());
+
+                // Send JSON payload
+                httppost.setEntity(new StringEntity(json.toString()));
+                httpclient.execute(httppost);
+            }
+        } catch (Exception e) {
+            ServletLog.log(Level.WARNING, "Couldn't hit upload webhook: " + e.getMessage());
+        }
+        
     }
 
     /**
