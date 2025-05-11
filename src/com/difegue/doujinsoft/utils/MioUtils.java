@@ -112,18 +112,7 @@ public class MioUtils {
 
     // .mio comic panels are 191x127px.
     while (!done) {
-      if (e2.getPixel((byte) page, x, y)) { // white pixel
-        if (isWhite)
-          i++;
-        else {
-          isWhite = true;
-          if (i == 1)
-            rleResult = rleResult + "B";
-          else if (i > 0)
-            rleResult = rleResult + i + "B";
-          i = 1;
-        }
-      } else { // black pixel
+      if (e2.getPixel((byte) page, x, y)) { // black pixel
         if (!isWhite)
           i++;
         else {
@@ -132,6 +121,17 @@ public class MioUtils {
             rleResult = rleResult + "W";
           else if (i > 0)
             rleResult = rleResult + i + "W";
+          i = 1;
+        }
+      } else { // white pixel
+        if (isWhite)
+          i++;
+        else {
+          isWhite = true;
+          if (i == 1)
+            rleResult = rleResult + "B";
+          else if (i > 0)
+            rleResult = rleResult + i + "B";
           i = 1;
         }
       }
