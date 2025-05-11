@@ -141,7 +141,7 @@ public class MailItemParser extends WC24Base {
         if (subject == null) // The Wii doesn't care about the subject field
             subject = "";
 
-        if (!DatabaseUtils.isFriendCodeSaved(wiiCode)) {
+        if (!DatabaseUtils.isFriendCodeSaved(dataDir, wiiCode)) {
 
             // If the mail is a friend request, handle it
             if (subject.contains("WC24 Cmd Message")) {

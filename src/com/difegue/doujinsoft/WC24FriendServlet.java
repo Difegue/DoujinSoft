@@ -35,7 +35,7 @@ public class WC24FriendServlet extends HttpServlet {
 		
 		// obtains ServletContext
 		ServletContext application = getServletConfig().getServletContext();
-		dataDir = application.getInitParameter("dataDirectory");
+		String dataDir = application.getInitParameter("dataDirectory");
 
 		response.setContentType("text/html; charset=UTF-8");
 
