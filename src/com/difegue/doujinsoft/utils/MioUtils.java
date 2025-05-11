@@ -89,6 +89,60 @@ public class MioUtils {
     }
   }
 
+  /**
+   * Parse a manga .mio and return the specified page in 1-bit Run-length encoding,
+   * starting at white on every line.
+   * 
+   * eg, "6,5,1,CR,1,3,2" means 6 white pixels, 5 black, 1 white, next line, 1 white, 3 black, 2 white, etc
+   */
+  public static String getRLEManga(byte[] mioFile, int page) {
+
+    int x = 0;
+    int y = 0;
+    boolean done = false;
+    MangaEdit e2 = new MangaEdit(mioFile);
+
+    String rleResult = "";
+    boolean isWhite = true;
+    int i = 0;
+
+    // .mio comic panels are 191x127px.
+    while (!done) {
+      if (e2.getPixel((byte) page, x, y)) { // white pixel
+        if (isWhite)
+          i++;
+        else {
+          isWhite = true;
+          if (i > 0)
+            rleResult = rleResult + i + ",";
+          i = 1;
+        }
+      } else { // black pixel
+        if (!isWhite)
+          i++;
+        else {
+          isWhite = false;
+          rleResult = rleResult + i + ",";
+          i = 1;
+        }
+      }
+
+      x++;
+      if (x > 191) {
+        y++;
+        x = 0;
+        isWhite = true;
+        rleResult = rleResult + "CR,";
+      }
+      if (y > 127) {
+        done = true;
+        break;
+      }
+    }
+
+    return rleResult;
+  }
+
   /*
    * Parse a manga .mio and return the specified page. (From 0 to 3)
    */
