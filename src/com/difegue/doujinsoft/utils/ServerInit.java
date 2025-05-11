@@ -42,7 +42,7 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                 + "creatorID TEXT, cartridgeID TEXT, PRIMARY KEY(`hash`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Surveys "
-                + "(timestamp INTEGER, type INTEGER, name TEXT, stars INTEGER, commentId INTEGER, friendcode TEXT,"
+                + "(timestamp INTEGER, type INTEGER, name TEXT, stars INTEGER, commentId INTEGER, friendcode TEXT, miohash TEXT,"
                 + "PRIMARY KEY(`timestamp`) )");
 
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Friends "
@@ -115,6 +115,8 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("DROP INDEX IF EXISTS Games_search_idx5;");
             statement.executeUpdate("DROP INDEX IF EXISTS Manga_search_idx5;");
             statement.executeUpdate("DROP INDEX IF EXISTS Record_search_idx5;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Survey_search_idx;");
+            statement.executeUpdate("DROP INDEX IF EXISTS Survey_search_idx2;");
 
             // Rebuild indexes
             statement.executeUpdate("CREATE INDEX Games_idx ON Games (normalizedName ASC, id);");
@@ -137,6 +139,9 @@ public class ServerInit implements javax.servlet.ServletContextListener {
             statement.executeUpdate("CREATE INDEX Games_search_idx5 ON Games (creatorID);");
             statement.executeUpdate("CREATE INDEX Manga_search_idx5 ON Manga (creatorID);");
             statement.executeUpdate("CREATE INDEX Record_search_idx5 ON Records (creatorID);");
+
+            statement.executeUpdate("CREATE INDEX Survey_search_idx ON Surveys (miohash);");
+            statement.executeUpdate("CREATE INDEX Survey_search_idx2 ON Surveys (friendcode);");
 
             statement.close();
         } catch (Exception e) {

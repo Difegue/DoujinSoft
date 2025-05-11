@@ -2,6 +2,7 @@ package com.difegue.doujinsoft;
 
 import com.difegue.doujinsoft.wc24.MailItem;
 import com.difegue.doujinsoft.wc24.WiiConnect24Api;
+import com.difegue.doujinsoft.utils.DatabaseUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @WebServlet("/friendreq")
 public class WC24FriendServlet extends HttpServlet {
+
 	private static final long serialVersionUID = 1L;
 
     /**
@@ -33,11 +35,18 @@ public class WC24FriendServlet extends HttpServlet {
 		
 		// obtains ServletContext
 		ServletContext application = getServletConfig().getServletContext();
+		dataDir = application.getInitParameter("dataDirectory");
+
 		response.setContentType("text/html; charset=UTF-8");
 
 		if (request.getParameterMap().containsKey("code")) {
 
 			String code = request.getParameter("code");
+
+			if (DatabaseUtils.isFriendCodeSaved(dataDir, code)) {
+				response.getOutputStream().print("This friend code is already registered.");
+				return;
+			}
 
 			try {
 				// Friend Request mail

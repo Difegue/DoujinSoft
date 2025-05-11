@@ -17,6 +17,7 @@ import javax.servlet.ServletContext;
 
 import com.difegue.doujinsoft.utils.CollectionUtils;
 import com.difegue.doujinsoft.utils.MioStorage;
+import com.difegue.doujinsoft.utils.DatabaseUtils;
 import com.xperia64.diyedit.metadata.*;
 
 import javax.mail.*;
@@ -140,7 +141,7 @@ public class MailItemParser extends WC24Base {
         if (subject == null) // The Wii doesn't care about the subject field
             subject = "";
 
-        if (!isFriendCodeSaved(wiiCode)) {
+        if (!DatabaseUtils.isFriendCodeSaved(wiiCode)) {
 
             // If the mail is a friend request, handle it
             if (subject.contains("WC24 Cmd Message")) {
@@ -177,7 +178,8 @@ public class MailItemParser extends WC24Base {
             if (title.isEmpty() || title.isBlank())
                 return null;
 
-            saveSurveyAnswer(wiiCode, survey[25], title, survey[26], survey[27]);
+            // We're unable to tie survey answers to a specific miohash for WC24
+            DatabaseUtils.saveSurveyAnswer(dataDir, wiiCode, survey[25], title, survey[26], survey[27], null);
 
             log.log(Level.INFO, "Survey for " + title);
 
@@ -265,29 +267,6 @@ public class MailItemParser extends WC24Base {
         return Files.readAllBytes(new File(filePath + "d").toPath());
     }
 
-    private boolean saveSurveyAnswer(String sender, byte type, String title, byte stars, byte comment) {
-
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
-
-            PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?,?)");
-            ret.setLong(1, System.currentTimeMillis());
-            ret.setInt(2, type & 0xFF);
-            ret.setString(3, title);
-            ret.setInt(4, stars & 0xFF);
-            ret.setInt(5, comment & 0xFF);
-            ret.setString(6, sender);
-
-            ret.executeUpdate();
-
-            ret.close();
-            connection.close();
-            return true;
-
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
     private boolean saveFriendCode(String code) {
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
@@ -299,20 +278,6 @@ public class MailItemParser extends WC24Base {
             connection.close();
             return true;
 
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    private boolean isFriendCodeSaved(String code) {
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
-
-            PreparedStatement ret = connection.prepareStatement("select COUNT(*) from Friends WHERE friendcode = ?");
-            ret.setString(1, code);
-
-            ResultSet result = ret.executeQuery();
-            int res = result.getInt(1);
-            return (res == 1);
         } catch (SQLException e) {
             return false;
         }
