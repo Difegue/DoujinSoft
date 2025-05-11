@@ -1,4 +1,4 @@
-FROM tomcat:9.0.56-jre11-openjdk-slim-buster
+FROM tomcat:9.0.104-jre21-temurin-noble
 
 # Copy WAR from context
 RUN rm -rf /usr/local/tomcat/webapps
