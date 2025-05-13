@@ -78,7 +78,7 @@ public class YonderuServlet extends HttpServlet {
 			json.addProperty("brand", mio.getBrand());
 			json.addProperty("description", mio.getDescription());
 			json.addProperty("logo", mio.getLogo());
-			json.addProperty("pages", gson.toJson(pages));
+			json.add("pages", gson.toJsonTree(pages).getAsJsonArray());
 		}
 		catch (IOException e) {
 			e.printStackTrace();
