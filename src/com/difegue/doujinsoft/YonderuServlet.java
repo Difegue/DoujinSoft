@@ -73,11 +73,22 @@ public class YonderuServlet extends HttpServlet {
 				pages.add(MioUtils.getRLEManga(mioData, i));
 			}
 
-			json.addProperty("name", mioFile.getName());
+			int timestamp = mio.getTimestamp();
+			// If the timestamp is larger than today's date, set it to today's date
+			if (MioUtils.DIY_TIMESTAMP_ORIGIN.plusDays(timestamp).toLocalDate().isAfter(LocalDate.now()))
+				timestamp = (int) MioUtils.DIY_TIMESTAMP_ORIGIN.until(ZonedDateTime.now(), ChronoUnit.DAYS);
+
+
+			json.addProperty("id", id);
+			json.addProperty("name", mio.getName());
+			json.addProperty("date", MioUtils.getTimeString(timestamp));
 			json.addProperty("creator", mio.getCreator());
 			json.addProperty("brand", mio.getBrand());
 			json.addProperty("description", mio.getDescription());
 			json.addProperty("logo", mio.getLogo());
+			json.addProperty("colorLogo", MioUtils.mapColorByte(mio.getLogoColor()));
+			json.addProperty("color", MioUtils.mapColorByte(mio.getMangaColor()));
+
 			json.add("pages", gson.toJsonTree(pages).getAsJsonArray());
 		}
 		catch (IOException e) {
