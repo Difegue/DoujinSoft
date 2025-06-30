@@ -16,11 +16,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * Servlet implementation class for daily comics and non-WC24 surveys.
@@ -58,17 +61,65 @@ public class YonderuServlet extends HttpServlet {
 			id = request.getParameter("id");
 		}
 
+		if (request.getParameterMap().containsKey("random")) {
+			// Get a random comic ID from the database
+			try (Connection connection = DriverManager
+					.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+				var statement = connection.createStatement();
+				var result = statement.executeQuery("SELECT hash FROM Manga ORDER BY RANDOM() LIMIT 1");
+				id = result.getString(1);
+			} catch (Exception e) {
+				e.printStackTrace();
+				json.addProperty("error", "Failed to connect to the database.");
+				response.getWriter().append(json.toString());
+				return;
+			}
+		}
+
+		if (request.getParameterMap().containsKey("daily")) {
+			// Look in the daily comic file for today's ID
+			File dailyComicFile = new File(dataDir + "/yonderu.txt");
+			if (!dailyComicFile.exists()) {
+				json.addProperty("error", "No daily comic available.");
+				response.getWriter().append(json.toString());
+				return;
+			}
+
+			try {
+				List<String> lines = Files.readAllLines(dailyComicFile.toPath());
+				LocalDate today = LocalDate.now();
+				int dayOfYear = today.getDayOfYear();
+				if (dayOfYear < 1 || dayOfYear > lines.size()) {
+					json.addProperty("error", "No daily comic available for today.");
+					response.getWriter().append(json.toString());
+					return;
+				}
+				id = lines.get(dayOfYear - 1).trim();
+			} catch (IOException e) {
+				e.printStackTrace();
+				json.addProperty("error", "Failed to read the daily comic file.");
+				response.getWriter().append(json.toString());
+				return;
+			}
+
+		}
+
+		File jsonFile = new File(dataDir + "/yonderu/" + id + ".json");
+		if (jsonFile.exists()) {
+			// If the JSON file for this ID already exists, read it and return it
+			String jsonContent = Files.readString(jsonFile.toPath());
+			response.getWriter().append(jsonContent);
+			return;
+		}
+
 		try {
+			// It would be better to use the DB instead of file ops, but the DB doesn't have
+			// the raw byte data for images.. This is cached so the FS hit will be minimal.
 			String filePath = dataDir + "/mio/manga/" + id + ".miozip";
 
 			File mioFile = MioCompress.uncompressMio(new File(filePath));
 			byte[] mioData = FileByteOperations.read(mioFile.getAbsolutePath());
 
-			// TODO: Use DB instead
-			/*
-			 * try (Connection connection = DriverManager
-			 * .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
-			 */
 			MangaEdit mio = new MangaEdit(mioData);
 			List<String> pages = new ArrayList<String>();
 			for (int i = 0; i < 4; i++) {
@@ -91,6 +142,11 @@ public class YonderuServlet extends HttpServlet {
 			json.addProperty("color", mio.getMangaColor());
 
 			json.add("pages", gson.toJsonTree(pages).getAsJsonArray());
+
+			// Save a copy of the generated JSON so it can be reused
+			jsonFile.getParentFile().mkdirs();
+			Files.writeString(jsonFile.toPath(), json.toString());
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			json.addProperty("error", "Failed to read the MIO file.");
