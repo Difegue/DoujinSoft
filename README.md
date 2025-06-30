@@ -23,6 +23,36 @@ Uses SQLite, materializeCSS and jQuery.
 
 Adding `&format=json` to most search pages in the webapp will give you a JSON equivalent. Use at will! 🙋‍♂️  
 
+## Yonderu! DoujinSoft API
+
+The `/yonderu` endpoint is slightly more specialized for use with the companion comic apps for Playdate and the Pebble watch. The following capabilities are available:  
+
+`GET /yonderu?id=xxxxx` - Return a Yonderu JSON for the given MIO hash, if it's in the server's storage.  
+`GET /yonderu?random` - Return a Yonderu JSON for a random comic MIO in the database.  
+`GET /yonderu?daily` - Return a Yonderu JSON for today's comic -- Daily comics are stored in a `yonderu.txt` file at the data directory root with 366 lines, one per day. (leap years included)  
+`POST /yonderu?id=xxxxx&note=(1-5)&comment=(1-7)` - Rate a given comic MIO.  
+
+Yonderu JSONs follow this spec:  
+```
+{
+    "id": "adf06f38c9d5399497a8d5314c83c40d", // mio hash
+    "name": "My comix", // Comic name
+    "date": "06/06/2009", // date of publication in DD/MM/YYYY format
+    "creator": "dfug", // Comic creator
+    "brand": "TVC-16", // WWDIY Brand for the creator
+    "description": "Description of the comic",
+    "logo": 2, // WWDIY logo for the comic
+    "colorLogo": 0, // color of the logo
+    "color": 0, // color of the comic icon itself
+    "pages": [ 
+        "RLE-encoded data for each page of the comic",
+        "The encoding is a simple schema where each line of the image is represented by a line in the string",
+        "with the number of pixels of a given black or white color in sequence. For example:",
+        "63W2B25W2B66WB33W\n means the first line had 63 white pixels, then 2 black ones, then 25 white pixels, etc",
+    ]
+}
+```
+
 ## Environment variables
 
 * WII_NUMBER: Wii Friend Code associated to the DoujinSoft WiiConnect24 account.
