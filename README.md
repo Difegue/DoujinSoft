@@ -30,7 +30,7 @@ The `/yonderu` endpoint is slightly more specialized for use with the companion 
 `GET /yonderu?id=xxxxx` - Return a Yonderu JSON for the given MIO hash, if it's in the server's storage.  
 `GET /yonderu?random` - Return a Yonderu JSON for a random comic MIO in the database.  
 `GET /yonderu?daily` - Return a Yonderu JSON for today's comic -- Daily comics are stored in a `yonderu.txt` file at the data directory root with 366 lines, one per day. (leap years included)  
-`POST /yonderu?id=xxxxx&note=(1-5)&comment=(1-7)` - Rate a given comic MIO.  
+`POST /yonderu?id=xxxxx&stars=(1-5)&comment=(1-8)` - Rate a given comic MIO.  
 
 Yonderu JSONs follow this spec:  
 ```
@@ -50,6 +50,14 @@ Yonderu JSONs follow this spec:
         "with the number of pixels of a given black or white color in sequence. For example:",
         "63W2B25W2B66WB33W\n means the first line had 63 white pixels, then 2 black ones, then 25 white pixels, etc",
     ]
+}
+```
+
+Any errors will output the following basic JSON:  
+
+```
+{
+    "error" : "Something happened" // Error detail
 }
 ```
 

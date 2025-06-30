@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.difegue.doujinsoft.utils.DatabaseUtils;
 import com.difegue.doujinsoft.utils.MioCompress;
 import com.difegue.doujinsoft.utils.MioUtils;
 
@@ -72,6 +73,7 @@ public class YonderuServlet extends HttpServlet {
 				e.printStackTrace();
 				json.addProperty("error", "Failed to connect to the database.");
 				response.getWriter().append(json.toString());
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				return;
 			}
 		}
@@ -82,6 +84,7 @@ public class YonderuServlet extends HttpServlet {
 			if (!dailyComicFile.exists()) {
 				json.addProperty("error", "No daily comic available.");
 				response.getWriter().append(json.toString());
+				response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 				return;
 			}
 
@@ -92,6 +95,7 @@ public class YonderuServlet extends HttpServlet {
 				if (dayOfYear < 1 || dayOfYear > lines.size()) {
 					json.addProperty("error", "No daily comic available for today.");
 					response.getWriter().append(json.toString());
+					response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 					return;
 				}
 				id = lines.get(dayOfYear - 1).trim();
@@ -99,6 +103,7 @@ public class YonderuServlet extends HttpServlet {
 				e.printStackTrace();
 				json.addProperty("error", "Failed to read the daily comic file.");
 				response.getWriter().append(json.toString());
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				return;
 			}
 
@@ -150,6 +155,7 @@ public class YonderuServlet extends HttpServlet {
 		} catch (IOException e) {
 			e.printStackTrace();
 			json.addProperty("error", "Failed to read the MIO file.");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 
 		response.getWriter().append(json.toString());
@@ -158,9 +164,64 @@ public class YonderuServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
+	 * 
+	 *      Process a survey answer for a comic.
+	 *      POST /yonderu?id=xxxxx&stars=(1-5)&comment=(1-8)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		doGet(request, response);
+
+		ServletContext application = getServletConfig().getServletContext();
+		String dataDir = application.getInitParameter("dataDirectory");
+
+		JsonObject json = new JsonObject();
+
+		response.setContentType("application/json; charset=UTF-8");
+
+		try (Connection connection = DriverManager
+				.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+
+			String id = request.getParameter("id");
+			int note = Integer.parseInt(request.getParameter("stars"));
+			int comment = Integer.parseInt(request.getParameter("comment"));
+
+			if (id == null || note < 1 || note > 5 || comment < 1 || comment > 8) {
+				json.addProperty("error", "Missing or invalid parameters.");
+				response.getWriter().append(json.toString());
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				return;
+			}
+
+			// Check if the MIO hash exists in the database
+			var statement = connection.createStatement();
+			var result = statement.executeQuery("SELECT * FROM Manga WHERE hash = '" + id + "'");
+			if (result.next()) {
+
+				var success = DatabaseUtils.saveSurveyAnswer(dataDir, request.getRemoteAddr(), 2,
+						result.getString("name"), note, comment, id);
+
+				if (success) {
+					json.addProperty("status", "success");
+					response.getWriter().append(json.toString());
+				} else {
+					json.addProperty("error", "Failed to save the survey answer.");
+					response.getWriter().append(json.toString());
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				}
+
+			} else {
+				json.addProperty("error", "Comic not found in the database.");
+				response.getWriter().append(json.toString());
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.addProperty("error", "An error occurred while processing the request.");
+			response.getWriter().append(json.toString());
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
 	}
 
 }

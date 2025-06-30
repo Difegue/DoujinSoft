@@ -178,7 +178,8 @@ public class MailItemParser extends WC24Base {
                 return null;
 
             // We're unable to tie survey answers to a specific miohash for WC24
-            DatabaseUtils.saveSurveyAnswer(dataDir, wiiCode, survey[25], title, survey[26], survey[27], null);
+            DatabaseUtils.saveSurveyAnswer(dataDir, wiiCode, survey[25] & 0xFF, title, survey[26] & 0xFF,
+                    survey[27] & 0xFF, null);
 
             log.log(Level.INFO, "Survey for " + title);
 

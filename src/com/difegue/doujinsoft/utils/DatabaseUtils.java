@@ -41,17 +41,31 @@ public class DatabaseUtils {
      * @param miohash The hash of the MIO file (optional).
      * @return true if the survey answer was saved successfully, false otherwise.
      */
-    public static boolean saveSurveyAnswer(String dataDir, String sender, byte type, String title, byte stars,
-            byte comment, String miohash) {
+    public static boolean saveSurveyAnswer(String dataDir, String sender, int type, String title, int stars,
+            int comment, String miohash) {
 
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
+            // Has the user already answered a survey for this mio?
+            PreparedStatement check = connection.prepareStatement(
+                    "SELECT COUNT(*) FROM Surveys WHERE friendcode = ? AND type = ? AND name = ?");
+            check.setString(1, sender);
+            check.setInt(2, type);
+            check.setString(3, title);
+            ResultSet result = check.executeQuery();
+            int res = result.getInt(1);
+            if (res > 0) {
+                // User has already answered this survey, do not save again
+                connection.close();
+                return false;
+            }
+
             PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?,?,?)");
             ret.setLong(1, System.currentTimeMillis());
-            ret.setInt(2, type & 0xFF);
+            ret.setInt(2, type);
             ret.setString(3, title);
-            ret.setInt(4, stars & 0xFF);
-            ret.setInt(5, comment & 0xFF);
+            ret.setInt(4, stars);
+            ret.setInt(5, comment);
             ret.setString(6, sender);
             ret.setString(7, miohash);
 
@@ -62,6 +76,7 @@ public class DatabaseUtils {
             return true;
 
         } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
