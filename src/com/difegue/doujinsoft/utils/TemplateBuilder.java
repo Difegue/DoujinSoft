@@ -41,10 +41,11 @@ public class TemplateBuilder {
 	protected String tableName, dataDir;
 
 	/*
-	 *  isContentNameSearch: Search by title name of the game, comic, or record
-	 *  isCreatorNameSearch: Search by author's name of the game, comic, or record
-	 *  isContentCreatorSearch: Search by cartridge ID or creator ID of the game, comic, or record
-	 *  isSortedBy: Sort content flag
+	 * isContentNameSearch: Search by title name of the game, comic, or record
+	 * isCreatorNameSearch: Search by author's name of the game, comic, or record
+	 * isContentCreatorSearch: Search by cartridge ID or creator ID of the game,
+	 * comic, or record
+	 * isSortedBy: Sort content flag
 	 */
 	protected boolean isContentNameSearch, isCreatorNameSearch, isContentCreatorSearch, isSortedBy;
 
@@ -96,8 +97,10 @@ public class TemplateBuilder {
 		isContentNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
 		isCreatorNameSearch = request.getParameterMap().containsKey("creator")
 				&& !request.getParameter("creator").isEmpty();
-		isContentCreatorSearch = (request.getParameterMap().containsKey("cartridge_id") && !request.getParameter("cartridge_id").isEmpty())
-		|| (request.getParameterMap().containsKey("creator_id") && !request.getParameter("creator_id").isEmpty());
+		isContentCreatorSearch = (request.getParameterMap().containsKey("cartridge_id")
+				&& !request.getParameter("cartridge_id").isEmpty())
+				|| (request.getParameterMap().containsKey("creator_id")
+						&& !request.getParameter("creator_id").isEmpty());
 		isSortedBy = request.getParameterMap().containsKey("sort_by") && !request.getParameter("sort_by").isEmpty();
 
 		compiledTemplate = engine.getTemplate(application.getRealPath(templatePath + ".html"));
@@ -145,8 +148,7 @@ public class TemplateBuilder {
 		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
 			performCreatorSearchQuery(queryBase, "normalizedName ASC");
 			GetCreatorInfo();
-		}
-		else {
+		} else {
 			performSearchQuery(queryBase, "normalizedName ASC");
 		}
 
@@ -177,8 +179,7 @@ public class TemplateBuilder {
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
 			performCreatorSearchQuery(queryBase, "normalizedName ASC");
 			GetCreatorInfo();
-		}
-		else
+		} else
 			performSearchQuery(queryBase, "normalizedName ASC");
 
 		// JSON hijack if specified in the parameters
@@ -214,7 +215,7 @@ public class TemplateBuilder {
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
 
 		// Those filters go in the LIKE parts of the query
-		String name    = isContentNameSearch ? request.getParameter("name") + "%" : "%";
+		String name = isContentNameSearch ? request.getParameter("name") + "%" : "%";
 		String creator = isCreatorNameSearch ? request.getParameter("creator") + "%" : "%";
 
 		// Remove last char for context display
@@ -302,8 +303,7 @@ public class TemplateBuilder {
 			ret.setString(2, cartridgeId);
 			retCount.setString(2, cartridgeId);
 			ret.setInt(3, page * 15 - 15);
-		}
-		else
+		} else
 			ret.setInt(2, page * 15 - 15);
 
 		ResultSet result = ret.executeQuery();
@@ -316,21 +316,23 @@ public class TemplateBuilder {
 
 		context.put("items", items);
 		context.put("totalitems", retCount.executeQuery().getInt(1));
-		
+
 		retCount.close();
 	}
 
 	protected void GetCreatorInfo() throws Exception {
-		/*  TODO:
-		 *  This method is fully functional but is commented out so that it
-		 *  will not go into the current release to prevent unnecessary DB calls
-		 */ 
+		/*
+		 * TODO:
+		 * This method is fully functional but is commented out so that it
+		 * will not go into the current release to prevent unnecessary DB calls
+		 */
 
 		// String creatorId = request.getParameter("creator_id");
 		// String cartridgeId = request.getParameter("cartridge_id");
 
-		// CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId, cartridgeId);
-		
+		// CreatorDetails creatorDetails = new CreatorDetails(connection, creatorId,
+		// cartridgeId);
+
 		// context.put("displaycreatordetails", true);
 		// context.put("creatordetails", creatorDetails);
 	}

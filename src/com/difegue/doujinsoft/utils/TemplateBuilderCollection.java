@@ -1,7 +1,6 @@
 package com.difegue.doujinsoft.utils;
 
 import java.sql.Statement;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -16,35 +15,37 @@ import com.difegue.doujinsoft.templates.*;
  */
 public class TemplateBuilderCollection extends TemplateBuilder {
 
-    public TemplateBuilderCollection(ServletContext application, HttpServletRequest request) throws SQLException {
-        super(application, request);
-    }
+	public TemplateBuilderCollection(ServletContext application, HttpServletRequest request) throws SQLException {
+		super(application, request);
+	}
 
-    /*
+	/*
 	 * Collection version - Uses the collection's specific type and a custom query.
 	 */
 	public String doStandardPageCollection(Collection c) throws Exception {
-		
+
 		initializeTemplate(c.getType(), false);
 
 		Statement statement = connection.createStatement();
-	    compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));
+		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));
 
-	    if (c.getMioSQL().equals(")")) {
+		if (c.getMioSQL().equals(")")) {
 			context.put("totalitems", 0);
 			context.put("collection", c);
 			return writeToTemplate();
 		}
 
-		// Unlike the regular pages, ordering by timestamp is the default for collections
-  		ResultSet result = statement.executeQuery("select * from "+tableName+" WHERE hash IN "+c.getMioSQL()+" ORDER BY timeStamp DESC LIMIT 15");
-  		while(result.next()) 
-		  	items.add(classConstructor.newInstance(result));
-  		
-  		context.put("items", items);
+		// Unlike the regular pages, ordering by timestamp is the default for
+		// collections
+		ResultSet result = statement.executeQuery(
+				"select * from " + tableName + " WHERE hash IN " + c.getMioSQL() + " ORDER BY timeStamp DESC LIMIT 15");
+		while (result.next())
+			items.add(classConstructor.newInstance(result));
+
+		context.put("items", items);
 		context.put("totalitems", c.mios.length);
 		context.put("collection", c);
-		
+
 		result.close();
 		statement.close();
 		connection.close();
@@ -56,24 +57,24 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 		}
 
 		return writeToTemplate();
-    }
-    
-    /*
+	}
+
+	/*
 	 * POST requests in collections.
 	 */
 	public String doSearchCollection(Collection c) throws Exception {
-		
+
 		initializeTemplate(c.getType(), true);
 
-		String queryBase = "FROM "+tableName+" WHERE hash IN "+c.getMioSQL();
-	    queryBase += (isContentNameSearch || isCreatorNameSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
+		String queryBase = "FROM " + tableName + " WHERE hash IN " + c.getMioSQL();
+		queryBase += (isContentNameSearch || isCreatorNameSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
 
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
 			performCreatorSearchQuery(queryBase, "timeStamp DESC");
 			GetCreatorInfo();
-		}
-		else {
-			// Unlike the regular pages, ordering by timestamp is the default for collections
+		} else {
+			// Unlike the regular pages, ordering by timestamp is the default for
+			// collections
 			performSearchQuery(queryBase, "timeStamp DESC");
 		}
 

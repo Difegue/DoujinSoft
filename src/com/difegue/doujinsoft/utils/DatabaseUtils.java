@@ -1,25 +1,10 @@
 package com.difegue.doujinsoft.utils;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.io.*;
-import java.nio.file.*;
-import java.nio.charset.StandardCharsets;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Base64;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import java.time.*;
-import java.time.format.DateTimeFormatter;
 
 public class DatabaseUtils {
 
@@ -56,7 +41,8 @@ public class DatabaseUtils {
      * @param miohash The hash of the MIO file (optional).
      * @return true if the survey answer was saved successfully, false otherwise.
      */
-    public static boolean saveSurveyAnswer(String dataDir, String sender, byte type, String title, byte stars, byte comment, String miohash) {
+    public static boolean saveSurveyAnswer(String dataDir, String sender, byte type, String title, byte stars,
+            byte comment, String miohash) {
 
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 
@@ -67,7 +53,7 @@ public class DatabaseUtils {
             ret.setInt(4, stars & 0xFF);
             ret.setInt(5, comment & 0xFF);
             ret.setString(6, sender);
-            ret.setString(7, miohash); 
+            ret.setString(7, miohash);
 
             ret.executeUpdate();
 
@@ -79,7 +65,5 @@ public class DatabaseUtils {
             return false;
         }
     }
-
-
 
 }

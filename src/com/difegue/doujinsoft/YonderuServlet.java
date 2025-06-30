@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.difegue.doujinsoft.utils.DatabaseUtils;
 import com.difegue.doujinsoft.utils.MioCompress;
 import com.difegue.doujinsoft.utils.MioUtils;
 
@@ -21,7 +20,6 @@ import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -32,19 +30,21 @@ public class YonderuServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public YonderuServlet() {
-        super();
-    }
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public YonderuServlet() {
+		super();
+	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 * Gets Yonderu-compatible information for either a daily comic, a random comic, or a specific MIO hash.
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 *      Gets Yonderu-compatible information for either a daily comic, a random
+	 *      comic, or a specific MIO hash.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		
+
 		ServletContext application = getServletConfig().getServletContext();
 		String dataDir = application.getInitParameter("dataDirectory");
 
@@ -60,7 +60,6 @@ public class YonderuServlet extends HttpServlet {
 
 		try {
 			String filePath = dataDir + "/mio/manga/" + id + ".miozip";
-			File f = new File(filePath);
 
 			File mioFile = MioCompress.uncompressMio(new File(filePath));
 			byte[] mioData = FileByteOperations.read(mioFile.getAbsolutePath());
@@ -68,7 +67,7 @@ public class YonderuServlet extends HttpServlet {
 			// TODO: Use DB instead
 			/*
 			 * try (Connection connection = DriverManager
-                        .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+			 * .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
 			 */
 			MangaEdit mio = new MangaEdit(mioData);
 			List<String> pages = new ArrayList<String>();
@@ -81,7 +80,6 @@ public class YonderuServlet extends HttpServlet {
 			if (MioUtils.DIY_TIMESTAMP_ORIGIN.plusDays(timestamp).toLocalDate().isAfter(LocalDate.now()))
 				timestamp = (int) MioUtils.DIY_TIMESTAMP_ORIGIN.until(ZonedDateTime.now(), ChronoUnit.DAYS);
 
-
 			json.addProperty("id", id);
 			json.addProperty("name", mio.getName());
 			json.addProperty("date", MioUtils.getTimeString(timestamp));
@@ -93,8 +91,7 @@ public class YonderuServlet extends HttpServlet {
 			json.addProperty("color", mio.getMangaColor());
 
 			json.add("pages", gson.toJsonTree(pages).getAsJsonArray());
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			json.addProperty("error", "Failed to read the MIO file.");
 		}
@@ -103,7 +100,8 @@ public class YonderuServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
