@@ -19,10 +19,17 @@
     <div class="card-content white-text">
       {{ item.comment }}
 
+      {% if item.miohash == null %}
       <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Search for this on the Store!"
         onclick="searchStore('{{item.category}}','{{ item.name }}')" style="float: right;">
         <i class="material-icons">search</i>
       </a>
+      {% else %}
+        <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="View this on the Store!"
+        href="{{item.category}}?id={{item.miohash}}" style="float: right;">
+        <i class="material-icons">link</i>
+      </a>
+      {% endif %}
     </div>
   </div>
 
