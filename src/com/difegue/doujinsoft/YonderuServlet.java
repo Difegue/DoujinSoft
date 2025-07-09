@@ -260,7 +260,7 @@ public class YonderuServlet extends HttpServlet {
 			int note = Integer.parseInt(request.getParameter("stars"));
 			int comment = Integer.parseInt(request.getParameter("comment"));
 
-			if (id == null || note < 1 || note > 5 || comment < 1 || comment > 8) {
+			if (id == null || note < 1 || note > 5 || comment < 0 || comment > 9) {
 				json.addProperty("error", "Missing or invalid parameters.");
 				response.getWriter().append(json.toString());
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
