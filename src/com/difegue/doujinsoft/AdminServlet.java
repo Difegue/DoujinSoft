@@ -232,14 +232,22 @@ public class AdminServlet extends HttpServlet {
             }
         }
 
-        if (req.getParameterMap().containsKey("sendgame")) {
+        if (req.getParameterMap().containsKey("sendgame") || req.getParameterMap().containsKey("sendmanga")) {
             // Send Wii mail through WC24
             ArrayList<MailItem> mails = new ArrayList<>();
-
-            String hash = req.getParameter("game_hash");
+            
+            bool isManga = req.getParameterMap().containsKey("sendmanga");
+            MioUtils.Types type = MioUtils.Types.GAME;
             String code = req.getParameter("wii_code");
-
+            String hash = req.getParameter("game_hash");
             String mioPath = dataDir + "/mio/game/" + hash + ".miozip";
+            
+            if (isManga) {
+                hash = req.getParameter("manga_hash");
+                mioPath = dataDir + "/mio/manga/" + hash + ".miozip";
+                type = MioUtils.Types.MANGA;
+            }
+            
             File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
             GameEdit data = new GameEdit(uncompressedMio.getAbsolutePath());
 
@@ -252,12 +260,12 @@ public class AdminServlet extends HttpServlet {
                     ResultSet result = statement.executeQuery("select friendcode from Friends");
 
                     while (result.next())
-                        mails.add(new MailItem(result.getString("friendcode"), data, MioUtils.Types.GAME, application));
+                        mails.add(new MailItem(result.getString("friendcode"), data, type, application));
 
                     result.close();
                     statement.close();
                 } else {
-                    mails.add(new MailItem(code, data, MioUtils.Types.GAME, application));
+                    mails.add(new MailItem(code, data, type, application));
                 }
 
                 WiiConnect24Api wc24 = new WiiConnect24Api(application);
