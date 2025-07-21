@@ -236,7 +236,7 @@ public class AdminServlet extends HttpServlet {
             // Send Wii mail through WC24
             ArrayList<MailItem> mails = new ArrayList<>();
             
-            bool isManga = req.getParameterMap().containsKey("sendmanga");
+            Boolean isManga = req.getParameterMap().containsKey("sendmanga");
             MioUtils.Types type = MioUtils.Types.GAME;
             String code = req.getParameter("wii_code");
             String hash = req.getParameter("game_hash");
