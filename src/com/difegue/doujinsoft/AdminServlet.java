@@ -249,7 +249,13 @@ public class AdminServlet extends HttpServlet {
             }
             
             File uncompressedMio = MioCompress.uncompressMio(new File(mioPath));
-            GameEdit data = new GameEdit(uncompressedMio.getAbsolutePath());
+            
+            Metadata data = null;
+            if (isManga) {
+                data = new MangaEdit(uncompressedMio.getAbsolutePath());
+            } else {
+                data = new GameEdit(uncompressedMio.getAbsolutePath());
+            }
 
             try (Connection connection = DriverManager
                     .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
