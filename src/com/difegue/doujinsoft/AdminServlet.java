@@ -30,6 +30,7 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import com.xperia64.diyedit.FileByteOperations;
 import com.xperia64.diyedit.editors.GameEdit;
+import com.xperia64.diyedit.editors.MangaEdit;
 import com.xperia64.diyedit.metadata.Metadata;
 
 import org.apache.commons.codec.binary.Base64;
