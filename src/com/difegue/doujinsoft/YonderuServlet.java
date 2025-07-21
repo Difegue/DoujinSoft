@@ -272,7 +272,9 @@ public class YonderuServlet extends HttpServlet {
 			var result = statement.executeQuery("SELECT * FROM Manga WHERE hash = '" + id + "'");
 			if (result.next()) {
 
-				var success = DatabaseUtils.saveSurveyAnswer(dataDir, request.getRemoteAddr(), 2,
+				// This doesn't really make for a "unique" identifier at this point, but should be enough to allow triaging through the database.
+				var uID = request.getHeader("user-agent") + System.currentTimeMillis();
+				var success = DatabaseUtils.saveSurveyAnswer(dataDir, uID, 2,
 						result.getString("name"), note, comment, id);
 
 				if (success) {
