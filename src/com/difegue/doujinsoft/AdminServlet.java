@@ -237,7 +237,7 @@ public class AdminServlet extends HttpServlet {
             ArrayList<MailItem> mails = new ArrayList<>();
             
             Boolean isManga = req.getParameterMap().containsKey("sendmanga");
-            MioUtils.Types type = MioUtils.Types.GAME;
+            int type = MioUtils.Types.GAME;
             String code = req.getParameter("wii_code");
             String hash = req.getParameter("game_hash");
             String mioPath = dataDir + "/mio/game/" + hash + ".miozip";
