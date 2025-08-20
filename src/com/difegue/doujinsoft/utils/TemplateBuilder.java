@@ -68,15 +68,26 @@ public class TemplateBuilder {
 			surveyType = 2;
 		}
 		
+		// Parse the fromWhereClause to extract table and where conditions
+		// fromWhereClause format: "TableName WHERE conditions"
+		String[] parts = fromWhereClause.split(" WHERE ", 2);
+		String tableClause = parts[0];
+		String whereClause = parts.length > 1 ? parts[1] : "";
+		
 		// Build query with LEFT JOIN to aggregate survey ratings
 		StringBuilder query = new StringBuilder();
 		query.append(selectType).append(" ");
 		query.append(tableName).append(".*, ");
 		query.append("COALESCE(AVG(CAST(Surveys.stars AS REAL)), 0.0) AS averageRating, ");
 		query.append("COALESCE(COUNT(Surveys.stars), 0) AS surveyCount ");
-		query.append("FROM ").append(fromWhereClause).append(" ");
+		query.append("FROM ").append(tableClause).append(" ");
 		query.append("LEFT JOIN Surveys ON ").append(tableName).append(".hash = Surveys.miohash ");
 		query.append("AND Surveys.type = ").append(surveyType).append(" ");
+		
+		if (!whereClause.isEmpty()) {
+			query.append("WHERE ").append(whereClause).append(" ");
+		}
+		
 		query.append("GROUP BY ").append(tableName).append(".hash ");
 		
 		if (!orderByClause.isEmpty()) {

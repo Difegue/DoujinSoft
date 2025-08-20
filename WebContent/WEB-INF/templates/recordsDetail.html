@@ -59,24 +59,26 @@
       {% if item.surveyCount > 0 %}
       <div class="rating-section" style="margin-top: 10px;">
         <div class="rating-display">
-          {% set fullStars = (item.averageRating | round(0, 'floor')) %}
-          {% set hasHalfStar = (item.averageRating - fullStars) >= 0.5 %}
+          {% set fullStars = item.averageRating | round(0, 'floor') %}
+          {% set decimalPart = item.averageRating - fullStars %}
           
-          {% for i in range(fullStars) %}
+          {% for i in range(0, fullStars) %}
             <i class="material-icons star-filled" style="color: #FFD700; font-size: 16px;">star</i>
           {% endfor %}
           
-          {% if hasHalfStar %}
+          {% if decimalPart >= 0.5 %}
             <i class="material-icons star-half" style="color: #FFD700; font-size: 16px;">star_half</i>
+            {% set remainingStars = 4 - fullStars %}
+          {% else %}
+            {% set remainingStars = 5 - fullStars %}
           {% endif %}
           
-          {% set remainingStars = 5 - fullStars - (hasHalfStar ? 1 : 0) %}
-          {% for i in range(remainingStars) %}
+          {% for i in range(0, remainingStars) %}
             <i class="material-icons star-empty" style="color: #FFD700; font-size: 16px;">star_border</i>
           {% endfor %}
           
           <span class="rating-text white-text" style="margin-left: 5px; font-size: 14px;">
-            {{ "%.1f" | format(item.averageRating) }} ({{ item.surveyCount }} review{{ item.surveyCount == 1 ? "" : "s" }})
+            {{ item.averageRating | numberformat("#.#") }} ({{ item.surveyCount }} review{% if item.surveyCount != 1 %}s{% endif %})
           </span>
         </div>
       </div>
