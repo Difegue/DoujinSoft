@@ -49,6 +49,43 @@ public class TemplateBuilder {
 	 */
 	protected boolean isContentNameSearch, isCreatorNameSearch, isContentCreatorSearch, isSortedBy;
 
+	/*
+	 * Build SQL query that includes survey rating aggregation
+	 */
+	protected String buildQueryWithSurveyRatings(String selectType, String selectFields, 
+			String fromWhereClause, String orderByClause, boolean isCount) {
+		
+		if (isCount) {
+			// For count queries, we don't need the survey join
+			return selectType + " COUNT(DISTINCT " + tableName + ".id) FROM " + fromWhereClause;
+		}
+		
+		// Determine survey type based on table name
+		int surveyType = 0; // Default to GAME
+		if (tableName.equals("Records")) {
+			surveyType = 1;
+		} else if (tableName.equals("Manga")) {
+			surveyType = 2;
+		}
+		
+		// Build query with LEFT JOIN to aggregate survey ratings
+		StringBuilder query = new StringBuilder();
+		query.append(selectType).append(" ");
+		query.append(tableName).append(".*, ");
+		query.append("COALESCE(AVG(CAST(Surveys.stars AS REAL)), 0.0) AS averageRating, ");
+		query.append("COALESCE(COUNT(Surveys.stars), 0) AS surveyCount ");
+		query.append("FROM ").append(fromWhereClause).append(" ");
+		query.append("LEFT JOIN Surveys ON ").append(tableName).append(".hash = Surveys.miohash ");
+		query.append("AND Surveys.type = ").append(surveyType).append(" ");
+		query.append("GROUP BY ").append(tableName).append(".hash ");
+		
+		if (!orderByClause.isEmpty()) {
+			query.append("ORDER BY ").append(orderByClause).append(" ");
+		}
+		
+		return query.toString();
+	}
+
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
 
@@ -129,8 +166,9 @@ public class TemplateBuilder {
 		// Specific hash request
 		if (request.getParameterMap().containsKey("id")) {
 
-			PreparedStatement statement = connection
-					.prepareStatement("select * from " + tableName + " WHERE hash == ?");
+			String singleItemQuery = buildQueryWithSurveyRatings("SELECT", "*", 
+				tableName + " WHERE " + tableName + ".hash = ?", "", false);
+			PreparedStatement statement = connection.prepareStatement(singleItemQuery);
 			statement.setString(1, request.getParameter("id"));
 
 			// disable search by setting totalitems to -1
@@ -201,15 +239,22 @@ public class TemplateBuilder {
 
 		// Change order if the parameter was given
 		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
-			orderBy = "timeStamp DESC";
+			orderBy = tableName + ".timeStamp DESC";
 		}
 
 		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
-			orderBy = "normalizedName ASC";
+			orderBy = tableName + ".normalizedName ASC";
 		}
 
-		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
-		String queryCount = "SELECT COUNT(id) " + queryBase;
+		// Build queries with survey ratings
+		String baseWhereClause = tableName + " WHERE ";
+		baseWhereClause += (isContentNameSearch || isCreatorNameSearch) ? tableName + ".name LIKE ? AND " + tableName + ".creator LIKE ? AND " : "";
+		baseWhereClause += tableName + ".id NOT LIKE '%them%'";
+		
+		String query = buildQueryWithSurveyRatings("SELECT", "*", 
+			baseWhereClause, orderBy + " LIMIT 15 OFFSET ?", false);
+		String queryCount = buildQueryWithSurveyRatings("SELECT", "COUNT(id)", 
+			baseWhereClause, "", true);
 
 		PreparedStatement ret = connection.prepareStatement(query);
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
@@ -261,24 +306,27 @@ public class TemplateBuilder {
 		String cartridgeId = request.getParameter("cartridge_id");
 		boolean isLegitCart = !cartridgeId.equals("00000000000000000000000000000000");
 
-		// Add creator/cartID checks to query
-		queryBase += " AND creatorID = ? ";
-		queryBase += isLegitCart ? " OR cartridgeID = ? " : "";
+		// Build the where clause for creator search
+		String baseWhereClause = tableName + " WHERE " + tableName + ".id NOT LIKE '%them%'";
+		baseWhereClause += " AND " + tableName + ".creatorID = ? ";
+		baseWhereClause += isLegitCart ? " OR " + tableName + ".cartridgeID = ? " : "";
 
 		// Default orderBy
 		String orderBy = defaultOrderBy;
 
 		// Change order if the parameter was given
 		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
-			orderBy = "timeStamp DESC";
+			orderBy = tableName + ".timeStamp DESC";
 		}
 
 		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
-			orderBy = "normalizedName ASC";
+			orderBy = tableName + ".normalizedName ASC";
 		}
 
-		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
-		String queryCount = "SELECT COUNT(id) " + queryBase;
+		String query = buildQueryWithSurveyRatings("SELECT", "*", 
+			baseWhereClause, orderBy + " LIMIT 15 OFFSET ?", false);
+		String queryCount = buildQueryWithSurveyRatings("SELECT", "COUNT(id)", 
+			baseWhereClause, "", true);
 
 		PreparedStatement ret = connection.prepareStatement(query);
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
