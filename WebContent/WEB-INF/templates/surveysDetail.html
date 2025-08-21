@@ -18,16 +18,19 @@
 
     <div class="card-content white-text">
       {{ item.comment }}
+    </div>
+
+    <div class="card-action">
 
       {% if item.miohash == null %}
-      <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="Search for this on the Store!"
-        onclick="searchStore('{{item.category}}','{{ item.name }}')" style="float: right;">
-        <i class="material-icons">search</i>
+      <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="We haven't been able to find an exact match for this.. But you can still search for it!"
+        onclick="searchStore('{{item.category}}','{{ item.name }}')" >
+        <i class="material-icons left">search</i>Find in Store
       </a>
       {% else %}
-        <a class="btn waves-effect tooltipped" data-position="top" data-tooltip="View this on the Store!"
-        href="{{item.category}}?id={{item.miohash}}" style="float: right;">
-        <i class="material-icons">link</i>
+        <a class="btn waves-effect" 
+        href="{{item.category}}?id={{item.miohash}}" >
+        <i class="material-icons left">link</i>View in Store
       </a>
       {% endif %}
     </div>
