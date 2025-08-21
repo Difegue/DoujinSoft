@@ -105,12 +105,13 @@ public class BaseMio {
 			surveyCount = 0;
 		}
 
+		fullStars = (int) Math.floor(averageRating);
 	}
 
 	public String name, timestamp, mioID, hash, brand, creator,
 			mioDesc1, mioDesc2, colorLogo, colorCart, specialBrand,
 			creatorId, cartridgeId;
-	public int logo, surveyCount;
+	public int logo, surveyCount, fullStars;
 	public double averageRating;
 
 	/**
