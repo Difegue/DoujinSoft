@@ -57,7 +57,7 @@ public class TemplateBuilder {
 		
 		if (isCount) {
 			// For count queries, we don't need the survey join
-			return selectType + " COUNT(DISTINCT " + tableName + ".id) FROM " + fromWhereClause;
+			return selectType + " COUNT(" + tableName + ".id) FROM " + fromWhereClause;
 		}
 		
 		// Determine survey type based on table name
