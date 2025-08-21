@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <div class="card-content black-text">
+    <div class="card-content black-text" style="padding: 24px 24px 6px 24px;">
 
           <div class="game-data">
 
@@ -52,34 +52,36 @@
 
           </div>
 
-      <span class="game-text card-title white-text" style=""><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>
+      <span class="game-text card-title white-text"><br/>{{ item.mioDesc1 }} <br/>{{ item.mioDesc2 }}</span>
       
       {% if item.surveyCount > 0 %}
-      <div class="rating-section" style="margin-top: 10px;">
+      <div class="rating-section" style="margin-top: 10px; height:24px;">
         <div class="rating-display">
-          {% set fullStars = item.averageRating | round(0, 'floor') %}
-          {% set decimalPart = item.averageRating - fullStars %}
+          {% set decimalPart = item.averageRating - item.fullStars %}
           
-          {% for i in range(0, fullStars) %}
+          {% for i in 1..item.fullStars %}
             <i class="material-icons star-filled" style="color: #FFD700; font-size: 16px;">star</i>
           {% endfor %}
           
           {% if decimalPart >= 0.5 %}
             <i class="material-icons star-half" style="color: #FFD700; font-size: 16px;">star_half</i>
-            {% set remainingStars = 4 - fullStars %}
+            {% set remainingStars = 4 - item.fullStars %}
           {% else %}
-            {% set remainingStars = 5 - fullStars %}
+            {% set remainingStars = 5 - item.fullStars %}
           {% endif %}
           
-          {% for i in range(0, remainingStars) %}
+          {% for i in 1..remainingStars %}
             <i class="material-icons star-empty" style="color: #FFD700; font-size: 16px;">star_border</i>
           {% endfor %}
           
-          <span class="rating-text white-text" style="margin-left: 5px; font-size: 14px;">
-            {{ item.averageRating | numberformat("#.#") }} ({{ item.surveyCount }} review{% if item.surveyCount != 1 %}s{% endif %})
+          <span class="rating-text white-text" style="margin-left: 4px; vertical-align: text-bottom;">
+            {{ item.averageRating | numberformat("#.#") }} <a href="./surveys">({{ item.surveyCount }} review{% if item.surveyCount != 1 %}s{% endif %})</a>
           </span>
         </div>
       </div>
+      {% else %}
+        <div class="rating-section" style="margin-top: 10px; height:24px;">
+        </div>
       {% endif %}          
     </div>
 
