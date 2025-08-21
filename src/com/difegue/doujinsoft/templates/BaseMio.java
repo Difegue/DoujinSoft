@@ -114,43 +114,4 @@ public class BaseMio {
 	public int logo, surveyCount, fullStars;
 	public double averageRating;
 
-	/**
-	 * Get a formatted star rating display
-	 * @return HTML string with star rating display
-	 */
-	public String getStarRatingDisplay() {
-		if (surveyCount == 0) {
-			return ""; // No ratings available
-		}
-		
-		StringBuilder stars = new StringBuilder();
-		stars.append("<div class=\"rating-display\">");
-		
-		int fullStars = (int) Math.floor(averageRating);
-		boolean hasHalfStar = (averageRating - fullStars) >= 0.5;
-		
-		// Add full stars
-		for (int i = 0; i < fullStars; i++) {
-			stars.append("<i class=\"material-icons star-filled\">star</i>");
-		}
-		
-		// Add half star if needed
-		if (hasHalfStar) {
-			stars.append("<i class=\"material-icons star-half\">star_half</i>");
-		}
-		
-		// Add empty stars to make 5 total
-		int remainingStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-		for (int i = 0; i < remainingStars; i++) {
-			stars.append("<i class=\"material-icons star-empty\">star_border</i>");
-		}
-		
-		// Add rating text
-		stars.append(String.format(" <span class=\"rating-text\">%.1f (%d review%s)</span>", 
-			averageRating, surveyCount, surveyCount == 1 ? "" : "s"));
-		
-		stars.append("</div>");
-		return stars.toString();
-	}
-
 }
