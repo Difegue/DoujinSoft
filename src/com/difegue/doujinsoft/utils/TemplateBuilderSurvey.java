@@ -23,7 +23,7 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
 
         initializeTemplate(Types.SURVEY, false);
         Statement statement = connection.createStatement();
-        ResultSet result = statement.executeQuery("select * from "+tableName+" ORDER BY timestamp DESC LIMIT 50");
+        ResultSet result = statement.executeQuery("select * from "+tableName+" ORDER BY timestamp DESC LIMIT 51");
         
         while(result.next()) 
             items.add(classConstructor.newInstance(result));
@@ -54,7 +54,7 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
         if (isNameSearch) {
             // Build search query with name filter
             String nameFilter = request.getParameter("name") + "%";
-            query = "SELECT * FROM " + tableName + " WHERE name LIKE ? ORDER BY timestamp DESC LIMIT 50 OFFSET ?";
+            query = "SELECT * FROM " + tableName + " WHERE name LIKE ? ORDER BY timestamp DESC LIMIT 51 OFFSET ?";
             queryCount = "SELECT COUNT(timestamp) FROM " + tableName + " WHERE name LIKE ?";
             
             ret = connection.prepareStatement(query);
@@ -68,7 +68,7 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
             context.put("nameSearch", request.getParameter("name"));
         } else {
             // Standard query without filter
-            query = "SELECT * FROM " + tableName + " ORDER BY timestamp DESC LIMIT 50 OFFSET ?";
+            query = "SELECT * FROM " + tableName + " ORDER BY timestamp DESC LIMIT 51 OFFSET ?";
             queryCount = "SELECT COUNT(timestamp) FROM " + tableName;
             
             ret = connection.prepareStatement(query);
