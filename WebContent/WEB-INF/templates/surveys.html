@@ -11,6 +11,23 @@ You can rate content from both <a href="https://www.mariowiki.com/WarioWare:_D.I
 and <a href="https://difegue.itch.io/yonderu-doujinsoft">Yonderu! DoujinSoft</a> for Playdate. <br /> This page is a simple way to display all the ratings we've received.
 <br /><br />
 
+<div id="survey-search">
+	<div style="height: 50px; width: 300px" class="chip">
+		<div class="input-field" style="margin-top:-5px; margin-left: -10px;">
+			<i style="margin-top: 5px;" class="material-icons prefix">search</i>
+			<input id="item_name" type="text" value="{{nameSearch}}">
+			<label class="" for="item_name" style="margin-top:-5px">Content Name</label>
+		</div>
+	</div>
+
+	<br /> <br />
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="loadItems(1)">
+		<i class="material-icons left">search</i>Search
+	</a>
+	<a class="waves-effect waves-light btn" style="width:160px" onclick="clearSearch()">
+		<i class="material-icons left">clear</i>Clear
+	</a>
+</div>
 <br />
 <div id="pagination-top" class="pagination-wrapper chip">
   <ul class="pagination pagination-survey"></ul>
