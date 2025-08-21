@@ -49,6 +49,54 @@ public class TemplateBuilder {
 	 */
 	protected boolean isContentNameSearch, isCreatorNameSearch, isContentCreatorSearch, isSortedBy;
 
+	/*
+	 * Build SQL query that includes survey rating aggregation
+	 */
+	protected String buildQueryWithSurveyRatings(String selectType, String selectFields, 
+			String fromWhereClause, String orderByClause, boolean isCount) {
+		
+		if (isCount) {
+			// For count queries, we don't need the survey join
+			return selectType + " COUNT(" + tableName + ".id) FROM " + fromWhereClause;
+		}
+		
+		// Determine survey type based on table name
+		int surveyType = 0; // Default to GAME
+		if (tableName.equals("Records")) {
+			surveyType = 1;
+		} else if (tableName.equals("Manga")) {
+			surveyType = 2;
+		}
+		
+		// Parse the fromWhereClause to extract table and where conditions
+		// fromWhereClause format: "TableName WHERE conditions"
+		String[] parts = fromWhereClause.split(" WHERE ", 2);
+		String tableClause = parts[0];
+		String whereClause = parts.length > 1 ? parts[1] : "";
+		
+		// Build query with LEFT JOIN to aggregate survey ratings
+		StringBuilder query = new StringBuilder();
+		query.append(selectType).append(" ");
+		query.append(tableName).append(".*, ");
+		query.append("COALESCE(AVG(CAST(Surveys.stars AS REAL)), 0.0) AS averageRating, ");
+		query.append("COALESCE(COUNT(Surveys.stars), 0) AS surveyCount ");
+		query.append("FROM ").append(tableClause).append(" ");
+		query.append("LEFT JOIN Surveys ON ").append(tableName).append(".hash = Surveys.miohash ");
+		query.append("AND Surveys.type = ").append(surveyType).append(" ");
+		
+		if (!whereClause.isEmpty()) {
+			query.append("WHERE ").append(whereClause).append(" ");
+		}
+		
+		query.append("GROUP BY ").append(tableName).append(".hash ");
+		
+		if (!orderByClause.isEmpty()) {
+			query.append("ORDER BY ").append(orderByClause).append(" ");
+		}
+		
+		return query.toString();
+	}
+
 	protected PebbleEngine engine = new PebbleEngine.Builder().build();
 	protected PebbleTemplate compiledTemplate;
 
@@ -122,15 +170,13 @@ public class TemplateBuilder {
 	public String doStandardPageGeneric(int type) throws Exception {
 
 		initializeTemplate(type, false);
-		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
-		queryBase += "id NOT LIKE '%them%'";
 
 		// Specific hash request
 		if (request.getParameterMap().containsKey("id")) {
 
-			PreparedStatement statement = connection
-					.prepareStatement("select * from " + tableName + " WHERE hash == ?");
+			String singleItemQuery = buildQueryWithSurveyRatings("SELECT", "*", 
+				tableName + " WHERE " + tableName + ".hash = ?", "", false);
+			PreparedStatement statement = connection.prepareStatement(singleItemQuery);
 			statement.setString(1, request.getParameter("id"));
 
 			// disable search by setting totalitems to -1
@@ -146,10 +192,10 @@ public class TemplateBuilder {
 			context.put("items", items);
 			statement.close();
 		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery(queryBase, "normalizedName ASC");
+			performCreatorSearchQuery("normalizedName ASC");
 			GetCreatorInfo();
 		} else {
-			performSearchQuery(queryBase, "normalizedName ASC");
+			performSearchQuery("normalizedName ASC");
 		}
 
 		// JSON hijack if specified in the parameters
@@ -171,16 +217,11 @@ public class TemplateBuilder {
 
 		initializeTemplate(type, true);
 
-		// Build both data and count queries
-		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
-		queryBase += "id NOT LIKE '%them%'";
-
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery(queryBase, "normalizedName ASC");
+			performCreatorSearchQuery("normalizedName ASC");
 			GetCreatorInfo();
 		} else
-			performSearchQuery(queryBase, "normalizedName ASC");
+			performSearchQuery("normalizedName ASC");
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -195,21 +236,28 @@ public class TemplateBuilder {
 	/*
 	 * Default query or search by creator name and/or content name
 	 */
-	protected void performSearchQuery(String queryBase, String defaultOrderBy) throws Exception {
+	protected void performSearchQuery(String defaultOrderBy) throws Exception {
 
 		String orderBy = defaultOrderBy;
 
 		// Change order if the parameter was given
 		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
-			orderBy = "timeStamp DESC";
+			orderBy = tableName + ".timeStamp DESC";
 		}
 
 		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
-			orderBy = "normalizedName ASC";
+			orderBy = tableName + ".normalizedName ASC";
 		}
 
-		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
-		String queryCount = "SELECT COUNT(id) " + queryBase;
+		// Build queries with survey ratings
+		String baseWhereClause = tableName + " WHERE ";
+		baseWhereClause += (isContentNameSearch || isCreatorNameSearch) ? tableName + ".name LIKE ? AND " + tableName + ".creator LIKE ? AND " : "";
+		baseWhereClause += tableName + ".id NOT LIKE '%them%'";
+		
+		String query = buildQueryWithSurveyRatings("SELECT", "*", 
+			baseWhereClause, orderBy + " LIMIT 15 OFFSET ?", false);
+		String queryCount = buildQueryWithSurveyRatings("SELECT", "COUNT(id)", 
+			baseWhereClause, "", true);
 
 		PreparedStatement ret = connection.prepareStatement(query);
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
@@ -255,30 +303,33 @@ public class TemplateBuilder {
 	/*
 	 * Query search by creator ID or cartridge ID
 	 */
-	protected void performCreatorSearchQuery(String queryBase, String defaultOrderBy) throws Exception {
+	protected void performCreatorSearchQuery(String defaultOrderBy) throws Exception {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
 		String cartridgeId = request.getParameter("cartridge_id");
 		boolean isLegitCart = !cartridgeId.equals("00000000000000000000000000000000");
 
-		// Add creator/cartID checks to query
-		queryBase += " AND creatorID = ? ";
-		queryBase += isLegitCart ? " OR cartridgeID = ? " : "";
+		// Build the where clause for creator search
+		String baseWhereClause = tableName + " WHERE " + tableName + ".id NOT LIKE '%them%'";
+		baseWhereClause += " AND " + tableName + ".creatorID = ? ";
+		baseWhereClause += isLegitCart ? " OR " + tableName + ".cartridgeID = ? " : "";
 
 		// Default orderBy
 		String orderBy = defaultOrderBy;
 
 		// Change order if the parameter was given
 		if (isSortedBy && request.getParameter("sort_by").equals("date")) {
-			orderBy = "timeStamp DESC";
+			orderBy = tableName + ".timeStamp DESC";
 		}
 
 		if (isSortedBy && request.getParameter("sort_by").equals("name")) {
-			orderBy = "normalizedName ASC";
+			orderBy = tableName + ".normalizedName ASC";
 		}
 
-		String query = "SELECT * " + queryBase + " ORDER BY " + orderBy + " LIMIT 15 OFFSET ?";
-		String queryCount = "SELECT COUNT(id) " + queryBase;
+		String query = buildQueryWithSurveyRatings("SELECT", "*", 
+			baseWhereClause, orderBy + " LIMIT 15 OFFSET ?", false);
+		String queryCount = buildQueryWithSurveyRatings("SELECT", "COUNT(id)", 
+			baseWhereClause, "", true);
 
 		PreparedStatement ret = connection.prepareStatement(query);
 		PreparedStatement retCount = connection.prepareStatement(queryCount);
