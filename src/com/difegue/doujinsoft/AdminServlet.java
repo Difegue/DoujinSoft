@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.difegue.doujinsoft.templates.BaseMio;
 import com.difegue.doujinsoft.templates.Collection;
 import com.difegue.doujinsoft.utils.CollectionUtils;
+import com.difegue.doujinsoft.utils.DatabaseUtils;
 import com.difegue.doujinsoft.utils.MioCompress;
 import com.difegue.doujinsoft.utils.MioStorage;
 import com.difegue.doujinsoft.utils.MioUtils;
@@ -308,6 +309,18 @@ public class AdminServlet extends HttpServlet {
                 MioStorage.UpdateMetadata(connection, dataDir, ServletLog, "manga");
                 MioStorage.UpdateMetadata(connection, dataDir, ServletLog, "record");
 
+            } catch (Exception e) {
+                ServletLog.log(Level.SEVERE, e.getMessage());
+                output = e.getMessage();
+            }
+        }
+
+        // Add missing miohash data to surveys
+        if (req.getParameterMap().containsKey("add_missing_miohash")) {
+            try {
+                ServletLog.log(Level.INFO, "Adding missing miohash data to Surveys table...");
+                output = DatabaseUtils.addMissingMiohash(dataDir);
+                ServletLog.log(Level.INFO, "Miohash update completed.");
             } catch (Exception e) {
                 ServletLog.log(Level.SEVERE, e.getMessage());
                 output = e.getMessage();
