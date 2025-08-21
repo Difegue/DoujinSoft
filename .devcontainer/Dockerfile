@@ -16,7 +16,7 @@ RUN cd /tmp && wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.73/bin/
     && mv apache-tomcat-9.0.73 /usr/local/tomcat && chmod -R 777 /usr/local/tomcat && rm -rf apache-tomcat-9.0.73.tar.gz
 
 # Grab the DB backup from the live site and use it as a starting point. 
-RUN cd /tmp && wget https://tvc-16.science/dsoft-backup.zip && unzip dsoft-backup.zip && mv doujinsoft2 /home/doujinsoft && chmod -R 777 /home/doujinsoft
+RUN cd /tmp && wget https://tvc-16.science/dsoft-backup.zip && unzip dsoft-backup.zip && mv Doujinsoft /home/doujinsoft && chmod -R 777 /home/doujinsoft
 
 USER codespace
 
