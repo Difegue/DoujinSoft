@@ -84,9 +84,9 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
         
         // Set pagination offset (different parameter position depending on search)
         if (isNameSearch) {
-            ret.setInt(2, page*50-50);
+            ret.setInt(2, page*51-51);
         } else {
-            ret.setInt(1, page*50-50);
+            ret.setInt(1, page*51-51);
         }
         
         ResultSet result = ret.executeQuery();
