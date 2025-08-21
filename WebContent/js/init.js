@@ -190,6 +190,18 @@ function clearSearch() {
 	loadItems(1);
 }
 
+function searchByName(name) {
+	// Clear other search fields first
+	$("#maker_name").val("");
+	$("#cartridge_id").val("");
+	$("#creator_id").val("");
+	
+	// Set the search term
+	$("#item_name").val(name);
+	M.updateTextFields();
+	loadItems(1);
+}
+
 function searchForUser(creatorName, cartridgeId, creatorId) {
 
 	$("#item_name").val("");
