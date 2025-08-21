@@ -170,9 +170,6 @@ public class TemplateBuilder {
 	public String doStandardPageGeneric(int type) throws Exception {
 
 		initializeTemplate(type, false);
-		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
-		queryBase += "id NOT LIKE '%them%'";
 
 		// Specific hash request
 		if (request.getParameterMap().containsKey("id")) {
@@ -195,10 +192,10 @@ public class TemplateBuilder {
 			context.put("items", items);
 			statement.close();
 		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery(queryBase, "normalizedName ASC");
+			performCreatorSearchQuery("normalizedName ASC");
 			GetCreatorInfo();
 		} else {
-			performSearchQuery(queryBase, "normalizedName ASC");
+			performSearchQuery("normalizedName ASC");
 		}
 
 		// JSON hijack if specified in the parameters
@@ -220,16 +217,11 @@ public class TemplateBuilder {
 
 		initializeTemplate(type, true);
 
-		// Build both data and count queries
-		String queryBase = "FROM " + tableName + " WHERE ";
-		queryBase += (isContentNameSearch || isCreatorNameSearch) ? "name LIKE ? AND creator LIKE ? AND " : "";
-		queryBase += "id NOT LIKE '%them%'";
-
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery(queryBase, "normalizedName ASC");
+			performCreatorSearchQuery("normalizedName ASC");
 			GetCreatorInfo();
 		} else
-			performSearchQuery(queryBase, "normalizedName ASC");
+			performSearchQuery("normalizedName ASC");
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -244,7 +236,7 @@ public class TemplateBuilder {
 	/*
 	 * Default query or search by creator name and/or content name
 	 */
-	protected void performSearchQuery(String queryBase, String defaultOrderBy) throws Exception {
+	protected void performSearchQuery(String defaultOrderBy) throws Exception {
 
 		String orderBy = defaultOrderBy;
 
@@ -311,7 +303,7 @@ public class TemplateBuilder {
 	/*
 	 * Query search by creator ID or cartridge ID
 	 */
-	protected void performCreatorSearchQuery(String queryBase, String defaultOrderBy) throws Exception {
+	protected void performCreatorSearchQuery(String defaultOrderBy) throws Exception {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
 		String cartridgeId = request.getParameter("cartridge_id");

@@ -66,16 +66,13 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 
 		initializeTemplate(c.getType(), true);
 
-		String queryBase = "FROM " + tableName + " WHERE hash IN " + c.getMioSQL();
-		queryBase += (isContentNameSearch || isCreatorNameSearch) ? " AND name LIKE ? AND creator LIKE ?" : "";
-
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery(queryBase, "timeStamp DESC");
+			performCreatorSearchQuery("timeStamp DESC");
 			GetCreatorInfo();
 		} else {
 			// Unlike the regular pages, ordering by timestamp is the default for
 			// collections
-			performSearchQuery(queryBase, "timeStamp DESC");
+			performSearchQuery("timeStamp DESC");
 		}
 
 		// JSON hijack if specified in the parameters
