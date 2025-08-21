@@ -13,6 +13,7 @@ public class Survey {
 
 	public Survey(ResultSet result) throws SQLException {
 
+		miohash = result.getString("miohash");
 		int commentId = result.getInt("commentId");
 
 		switch (result.getInt("type")) {
@@ -43,7 +44,7 @@ public class Survey {
 	}
 
 	public int starCount, type;
-	public String name, comment, color, category;
+	public String name, comment, color, category, miohash;
 
 	private String getComment(int type, int commentId) {
 		switch (type) {
