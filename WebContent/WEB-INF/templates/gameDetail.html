@@ -80,7 +80,7 @@
           {% endfor %}
           
           <span class="rating-text white-text" style="margin-left: 4px; vertical-align: text-bottom;">
-            {{ game.averageRating | numberformat("#.#") }} <a href="./surveys">({{ game.surveyCount }} review{% if game.surveyCount != 1 %}s{% endif %})</a>
+            {{ game.averageRating | numberformat("#.#") }} <a href="./surveys?name={{ game.name }}">({{ game.surveyCount }} review{% if game.surveyCount != 1 %}s{% endif %})</a>
           </span>
         </div>
       </div>
