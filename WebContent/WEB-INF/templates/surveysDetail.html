@@ -7,7 +7,7 @@
       <div class="chip game-title">
         <a href="#" style="color: inherit; text-decoration: none;" onclick="searchByName('{{ item.name }}'); return false;">{{ item.name }}</a>
       </div>
-      <div class="game-metadata note-{{ item.starCount }}">
+      <div class="game-metadata note-{{ item.starCount }}" style="margin-top: 12px">
         <i class="material-icons star-1">star</i>
         <i class="material-icons star-2">star</i>
         <i class="material-icons star-3">star</i>
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div class="card-content white-text">
+    <div class="card-content white-text center" style="height: 92px; padding: 24px 24px 8px 24px; font-size: 20px">
       {{ item.comment }}
     </div>
 
