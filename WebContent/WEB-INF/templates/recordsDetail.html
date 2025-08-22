@@ -77,7 +77,7 @@
           {% endfor %}
           
           <span class="rating-text white-text" style="margin-left: 4px; vertical-align: text-bottom;">
-            {{ item.averageRating | numberformat("#.#") }} <a href="./surveys">({{ item.surveyCount }} review{% if item.surveyCount != 1 %}s{% endif %})</a>
+            {{ item.averageRating | numberformat("#.#") }} <a href="./surveys?name={{ item.name }}">({{ item.surveyCount }} review{% if item.surveyCount != 1 %}s{% endif %})</a>
           </span>
         </div>
       </div>

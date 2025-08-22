@@ -114,6 +114,10 @@ label.active {
     color: #FFF !important;
     display: inline-block;
     min-width: 50%;
+    max-width: 60%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     text-align: center;
 }
 

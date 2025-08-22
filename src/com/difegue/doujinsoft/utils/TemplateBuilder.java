@@ -192,10 +192,10 @@ public class TemplateBuilder {
 			context.put("items", items);
 			statement.close();
 		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery("normalizedName ASC");
+			performCreatorSearchQuery("normalizedName ASC", "");
 			GetCreatorInfo();
 		} else {
-			performSearchQuery("normalizedName ASC");
+			performSearchQuery("normalizedName ASC", "");
 		}
 
 		// JSON hijack if specified in the parameters
@@ -218,10 +218,10 @@ public class TemplateBuilder {
 		initializeTemplate(type, true);
 
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery("normalizedName ASC");
+			performCreatorSearchQuery("normalizedName ASC", "");
 			GetCreatorInfo();
 		} else
-			performSearchQuery("normalizedName ASC");
+			performSearchQuery("normalizedName ASC", "");
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -236,7 +236,7 @@ public class TemplateBuilder {
 	/*
 	 * Default query or search by creator name and/or content name
 	 */
-	protected void performSearchQuery(String defaultOrderBy) throws Exception {
+	protected void performSearchQuery(String defaultOrderBy, String additionalWhereClause) throws Exception {
 
 		String orderBy = defaultOrderBy;
 
@@ -252,6 +252,7 @@ public class TemplateBuilder {
 		// Build queries with survey ratings
 		String baseWhereClause = tableName + " WHERE ";
 		baseWhereClause += (isContentNameSearch || isCreatorNameSearch) ? tableName + ".name LIKE ? AND " + tableName + ".creator LIKE ? AND " : "";
+		baseWhereClause += additionalWhereClause.isEmpty() ? "" : additionalWhereClause + " AND ";
 		baseWhereClause += tableName + ".id NOT LIKE '%them%'";
 		
 		String query = buildQueryWithSurveyRatings("SELECT", "*", 
@@ -303,15 +304,16 @@ public class TemplateBuilder {
 	/*
 	 * Query search by creator ID or cartridge ID
 	 */
-	protected void performCreatorSearchQuery(String defaultOrderBy) throws Exception {
+	protected void performCreatorSearchQuery(String defaultOrderBy, String additionalWhereClause) throws Exception {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
 		String cartridgeId = request.getParameter("cartridge_id");
 		boolean isLegitCart = !cartridgeId.equals("00000000000000000000000000000000");
 
 		// Build the where clause for creator search
-		String baseWhereClause = tableName + " WHERE " + tableName + ".id NOT LIKE '%them%'";
-		baseWhereClause += " AND " + tableName + ".creatorID = ? ";
+		String baseWhereClause = tableName + " WHERE " + tableName + ".id NOT LIKE '%them%' AND";
+		baseWhereClause += additionalWhereClause.isEmpty() ? "" : additionalWhereClause + " AND ";
+		baseWhereClause += tableName + ".creatorID = ? ";
 		baseWhereClause += isLegitCart ? " OR " + tableName + ".cartridgeID = ? " : "";
 
 		// Default orderBy
