@@ -22,22 +22,53 @@ public class TemplateBuilderSurvey extends TemplateBuilder {
     public String doGetSurveys() throws Exception {
 
         initializeTemplate(Types.SURVEY, false);
-        Statement statement = connection.createStatement();
-        ResultSet result = statement.executeQuery("select * from "+tableName+" ORDER BY timestamp DESC LIMIT 51");
+
+        // Check if this is a name search
+        boolean isNameSearch = request.getParameterMap().containsKey("name") && !request.getParameter("name").isEmpty();
+
+        String query, queryCount;
+        PreparedStatement ret, retCount;
+
+        if (isNameSearch) {
+            // Build search query with name filter
+            String nameFilter = request.getParameter("name") + "%";
+            query = "SELECT * FROM " + tableName + " WHERE name LIKE ? ORDER BY timestamp DESC LIMIT 51";
+            queryCount = "SELECT COUNT(timestamp) FROM " + tableName + " WHERE name LIKE ?";
+            
+            ret = connection.prepareStatement(query);
+            retCount = connection.prepareStatement(queryCount);
+            
+            // Set search parameters
+            ret.setString(1, nameFilter);
+            retCount.setString(1, nameFilter);
+            
+            // Add search term to context for display
+            context.put("nameSearch", request.getParameter("name"));
+        } else {
+            // Standard query without filter
+            query = "SELECT * FROM " + tableName + " ORDER BY timestamp DESC LIMIT 51";
+            queryCount = "SELECT COUNT(timestamp) FROM " + tableName;
+            
+            ret = connection.prepareStatement(query);
+            retCount = connection.prepareStatement(queryCount);
+            
+            // Clear search context
+            context.put("nameSearch", "");
+        }
+        
+        ResultSet result = ret.executeQuery();
         
         while(result.next()) 
             items.add(classConstructor.newInstance(result));
-
-        result.close();
-
-        result = statement.executeQuery("select COUNT(timestamp) from "+tableName);
-        context.put("items", items);
-        context.put("totalitems", result.getInt(1));
         
         result.close();
-        statement.close();
+        ret.close();
+
+        context.put("items", items);
+        context.put("totalitems", retCount.executeQuery().getInt(1));
+        
+        retCount.close();
         connection.close();
-        //Output to client
         return writeToTemplate();
     }
 
