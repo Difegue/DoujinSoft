@@ -25,30 +25,21 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 	public String doStandardPageCollection(Collection c) throws Exception {
 
 		initializeTemplate(c.getType(), false);
-
-		Statement statement = connection.createStatement();
 		compiledTemplate = engine.getTemplate(application.getRealPath("/WEB-INF/templates/collection.html"));
+		context.put("collection", c);
 
 		if (c.getMioSQL().equals(")")) {
 			context.put("totalitems", 0);
-			context.put("collection", c);
 			return writeToTemplate();
 		}
 
-		// Unlike the regular pages, ordering by timestamp is the default for
-		// collections
-		ResultSet result = statement.executeQuery(
-				"select * from " + tableName + " WHERE hash IN " + c.getMioSQL() + " ORDER BY timeStamp DESC LIMIT 15");
-		while (result.next())
-			items.add(classConstructor.newInstance(result));
-
-		context.put("items", items);
-		context.put("totalitems", c.mios.length);
-		context.put("collection", c);
-
-		result.close();
-		statement.close();
-		connection.close();
+		// Unlike the regular pages, ordering by timestamp is the default for collections
+		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
+			performCreatorSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL());
+			GetCreatorInfo();
+		} else {
+			performSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL()); 
+		}
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -56,6 +47,7 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 			return gson.toJson(context);
 		}
 
+		connection.close();
 		return writeToTemplate();
 	}
 
@@ -67,12 +59,12 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 		initializeTemplate(c.getType(), true);
 
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery("timeStamp DESC");
+			performCreatorSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL());
 			GetCreatorInfo();
 		} else {
 			// Unlike the regular pages, ordering by timestamp is the default for
 			// collections
-			performSearchQuery("timeStamp DESC");
+			performSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL());
 		}
 
 		// JSON hijack if specified in the parameters
