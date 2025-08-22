@@ -247,7 +247,7 @@ label.active {
     font-size: 22px !important;
     display: inline-flex !important;
     height: 80px;
-    text-overflow: ellipsis;
+    overflow: scroll;
 }
 
 .selection-card {

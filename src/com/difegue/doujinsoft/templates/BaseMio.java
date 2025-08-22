@@ -95,11 +95,23 @@ public class BaseMio {
 		colorCart = result.getString("color");
 		logo = result.getInt("logo");
 
+		// Survey rating aggregation
+		try {
+			averageRating = result.getDouble("averageRating");
+			surveyCount = result.getInt("surveyCount");
+		} catch (SQLException e) {
+			// Columns may not exist in queries that don't join with Surveys table
+			averageRating = 0.0;
+			surveyCount = 0;
+		}
+
+		fullStars = (int) Math.floor(averageRating);
 	}
 
 	public String name, timestamp, mioID, hash, brand, creator,
 			mioDesc1, mioDesc2, colorLogo, colorCart, specialBrand,
 			creatorId, cartridgeId;
-	public int logo;
+	public int logo, surveyCount, fullStars;
+	public double averageRating;
 
 }
