@@ -68,6 +68,7 @@
     var lostLastGame = false;
     var isBossGame = false;
     var tempHash = null;
+    var gameSpeed = 1; // Track current game speed for collections
 
     var mioPlayer = new window.mio.Player(canvas, document);
     const loadSound = (name) => {
@@ -215,13 +216,15 @@
         // only if playerSounds is empty
         if (playerSounds.length == 0)
             playerSounds = [loadSound('player/player_start'), loadSound('player/player_game'), loadSound('player/player_win'),
-            loadSound('player/player_lose'), loadSound('player/player_gameover')];
+            loadSound('player/player_lose'), loadSound('player/player_gameover'), loadSound('player/player_speedup')];
 
         isPlayingCollection = true;
         currentCollectionIteration++;
         const currentIteration = currentCollectionIteration;
         lives = 4;
         score = 1;
+        gameSpeed = 1; // Reset speed for new collection
+        playerSounds[1].playbackRate = 1; // Reset game sound speed
         $("#replay-button").hide();
         $("#animation-overlay").show();
         $("#score-number").html(score);
@@ -247,14 +250,15 @@
         while (isPlayingCollection && currentCollectionIteration === currentIteration) {
 
             // GAME_START
+            const animSpeed = gameSpeed > 2 ? 'animate__faster' : gameSpeed > 1 ? 'animate__fast' : '';
             currentSound = playerSounds[1].play();
-            await playAnimation('animate__bounce');
-            await playAnimation('animate__bounceOutRight');
+            await playAnimation('animate__bounce ' + animSpeed);
+            await playAnimation('animate__bounceOutRight ' + animSpeed);
 
             if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
                 break;
 
-            playGame(mioData); // Start playback so that mio loads during the animation
+            playGame(mioData, gameSpeed); // Start playback so that mio loads during the animation
 
             // Animate overlay away 
             $("#animation-overlay").attr('class', 'animate__animated animate__backOutDown animate__faster');
@@ -303,13 +307,28 @@
                         $(icon).attr('class', 'animate__animated animate__bounceIn life-icon');
                     }
                 }
-                else
-                    $("#player-title").text("Nice!");
 
-                // GAME_WIN
-                currentSound = playerSounds[2].play();
-                await playAnimation('animate__zoomInLeft');
-                await playAnimation('animate__heartBeat animate__fast');
+                // Check for speed increase every 5 games cleared
+                if (score % 5 === 0) {
+                    gameSpeed += 0.5;
+                    $("#player-title").text("Speed Up!");
+                    currentSound = playerSounds[5].play();
+                    
+                    playerSounds[1].playbackRate += 0.2; // Speed up game sound too
+
+                    // Play speed up animation
+                    await playAnimation('animate__heartBeat');
+                    await playAnimation('animate__flash');
+                    await playAnimation('animate__pulse');
+                } else {
+                    // GAME_WIN
+                    $("#player-title").text("Nice!");
+                    currentSound = playerSounds[2].play();
+                    await playAnimation('animate__zoomInLeft');
+                    await playAnimation('animate__heartBeat animate__fast');
+                }
+
+                
             }
 
             if (lives <= 0) {
@@ -362,12 +381,17 @@
         mioPlayer.withdrawTouchFromScreen();
     }
 
-    function playGame(mioData) {
+    function playGame(mioData, speed) {
         if (!isInitialised) {
             initializeMioPlayer();
         }
 
-        mioPlayer.loadAndStart(mioData);
+        // Pass speed parameter to loadAndStart if provided, otherwise default behavior
+        if (speed !== undefined) {
+            mioPlayer.loadAndStart(mioData, speed);
+        } else {
+            mioPlayer.loadAndStart(mioData);
+        }
     }
 
     function initializeMioPlayer() {
