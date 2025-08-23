@@ -62,6 +62,11 @@ public class DatabaseUtils {
                 return false;
             }
 
+            // For WC24 surveys, hashes are not provided. Try to find a matching hash.
+            if (miohash == null) {
+                miohash = findHashForSurvey(connection, title, type);
+            }
+
             PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?,?,?)");
             ret.setLong(1, System.currentTimeMillis());
             ret.setInt(2, type);
@@ -81,6 +86,76 @@ public class DatabaseUtils {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static String findHashForSurvey(Connection connection, String name, int type) throws SQLException {
+
+        String selectedHash = null;
+        String tableName;
+        switch (type) {
+            case 0:
+                tableName = "Games";
+                break;
+            case 1:
+                tableName = "Records";
+                break;
+            case 2:
+                tableName = "Manga";
+                break;
+            default:
+                return null;
+        }
+
+        // Search for matching entries in the corresponding table
+        PreparedStatement findMatches = connection.prepareStatement(
+                "SELECT hash FROM " + tableName + " WHERE name LIKE ?");
+        findMatches.setString(1, "%" + name + "%");
+
+        ResultSet matches = findMatches.executeQuery();
+        ArrayList<String> foundHashes = new ArrayList<>();
+
+        while (matches.next()) {
+            foundHashes.add(matches.getString("hash"));
+        }
+        matches.close();
+        findMatches.close();
+
+        if (foundHashes.isEmpty()) {
+            return null;
+        }
+
+        // If multiple matches, prioritize hashes that already exist in Surveys table
+        if (foundHashes.size() > 1) {
+            // Build a parameterized query for checking existing hashes
+            StringBuilder placeholders = new StringBuilder();
+            for (int i = 0; i < foundHashes.size(); i++) {
+                if (i > 0)
+                    placeholders.append(",");
+                placeholders.append("?");
+            }
+
+            PreparedStatement checkExisting = connection.prepareStatement(
+                    "SELECT DISTINCT miohash FROM Surveys WHERE miohash IN (" + placeholders.toString()
+                            + ") AND miohash IS NOT NULL AND miohash != ''");
+
+            for (int i = 0; i < foundHashes.size(); i++) {
+                checkExisting.setString(i + 1, foundHashes.get(i));
+            }
+
+            ResultSet existingHashes = checkExisting.executeQuery();
+            if (existingHashes.next()) {
+                selectedHash = existingHashes.getString("miohash");
+            }
+            existingHashes.close();
+            checkExisting.close();
+        }
+
+        // If no existing hash found, use the first match
+        if (selectedHash == null) {
+            selectedHash = foundHashes.get(0);
+        }
+
+        return selectedHash;
     }
 
     /**
@@ -109,23 +184,6 @@ public class DatabaseUtils {
                 int type = missingSurveys.getInt("type");
                 String name = missingSurveys.getString("name");
 
-                // Determine table name based on type
-                String tableName;
-                switch (type) {
-                    case 0:
-                        tableName = "Games";
-                        break;
-                    case 1:
-                        tableName = "Records";
-                        break;
-                    case 2:
-                        tableName = "Manga";
-                        break;
-                    default:
-                        output.append("Unknown type ").append(type).append(" for survey '").append(name).append("'\n");
-                        continue;
-                }
-
                 // If this name was seen before, assign the same hash
                 if (nameHashMap.containsKey(type + name)) {
                     String existingHash = nameHashMap.get(type + name);
@@ -144,60 +202,12 @@ public class DatabaseUtils {
                     continue;
                 }
 
-                // Search for matching entries in the corresponding table
-                PreparedStatement findMatches = connection.prepareStatement(
-                        "SELECT hash FROM " + tableName + " WHERE name LIKE ?");
-                findMatches.setString(1, "%" + name + "%");
+                // Try to find a miohash by searching the corresponding table
+                String selectedHash = findHashForSurvey(connection, name, type);
 
-                ResultSet matches = findMatches.executeQuery();
-                ArrayList<String> foundHashes = new ArrayList<>();
-
-                while (matches.next()) {
-                    foundHashes.add(matches.getString("hash"));
-                }
-                matches.close();
-                findMatches.close();
-
-                if (foundHashes.isEmpty()) {
-                    output.append("No matches found for survey '").append(name).append("' in ").append(tableName)
-                            .append("\n");
-                    continue;
-                }
-
-                // If multiple matches, prioritize hashes that already exist in Surveys
-                String selectedHash = null;
-                if (foundHashes.size() > 1) {
-                    // Build a parameterized query for checking existing hashes
-                    StringBuilder placeholders = new StringBuilder();
-                    for (int i = 0; i < foundHashes.size(); i++) {
-                        if (i > 0)
-                            placeholders.append(",");
-                        placeholders.append("?");
-                    }
-
-                    PreparedStatement checkExisting = connection.prepareStatement(
-                            "SELECT DISTINCT miohash FROM Surveys WHERE miohash IN (" + placeholders.toString()
-                                    + ") AND miohash IS NOT NULL AND miohash != ''");
-
-                    for (int i = 0; i < foundHashes.size(); i++) {
-                        checkExisting.setString(i + 1, foundHashes.get(i));
-                    }
-
-                    ResultSet existingHashes = checkExisting.executeQuery();
-                    if (existingHashes.next()) {
-                        selectedHash = existingHashes.getString("miohash");
-                        output.append("Using existing hash '").append(selectedHash).append("' for survey '")
-                                .append(name).append("'\n");
-                    }
-                    existingHashes.close();
-                    checkExisting.close();
-                }
-
-                // If no existing hash found, use the first match
                 if (selectedHash == null) {
-                    selectedHash = foundHashes.get(0);
-                    output.append("Using first match hash '").append(selectedHash).append("' for survey '").append(name)
-                            .append("'\n");
+                    output.append("No matching hash found for survey '").append(name).append("'\n");
+                    continue;
                 }
 
                 // Add to map for future consistency
