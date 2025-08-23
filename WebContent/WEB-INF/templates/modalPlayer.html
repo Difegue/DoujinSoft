@@ -216,7 +216,7 @@
         // only if playerSounds is empty
         if (playerSounds.length == 0)
             playerSounds = [loadSound('player/player_start'), loadSound('player/player_game'), loadSound('player/player_win'),
-            loadSound('player/player_lose'), loadSound('player/player_gameover')];
+            loadSound('player/player_lose'), loadSound('player/player_gameover'), loadSound('player/player_speedup')];
 
         isPlayingCollection = true;
         currentCollectionIteration++;
@@ -224,6 +224,7 @@
         lives = 4;
         score = 1;
         gameSpeed = 1; // Reset speed for new collection
+        playerSounds[1].playbackRate = 1; // Reset game sound speed
         $("#replay-button").hide();
         $("#animation-overlay").show();
         $("#score-number").html(score);
@@ -249,9 +250,10 @@
         while (isPlayingCollection && currentCollectionIteration === currentIteration) {
 
             // GAME_START
+            const animSpeed = gameSpeed > 2 ? 'animate__faster' : gameSpeed > 1 ? 'animate__fast' : '';
             currentSound = playerSounds[1].play();
-            await playAnimation('animate__bounce');
-            await playAnimation('animate__bounceOutRight');
+            await playAnimation('animate__bounce ' + animSpeed);
+            await playAnimation('animate__bounceOutRight ' + animSpeed);
 
             if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
                 break;
@@ -305,23 +307,28 @@
                         $(icon).attr('class', 'animate__animated animate__bounceIn life-icon');
                     }
                 }
-                else
-                    $("#player-title").text("Nice!");
 
                 // Check for speed increase every 5 games cleared
                 if (score % 5 === 0) {
                     gameSpeed += 0.5;
                     $("#player-title").text("Speed Up!");
+                    currentSound = playerSounds[5].play();
                     
+                    playerSounds[1].playbackRate += 0.2; // Speed up game sound too
+
                     // Play speed up animation
-                    await playAnimation('animate__flash animate__fast');
-                    await playAnimation('animate__pulse animate__fast');
+                    await playAnimation('animate__heartBeat');
+                    await playAnimation('animate__flash');
+                    await playAnimation('animate__pulse');
+                } else {
+                    // GAME_WIN
+                    $("#player-title").text("Nice!");
+                    currentSound = playerSounds[2].play();
+                    await playAnimation('animate__zoomInLeft');
+                    await playAnimation('animate__heartBeat animate__fast');
                 }
 
-                // GAME_WIN
-                currentSound = playerSounds[2].play();
-                await playAnimation('animate__zoomInLeft');
-                await playAnimation('animate__heartBeat animate__fast');
+                
             }
 
             if (lives <= 0) {
