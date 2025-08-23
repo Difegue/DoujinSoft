@@ -31,11 +31,19 @@ public class HDThumbnailTest {
         result = MioUtils.getHDGamePreview(wrongMagic);
         System.out.println("Wrong magic test: " + (result == null ? "PASS (returned null)" : "FAIL"));
         
-        // Test the method exists and basic structure works
-        System.out.println("Method compilation test: PASS");
-        
         // Try to create a minimal valid .mio structure for testing
         byte[] testMio = createMinimalValidMio();
+        
+        // Test the HD vs standard preview methods
+        result = MioUtils.getGamePreview(testMio, false);
+        System.out.println("Standard preview test: " + (result != null ? "PASS" : "FAIL"));
+        
+        result = MioUtils.getGamePreview(testMio, true);
+        System.out.println("HD preview with fallback test: " + (result != null ? "PASS" : "FAIL"));
+        
+        result = MioUtils.getGamePreview(testMio);
+        System.out.println("Default preview test: " + (result != null ? "PASS" : "FAIL"));
+        
         result = MioUtils.getHDGamePreview(testMio);
         System.out.println("Minimal valid .mio test: " + (result != null ? "PASS (generated image)" : "FAIL (returned null)"));
         

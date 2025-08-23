@@ -394,6 +394,34 @@ public class MioUtils {
   }
 
   /**
+   * Generate game preview image from .mio game file.
+   * By default uses the standard 95x63px preview, but can optionally generate HD 192x128px preview.
+   * 
+   * @param mioFile The .mio file bytes
+   * @param useHD Whether to generate HD (192x128) or standard (95x63) preview
+   * @return Base64 encoded PNG image
+   */
+  public static String getGamePreview(byte[] mioFile, boolean useHD) {
+    if (useHD) {
+      String hdPreview = getHDGamePreview(mioFile);
+      return hdPreview != null ? hdPreview : getBase64GamePreview(mioFile);
+    } else {
+      return getBase64GamePreview(mioFile);
+    }
+  }
+
+  /**
+   * Generate game preview image from .mio game file using standard resolution.
+   * This method maintains backward compatibility.
+   * 
+   * @param mioFile The .mio file bytes
+   * @return Base64 encoded PNG image
+   */
+  public static String getGamePreview(byte[] mioFile) {
+    return getGamePreview(mioFile, false);
+  }
+
+  /**
    * Generate high-quality preview image from .mio game file.
    * This is a Java port of the Python mio_hd_thumbnail.py script.
    * 
