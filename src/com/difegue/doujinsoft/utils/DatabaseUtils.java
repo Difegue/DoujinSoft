@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class DatabaseUtils {
 
@@ -60,6 +62,11 @@ public class DatabaseUtils {
                 return false;
             }
 
+            // For WC24 surveys, hashes are not provided. Try to find a matching hash.
+            if (miohash == null) {
+                miohash = findHashForSurvey(connection, title, type);
+            }
+
             PreparedStatement ret = connection.prepareStatement("INSERT INTO Surveys VALUES (?,?,?,?,?,?,?)");
             ret.setLong(1, System.currentTimeMillis());
             ret.setInt(2, type);
@@ -79,6 +86,158 @@ public class DatabaseUtils {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static String findHashForSurvey(Connection connection, String name, int type) throws SQLException {
+
+        String selectedHash = null;
+        String tableName;
+        switch (type) {
+            case 0:
+                tableName = "Games";
+                break;
+            case 1:
+                tableName = "Records";
+                break;
+            case 2:
+                tableName = "Manga";
+                break;
+            default:
+                return null;
+        }
+
+        // Search for matching entries in the corresponding table
+        PreparedStatement findMatches = connection.prepareStatement(
+                "SELECT hash FROM " + tableName + " WHERE name LIKE ?");
+        findMatches.setString(1, "%" + name + "%");
+
+        ResultSet matches = findMatches.executeQuery();
+        ArrayList<String> foundHashes = new ArrayList<>();
+
+        while (matches.next()) {
+            foundHashes.add(matches.getString("hash"));
+        }
+        matches.close();
+        findMatches.close();
+
+        if (foundHashes.isEmpty()) {
+            return null;
+        }
+
+        // If multiple matches, prioritize hashes that already exist in Surveys table
+        if (foundHashes.size() > 1) {
+            // Build a parameterized query for checking existing hashes
+            StringBuilder placeholders = new StringBuilder();
+            for (int i = 0; i < foundHashes.size(); i++) {
+                if (i > 0)
+                    placeholders.append(",");
+                placeholders.append("?");
+            }
+
+            PreparedStatement checkExisting = connection.prepareStatement(
+                    "SELECT DISTINCT miohash FROM Surveys WHERE miohash IN (" + placeholders.toString()
+                            + ") AND miohash IS NOT NULL AND miohash != ''");
+
+            for (int i = 0; i < foundHashes.size(); i++) {
+                checkExisting.setString(i + 1, foundHashes.get(i));
+            }
+
+            ResultSet existingHashes = checkExisting.executeQuery();
+            if (existingHashes.next()) {
+                selectedHash = existingHashes.getString("miohash");
+            }
+            existingHashes.close();
+            checkExisting.close();
+        }
+
+        // If no existing hash found, use the first match
+        if (selectedHash == null) {
+            selectedHash = foundHashes.get(0);
+        }
+
+        return selectedHash;
+    }
+
+    /**
+     * Adds missing miohash data to Survey entries by searching matching tables.
+     * 
+     * @param dataDir The directory where the database is located.
+     * @return A status message describing the operation results.
+     */
+    public static String addMissingMiohash(String dataDir) {
+        StringBuilder output = new StringBuilder();
+        int updatedCount = 0;
+
+        // Keep track of name/hash pairs to ensure consistency
+        HashMap<String, String> nameHashMap = new HashMap<>();
+
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+
+            // Find all surveys with missing miohash
+            PreparedStatement findMissing = connection.prepareStatement(
+                    "SELECT * FROM Surveys WHERE miohash IS NULL OR miohash = ''");
+
+            ResultSet missingSurveys = findMissing.executeQuery();
+
+            while (missingSurveys.next()) {
+                long timestamp = missingSurveys.getLong("timestamp");
+                int type = missingSurveys.getInt("type");
+                String name = missingSurveys.getString("name");
+
+                // If this name was seen before, assign the same hash
+                if (nameHashMap.containsKey(type + name)) {
+                    String existingHash = nameHashMap.get(type + name);
+                    PreparedStatement updateSurvey = connection.prepareStatement(
+                            "UPDATE Surveys SET miohash = ? WHERE timestamp = ?");
+                    updateSurvey.setString(1, existingHash);
+                    updateSurvey.setLong(2, timestamp);
+
+                    int updated = updateSurvey.executeUpdate();
+                    if (updated > 0) {
+                        updatedCount++;
+                        output.append("Reused hash '").append(existingHash).append("' for survey '").append(name)
+                                .append("'\n");
+                    }
+                    updateSurvey.close();
+                    continue;
+                }
+
+                // Try to find a miohash by searching the corresponding table
+                String selectedHash = findHashForSurvey(connection, name, type);
+
+                if (selectedHash == null) {
+                    output.append("No matching hash found for survey '").append(name).append("'\n");
+                    continue;
+                }
+
+                // Add to map for future consistency
+                nameHashMap.put(type + name, selectedHash);
+
+                // Update the survey with the selected hash
+                PreparedStatement updateSurvey = connection.prepareStatement(
+                        "UPDATE Surveys SET miohash = ? WHERE timestamp = ?");
+                updateSurvey.setString(1, selectedHash);
+                updateSurvey.setLong(2, timestamp);
+
+                int updated = updateSurvey.executeUpdate();
+                if (updated > 0) {
+                    updatedCount++;
+                }
+                updateSurvey.close();
+            }
+
+            missingSurveys.close();
+            findMissing.close();
+
+            output.append("\nCompleted! Updated ").append(updatedCount)
+                    .append(" survey entries with missing miohash data.");
+
+        } catch (SQLException e) {
+            output.append("Error: ").append(e.getMessage());
+            e.printStackTrace();
+        }
+
+        return output.toString();
     }
 
 }
