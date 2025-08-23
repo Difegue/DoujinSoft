@@ -68,6 +68,7 @@
     var lostLastGame = false;
     var isBossGame = false;
     var tempHash = null;
+    var gameSpeed = 1; // Track current game speed for collections
 
     var mioPlayer = new window.mio.Player(canvas, document);
     const loadSound = (name) => {
@@ -222,6 +223,7 @@
         const currentIteration = currentCollectionIteration;
         lives = 4;
         score = 1;
+        gameSpeed = 1; // Reset speed for new collection
         $("#replay-button").hide();
         $("#animation-overlay").show();
         $("#score-number").html(score);
@@ -254,7 +256,7 @@
             if (!isPlayingCollection || currentIteration !== currentCollectionIteration)
                 break;
 
-            playGame(mioData); // Start playback so that mio loads during the animation
+            playGame(mioData, gameSpeed); // Start playback so that mio loads during the animation
 
             // Animate overlay away 
             $("#animation-overlay").attr('class', 'animate__animated animate__backOutDown animate__faster');
@@ -305,6 +307,16 @@
                 }
                 else
                     $("#player-title").text("Nice!");
+
+                // Check for speed increase every 5 games cleared
+                if (score % 5 === 0) {
+                    gameSpeed += 0.5;
+                    $("#player-title").text("Speed Up!");
+                    
+                    // Play speed up animation
+                    await playAnimation('animate__flash animate__fast');
+                    await playAnimation('animate__pulse animate__fast');
+                }
 
                 // GAME_WIN
                 currentSound = playerSounds[2].play();
@@ -362,12 +374,17 @@
         mioPlayer.withdrawTouchFromScreen();
     }
 
-    function playGame(mioData) {
+    function playGame(mioData, speed) {
         if (!isInitialised) {
             initializeMioPlayer();
         }
 
-        mioPlayer.loadAndStart(mioData);
+        // Pass speed parameter to loadAndStart if provided, otherwise default behavior
+        if (speed !== undefined) {
+            mioPlayer.loadAndStart(mioData, speed);
+        } else {
+            mioPlayer.loadAndStart(mioData);
+        }
     }
 
     function initializeMioPlayer() {
