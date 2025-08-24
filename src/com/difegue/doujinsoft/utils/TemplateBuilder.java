@@ -192,10 +192,10 @@ public class TemplateBuilder {
 			context.put("items", items);
 			statement.close();
 		} else if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery("normalizedName ASC", "");
+			performCreatorSearchQuery("normalizedName ASC", "", false);
 			GetCreatorInfo();
 		} else {
-			performSearchQuery("normalizedName ASC", "");
+			performSearchQuery("normalizedName ASC", "", false);
 		}
 
 		// JSON hijack if specified in the parameters
@@ -218,10 +218,10 @@ public class TemplateBuilder {
 		initializeTemplate(type, true);
 
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery("normalizedName ASC", "");
+			performCreatorSearchQuery("normalizedName ASC", "", false);
 			GetCreatorInfo();
 		} else
-			performSearchQuery("normalizedName ASC", "");
+			performSearchQuery("normalizedName ASC", "", false);
 
 		// JSON hijack if specified in the parameters
 		if (request.getParameterMap().containsKey("format") && request.getParameter("format").equals("json")) {
@@ -236,7 +236,7 @@ public class TemplateBuilder {
 	/*
 	 * Default query or search by creator name and/or content name
 	 */
-	protected void performSearchQuery(String defaultOrderBy, String additionalWhereClause) throws Exception {
+	protected void performSearchQuery(String defaultOrderBy, String additionalWhereClause, boolean includeThemeGames) throws Exception {
 
 		String orderBy = defaultOrderBy;
 
@@ -249,11 +249,20 @@ public class TemplateBuilder {
 			orderBy = tableName + ".normalizedName ASC";
 		}
 
-		// Build queries with survey ratings
-		String baseWhereClause = tableName + " WHERE ";
-		baseWhereClause += (isContentNameSearch || isCreatorNameSearch) ? tableName + ".name LIKE ? AND " + tableName + ".creator LIKE ? AND " : "";
-		baseWhereClause += additionalWhereClause.isEmpty() ? "" : additionalWhereClause + " AND ";
-		baseWhereClause += tableName + ".id NOT LIKE '%them%'";
+		ArrayList<String> whereConditions = new ArrayList<>();
+		// Add conditions based on parameters
+		if (isContentNameSearch || isCreatorNameSearch)
+			whereConditions.add(tableName + ".name LIKE ? AND " + tableName + ".creator LIKE ?");
+		
+		if (!additionalWhereClause.isEmpty()) 
+			whereConditions.add(additionalWhereClause);
+
+		if (!includeThemeGames)
+			whereConditions.add(tableName + ".id NOT LIKE '%them%'");
+
+		String baseWhereClause = tableName;
+		if (!whereConditions.isEmpty())
+			baseWhereClause += " WHERE " + String.join(" AND ", whereConditions);
 		
 		String query = buildQueryWithSurveyRatings("SELECT", "*", 
 			baseWhereClause, orderBy + " LIMIT 15 OFFSET ?", false);
@@ -304,14 +313,15 @@ public class TemplateBuilder {
 	/*
 	 * Query search by creator ID or cartridge ID
 	 */
-	protected void performCreatorSearchQuery(String defaultOrderBy, String additionalWhereClause) throws Exception {
+	protected void performCreatorSearchQuery(String defaultOrderBy, String additionalWhereClause, boolean includeThemeGames) throws Exception {
 		// Get creatorId and cartridgeId for search query
 		String creatorId = request.getParameter("creator_id");
 		String cartridgeId = request.getParameter("cartridge_id");
 		boolean isLegitCart = !cartridgeId.equals("00000000000000000000000000000000");
 
 		// Build the where clause for creator search
-		String baseWhereClause = tableName + " WHERE " + tableName + ".id NOT LIKE '%them%' AND";
+		String baseWhereClause = tableName + " WHERE ";
+		baseWhereClause += includeThemeGames ? "" : tableName + ".id NOT LIKE '%them%' AND";
 		baseWhereClause += additionalWhereClause.isEmpty() ? "" : additionalWhereClause + " AND ";
 		baseWhereClause += tableName + ".creatorID = ? ";
 		baseWhereClause += isLegitCart ? " OR " + tableName + ".cartridgeID = ? " : "";

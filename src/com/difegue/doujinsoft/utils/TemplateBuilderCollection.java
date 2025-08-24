@@ -35,10 +35,10 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 
 		// Unlike the regular pages, ordering by timestamp is the default for collections
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL());
+			performCreatorSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL(), true);
 			GetCreatorInfo();
 		} else {
-			performSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL()); 
+			performSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL(), true); 
 		}
 
 		// JSON hijack if specified in the parameters
@@ -59,12 +59,12 @@ public class TemplateBuilderCollection extends TemplateBuilder {
 		initializeTemplate(c.getType(), true);
 
 		if (isContentCreatorSearch && !isContentNameSearch && !isCreatorNameSearch) {
-			performCreatorSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL());
+			performCreatorSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL(), true);
 			GetCreatorInfo();
 		} else {
 			// Unlike the regular pages, ordering by timestamp is the default for
 			// collections
-			performSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL());
+			performSearchQuery("timeStamp DESC", "hash IN " + c.getMioSQL(), true);
 		}
 
 		// JSON hijack if specified in the parameters
