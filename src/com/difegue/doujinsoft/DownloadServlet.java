@@ -1,6 +1,7 @@
 package com.difegue.doujinsoft;
 
 import com.difegue.doujinsoft.utils.MioCompress;
+import com.difegue.doujinsoft.utils.MioUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,6 +60,7 @@ public class DownloadServlet extends HttpServlet {
 			String id = request.getParameter("id");
 			String type = request.getParameter("type");
 			boolean isImageOnly = request.getParameterMap().containsKey("preview");
+			boolean isHDPreview = request.getParameterMap().containsKey("hd");
 
 			boolean isGame = type.equals("game");
 			boolean isRecord = type.equals("record");
@@ -66,6 +68,37 @@ public class DownloadServlet extends HttpServlet {
 
 			// Only serve an image if that's what's asked
 			if (isImageOnly && (isGame || isManga)) {
+
+				// If HD preview is requested for games, generate it from the .mio file
+				if (isHDPreview && isGame) {
+					try {
+						String filePath = dataDir + "/mio/game/" + id + ".miozip";
+						File mioFile = MioCompress.uncompressMio(new File(filePath));
+						
+						if (mioFile.exists()) {
+							FileInputStream fis = new FileInputStream(mioFile);
+							byte[] mioData = fis.readAllBytes();
+							fis.close();
+							
+							String hdPreview = MioUtils.getHDGamePreview(mioData);
+							if (hdPreview != null) {
+								String base64ImageData = hdPreview.replace("data:image/png;base64,", "");
+								byte[] imageData = Base64.getDecoder().decode(base64ImageData);
+								
+								response.setContentType("image/png");
+								response.setCharacterEncoding("UTF-8");
+
+								OutputStream outStream = response.getOutputStream();
+								outStream.write(imageData);
+								outStream.flush();
+								outStream.close();
+								return;
+							}
+						}
+					} catch (Exception e) {
+						// Fall back to database preview if HD generation fails
+					}
+				}
 
 				String statement = isGame ? "SELECT previewPic, isNsfw FROM Games WHERE hash == ?"
 						: "SELECT frame0 FROM Manga WHERE hash == ?";
