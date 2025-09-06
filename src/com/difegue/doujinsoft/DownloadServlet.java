@@ -67,8 +67,22 @@ public class DownloadServlet extends HttpServlet {
 			// Only serve an image if that's what's asked
 			if (isImageOnly && (isGame || isManga)) {
 
+				String page = "frame0";
+				if (isManga && request.getParameterMap().containsKey("page")) {
+
+					String p = request.getParameter("page");
+					if (p == "1")
+						page = "frame0";
+					if (p == "2")
+						page = "frame1";
+					if (p == "3")
+						page = "frame2";
+					if (p == "4")
+						page = "frame3";
+				}
+
 				String statement = isGame ? "SELECT previewPic, isNsfw FROM Games WHERE hash == ?"
-						: "SELECT frame0 FROM Manga WHERE hash == ?";
+						: "SELECT " + page + " FROM Manga WHERE hash == ?";
 
 				try (Connection connection = DriverManager
 						.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
