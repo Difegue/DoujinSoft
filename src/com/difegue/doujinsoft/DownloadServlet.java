@@ -15,6 +15,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Base64;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
+
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.image.Kernel;
@@ -33,12 +38,16 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/download")
 public class DownloadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private Logger ServletLog;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public DownloadServlet() {
 		super();
+
+		ServletLog = Logger.getLogger("DownloadServlet");
+		ServletLog.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
 	}
 
 	/**
@@ -69,15 +78,17 @@ public class DownloadServlet extends HttpServlet {
 
 				String page = "frame0";
 				if (isManga && request.getParameterMap().containsKey("page")) {
-
+					
 					String p = request.getParameter("page");
-					if (p == "1")
+					//ServletLog.log(Level.INFO, "Requested comic page " + p);
+
+					if (p.equals("1"))
 						page = "frame0";
-					if (p == "2")
+					if (p.equals("2"))
 						page = "frame1";
-					if (p == "3")
+					if (p.equals("3"))
 						page = "frame2";
-					if (p == "4")
+					if (p.equals("4"))
 						page = "frame3";
 				}
 
