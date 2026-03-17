@@ -25,7 +25,7 @@ Adding `&format=json` to most search pages in the webapp will give you a JSON eq
 
 ## Yonderu! DoujinSoft API
 
-The `/yonderu` endpoint is slightly more specialized for use with the companion comic apps for Playdate and the Pebble watch. The following capabilities are available:  
+The `/yonderu` endpoint is slightly more specialized for use with the companion comic apps for [Playdate](https://github.com/Difegue/Yonderu) and the Pebble watch. The following capabilities are available:  
 
 `GET /yonderu?id=xxxxx` - Return a Yonderu JSON for the given MIO hash, if it's in the server's storage.  
 `GET /yonderu?random` - Return a Yonderu JSON for a random comic MIO in the database.  
