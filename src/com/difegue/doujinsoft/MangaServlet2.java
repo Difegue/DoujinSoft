@@ -11,8 +11,8 @@ import com.difegue.doujinsoft.utils.MioUtils.Types;
 /**
  * Servlet implementation class ComicListing
  */
-@WebServlet("/comics")
-public class MangaServlet extends ContentServletBase {
+@WebServlet("/COMICS")
+public class MangaServlet2 extends ContentServletBase {
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,7 +29,7 @@ public class MangaServlet extends ContentServletBase {
 		super.doPost(request, response, Types.MANGA);
 	}
 
-    public MangaServlet() {
-        super("MangaServlet"); 
+    public MangaServlet2() {
+        super("MangaServlet2"); 
     }
 }

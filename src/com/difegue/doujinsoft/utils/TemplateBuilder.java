@@ -173,11 +173,11 @@ public class TemplateBuilder {
 
 		// Specific hash request
 		if (request.getParameterMap().containsKey("id")) {
-
+			
 			String singleItemQuery = buildQueryWithSurveyRatings("SELECT", "*", 
 				tableName + " WHERE " + tableName + ".hash = ?", "", false);
 			PreparedStatement statement = connection.prepareStatement(singleItemQuery);
-			statement.setString(1, request.getParameter("id"));
+			statement.setString(1, request.getParameter("id").toLowerCase());
 
 			// disable search by setting totalitems to -1
 			context.put("totalitems", -1);
