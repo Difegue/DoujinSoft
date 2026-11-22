@@ -204,6 +204,40 @@ public class DownloadServlet extends HttpServlet {
 	}
 
 	/**
+	 * Builds a readable download name, "Name - Creator.mio", from the database.
+	 * Falls back to the stored file name if the mio isn't found or has no usable name.
+	 */
+	private String niceFileName(String dataDir, String table, String hash, String fallback) {
+		try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+			// table is picked from a fixed list by the caller, never from user input
+			PreparedStatement query = connection.prepareStatement("SELECT name, creator FROM " + table + " WHERE hash == ?");
+			query.setString(1, hash);
+			ResultSet result = query.executeQuery();
+			if (!result.next())
+				return fallback;
+
+			String name = cleanForFileName(result.getString(1));
+			String creator = cleanForFileName(result.getString(2));
+			if (name.isEmpty())
+				return fallback;
+
+			return (creator.isEmpty() ? name : name + " - " + creator) + ".mio";
+		} catch (Exception e) {
+			return fallback;
+		}
+	}
+
+	// Drops characters that are invalid in file names on common systems, and tidies whitespace.
+	private static String cleanForFileName(String s) {
+		if (s == null)
+			return "";
+		s = s.replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "").replaceAll("\\s+", " ").trim();
+		// Windows doesn't like trailing dots, and very long names are just noise
+		s = s.replaceAll("\\.+$", "").trim();
+		return s.length() > 60 ? s.substring(0, 60).trim() : s;
+	}
+
+	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
