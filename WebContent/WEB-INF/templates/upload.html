@@ -102,7 +102,7 @@ send us content.
         </li>
     </ul>
 
-    Drag and drop your .mio files below to get started. Files sent this way will have to be <b>approved manually</b>!<br>
+    Drag and drop your .mio files, or a WarioWare: DIY / DIY Showcase save file (DS .sav/.dsv, Wii GDATA/RDATA/MDATA or data.bin), below to get started. Files sent this way will have to be <b>approved manually</b>!<br>
     Please add in a brief description of the content you're uploading to make our lives easier.<br>
     (png2mio/midi2mio submissions will be automatically rejected.)<br><br>
 
@@ -152,18 +152,24 @@ send us content.
             },
             done: function (e, data) {
 
+                // Save files return their mios in a list, single .mio files return one result.
+                var items = data.result.mios || [data.result];
                 if (!data.result.success)
-                    result = '<li class="collection-item avatar cart-item" type=data.result.type>' +
-                        '	<i class="material-icons red-text cart-icon">error</i>' +
-                        '	<span class="title">' + escapeHtml(data.result.filename) + ' is not a valid .mio file.</span>' +
-                        '</li>';
-                else
-                    result = '<li class="collection-item avatar cart-item" type=' + data.result.type + '>' + (
-                        (data.result.type === "game") ? '<i class="material-icons green-text cart-icon">videogame_asset</i>'
-                            : (data.result.type === "record") ? '<i class="material-icons pink-text cart-icon">album</i>'
+                    items = [data.result];
+
+                var result = items.map(function (r) {
+                    if (!r.success)
+                        return '<li class="collection-item avatar cart-item" type=data.result.type>' +
+                            '	<i class="material-icons red-text cart-icon">error</i>' +
+                            '	<span class="title">' + escapeHtml(r.filename) + ' is not a valid .mio or save file.</span>' +
+                            '</li>';
+                    return '<li class="collection-item avatar cart-item" type=' + r.type + '>' + (
+                        (r.type === "game") ? '<i class="material-icons green-text cart-icon">videogame_asset</i>'
+                            : (r.type === "record") ? '<i class="material-icons pink-text cart-icon">album</i>'
                                 : '<i class="material-icons blue-text cart-icon">local_library</i>') +
-                        '	    <span class="title">' + escapeHtml(data.result.name) + ' by ' + escapeHtml(data.result.creator) + ' uploaded!</span>' +
+                        '	    <span class="title">' + escapeHtml(r.name) + ' by ' + escapeHtml(r.creator) + ' uploaded!</span>' +
                         '</li>';
+                }).join('');
 
                 $('#files').append(result);
             },
@@ -172,7 +178,7 @@ send us content.
                 if ($("#uploadinfo").val() === "") 
                     popToast("Please add in a description before sending an upload.");
                 else
-                    popToast("Upload failed! Is this file a .mio?");
+                    popToast("Upload failed! Is this file a .mio or a save file?");
                 console.log(data.errorThrown);
                 $(".progress").hide();
                 $("#files").hide();

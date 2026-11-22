@@ -3,7 +3,9 @@ package com.difegue.doujinsoft;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -18,7 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import com.difegue.doujinsoft.utils.MioStorage;
 import com.difegue.doujinsoft.utils.MioUtils;
+import com.difegue.doujinsoft.utils.SaveExtractor;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
@@ -41,8 +46,8 @@ import org.apache.http.entity.StringEntity;
  */
 @WebServlet("/upload")
 @MultipartConfig(fileSizeThreshold = 1024 * 8, // 8KB - smallest .mio filetype, records
-        maxFileSize = 1024 * 64, // 64KB - .mio files can't go past that size
-        maxRequestSize = 1024 * 1024 * 5) // 5MB - About 80 games, which is more than enough for a single request.
+        maxFileSize = SaveExtractor.MAX_SAVE_SIZE, // .mio files can't go past 64KB, but DS save files are 32MB
+        maxRequestSize = SaveExtractor.MAX_SAVE_SIZE + 1024 * 1024 * 5) // A save file plus a few .mio files.
 public class UploadServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Logger ServletLog;
@@ -104,70 +109,44 @@ public class UploadServlet extends HttpServlet {
                 continue;
             }
 
-            String fileName = extractFileName(part);
+            // Refine the fileName in case it is an absolute path
+            String fileName = new File(extractFileName(part)).getName();
+            byte[] data = part.getInputStream().readAllBytes();
+            JsonObject json;
 
-            // Check if this is a proper .mio through DIYEdit
-            String type = "", name = "", creator = "";
-            byte[] mioData = part.getInputStream().readAllBytes();
-            boolean valid = true;
-            try {
-                Metadata m = null;
-                switch (mioData.length) { // Do some tests
-                    case MioUtils.Types.GAME:
-                        m = new GameEdit(mioData);
-                        type = "game";
-                        MioUtils.getBase64GamePreview(mioData);
-                        break;
-                    case MioUtils.Types.MANGA:
-                        m = new MangaEdit(mioData);
-                        type = "manga";
-                        MioUtils.getBase64Manga(mioData, 0);
-                        break;
-                    case MioUtils.Types.RECORD:
-                        m = new RecordEdit(mioData);
-                        type = "record";
-                        break;
-                    default:
-                        valid = false;
-                        break;
+            if (SaveExtractor.looksLikeSave(data, fileName)) {
+                // DS/Wii save file: every mio inside it goes to the pending directory.
+                json = new JsonObject();
+                JsonArray mios = new JsonArray();
+                String base = fileName.replaceAll("\\.[^.]*$", "").replaceAll("[^A-Za-z0-9._-]", "_");
+                Set<String> seen = new HashSet<>();
+                try {
+                    for (byte[] mio : SaveExtractor.extract(data, fileName)) {
+                        String mioName = base + "-" + MioStorage.computeMioHash(mio).substring(0, 8) + ".mio";
+                        if (!seen.add(mioName))
+                            continue; // same mio referenced by several slots
+                        JsonObject result = processMio(mio, mioName, savePath);
+                        if (result.get("success").getAsBoolean()) {
+                            mios.add(result);
+                            uploadSessionFiles += mioName + "; ";
+                        }
+                    }
+                } catch (Exception e) {
+                    ServletLog.log(Level.WARNING, "Couldn't read save file " + fileName + ": " + e.getMessage());
                 }
-                name = m.getName();
-                creator = m.getCreator();
-            } catch (Exception e) {
-                // Error while verifying file
-                valid = false;
-            }
-
-            // Skip file if invalid
-            if (valid) {
-                // Refine the fileName in case it is an absolute path
-                fileName = new File(fileName).getName();
-                uploadSessionFiles += fileName + "; ";
-
-                // Save it to the pending directory
-                File mio = new File(savePath + File.separator + fileName);
-                try (FileOutputStream fos = new FileOutputStream(mio.getAbsolutePath())) {
-                    fos.write(mioData);
-                }
-
+                json.addProperty("filename", fileName);
+                json.addProperty("success", mios.size() > 0);
+                json.add("mios", mios);
+            } else {
+                json = processMio(data, fileName, savePath);
+                if (json.get("success").getAsBoolean())
+                    uploadSessionFiles += fileName + "; ";
             }
 
             // Send JSON response
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
             PrintWriter out = response.getWriter();
-
-            // create Json Object
-            JsonObject json = new JsonObject();
-
-            // put some value pairs into the JSON object
-            json.addProperty("filename", fileName);
-            json.addProperty("type", type);
-            json.addProperty("name", name);
-            json.addProperty("creator", creator);
-            json.addProperty("success", valid);
-
-            // finally output the json string
             out.print(json.toString());
         }
 
@@ -225,6 +204,56 @@ public class UploadServlet extends HttpServlet {
         String output = writer.toString();
 
         return output;
+    }
+
+    /**
+     * Checks that the data is a proper .mio through DIYEdit and saves it to the pending directory if so.
+     * Returns the JSON describing the result.
+     */
+    private JsonObject processMio(byte[] mioData, String fileName, String savePath) throws IOException {
+        String type = "", name = "", creator = "";
+        boolean valid = true;
+        try {
+            Metadata m = null;
+            switch (mioData.length) { // Do some tests
+                case MioUtils.Types.GAME:
+                    m = new GameEdit(mioData);
+                    type = "game";
+                    MioUtils.getBase64GamePreview(mioData);
+                    break;
+                case MioUtils.Types.MANGA:
+                    m = new MangaEdit(mioData);
+                    type = "manga";
+                    MioUtils.getBase64Manga(mioData, 0);
+                    break;
+                case MioUtils.Types.RECORD:
+                    m = new RecordEdit(mioData);
+                    type = "record";
+                    break;
+                default:
+                    valid = false;
+                    break;
+            }
+            name = m.getName();
+            creator = m.getCreator();
+        } catch (Exception e) {
+            // Error while verifying file
+            valid = false;
+        }
+
+        if (valid) {
+            try (FileOutputStream fos = new FileOutputStream(savePath + File.separator + fileName)) {
+                fos.write(mioData);
+            }
+        }
+
+        JsonObject json = new JsonObject();
+        json.addProperty("filename", fileName);
+        json.addProperty("type", type);
+        json.addProperty("name", name);
+        json.addProperty("creator", creator);
+        json.addProperty("success", valid);
+        return json;
     }
 
     /**
