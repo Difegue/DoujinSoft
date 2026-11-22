@@ -50,7 +50,6 @@ body {
     background-attachment: fixed;
     background-size: cover;
     background-position: center;
-    height: 100%;
 
     /* sticky footer fix */
     display: flex;
@@ -60,6 +59,10 @@ body {
 
 main {
     flex: 1 0 auto;
+}
+
+.page-footer {
+    margin-top: 0;
 }
 
 nav .brand-logo {
@@ -247,7 +250,8 @@ label.active {
     font-size: 22px !important;
     display: inline-flex !important;
     height: 80px;
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .selection-card {
