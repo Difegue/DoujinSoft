@@ -38,6 +38,16 @@ public class MioStorage {
 
     }
 
+    /**
+     * Hash of a mio ignoring the header fields that differ between copies of the same
+     * mio (serial/ID, creator ID, timestamp, lock flag, cartridge ID: bytes 0xCF-0xFF).
+     */
+    public static String computeContentHash(byte[] data) {
+        byte[] copy = data.clone();
+        java.util.Arrays.fill(copy, 0xCF, 0x100, (byte) 0);
+        return computeMioHash(copy);
+    }
+
     private static String convertByteToHex(byte[] byteData) {
 
         StringBuilder sb = new StringBuilder();
@@ -62,7 +72,9 @@ public class MioStorage {
                     String creatorId = metadata.getCreatorId();
                     String cartridgeId = metadata.getCartridgeId();
                     int type = mioData.length;
-                    PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, creatorId, connection, type);
+                    String contentHash = computeContentHash(mioData);
+                    PreparedStatement insertQuery = parseMioBase(metadata, hash, ID, creatorId, connection, type,
+                            contentHash);
 
                     // The file is game, manga or record, depending on its size.
                     if (mioData.length == MioUtils.Types.GAME) {
@@ -77,6 +89,7 @@ public class MioStorage {
                         insertQuery.setString(13, creatorId);
                         insertQuery.setBoolean(14, false);
                         insertQuery.setString(15, cartridgeId);
+                        insertQuery.setString(16, contentHash);
 
                         logger.log(Level.INFO, "Game;" + hash + ";" + ID + ";" + game.getName() + "\n");
                     }
@@ -94,6 +107,7 @@ public class MioStorage {
                         insertQuery.setString(15, MioUtils.getBase64Manga(mioData, 3));
                         insertQuery.setString(16, creatorId);
                         insertQuery.setString(17, cartridgeId);
+                        insertQuery.setString(18, contentHash);
 
                         logger.log(Level.INFO, "Manga;" + hash + ";" + ID + ";" + manga.getName() + "\n");
                     }
@@ -106,6 +120,7 @@ public class MioStorage {
                         insertQuery.setInt(11, record.getLogo());
                         insertQuery.setString(12, creatorId);
                         insertQuery.setString(13, cartridgeId);
+                        insertQuery.setString(14, contentHash);
 
                         logger.log(Level.INFO, "Record;" + hash + ";" + ID + ";" + record.getName() + "\n");
                     }
@@ -134,22 +149,33 @@ public class MioStorage {
      * SQL Statement.
      */
     private static PreparedStatement parseMioBase(Metadata mio, String hash, String ID, String creatorID, Connection co,
-            int type)
+            int type, String contentHash)
             throws SQLException {
 
         PreparedStatement ret = null;
         String query = "";
+        String table = "";
 
         switch (type) {
             case MioUtils.Types.GAME:
-                query = "INSERT INTO Games VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                table = "Games";
+                query = "INSERT INTO Games VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 break;
             case MioUtils.Types.MANGA:
-                query = "INSERT INTO Manga VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                table = "Manga";
+                query = "INSERT INTO Manga VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 break;
             case MioUtils.Types.RECORD:
-                query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                table = "Records";
+                query = "INSERT INTO Records VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 break;
+        }
+
+        // Caught by the caller like a primary key clash: the file goes to /duplicates.
+        try (PreparedStatement check = co.prepareStatement("SELECT 1 FROM " + table + " WHERE contentHash = ?")) {
+            check.setString(1, contentHash);
+            if (check.executeQuery().next())
+                throw new SQLException("Same content as an existing mio, only the header differs.");
         }
 
         ret = co.prepareStatement(query);
