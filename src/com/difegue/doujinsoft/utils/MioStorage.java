@@ -40,10 +40,11 @@ public class MioStorage {
 
     /**
      * Hash of a mio ignoring the header fields that differ between copies of the same
-     * mio (serial/ID, creator ID, timestamp, lock flag, cartridge ID: bytes 0xCF-0xFF).
+     * mio (16-bit checksum at 0x10, then serial/ID, creator ID, timestamp, lock flag, cartridge ID: 0xCF-0xFF).
      */
     public static String computeContentHash(byte[] data) {
         byte[] copy = data.clone();
+        java.util.Arrays.fill(copy, 0x10, 0x12, (byte) 0);
         java.util.Arrays.fill(copy, 0xCF, 0x100, (byte) 0);
         return computeMioHash(copy);
     }
