@@ -522,3 +522,16 @@ function checkoutSave() {
     }
 
 }
+
+var reportHash = null;
+function openReportModal(hash) {
+	reportHash = hash;
+	$('#report-reason').val('');
+	M.Modal.init($('#report-modal')[0]).open();
+}
+async function submitReport() {
+	var body = new URLSearchParams({hash: reportHash, reason: $('#report-reason').val()});
+	var res = await fetch('./report', {method: 'POST', body: body});
+	M.Modal.getInstance($('#report-modal')[0]).close();
+	popToast(res.ok ? "Thanks, the admins will take a look!" : "Couldn't send your report.");
+}

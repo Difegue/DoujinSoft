@@ -45,6 +45,8 @@ public class ServerInit implements javax.servlet.ServletContextListener {
                 + "(timestamp INTEGER, type INTEGER, name TEXT, stars INTEGER, commentId INTEGER, friendcode TEXT, miohash TEXT,"
                 + "PRIMARY KEY(`timestamp`) )");
 
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS Reports "
+                + "(hash TEXT, reason TEXT, timestamp INTEGER)");
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Friends "
                 + "(friendcode TEXT, "
                 + "PRIMARY KEY(`friendcode`) )");

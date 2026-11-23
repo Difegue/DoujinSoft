@@ -89,6 +89,26 @@ Unapproved .mios will be deleted.
 	</a>
 </div>
 
+<h4 class="white-text">Reported games ({{ reports | length }})</h4>
+<table style="width:100%">
+	{% for r in reports %}
+	<tr>
+		<td>{{ r.name }}<br /><small>{{ r.hash }}</small></td>
+		<td>{{ r.total }} report(s){% if r.isNsfw %} - already NSFW{% endif %}</td>
+		<td>{{ r.reasons }}</td>
+		<td>
+			<form method="post" style="display:inline">
+				<input type="hidden" name="hash" value="{{ r.hash }}" />
+				<button class="btn" type="submit" name="report_action" value="nsfw">Flag NSFW</button>
+				<button class="btn" type="submit" name="report_action" value="dismiss">Dismiss</button>
+			</form>
+		</td>
+	</tr>
+	{% else %}
+	<tr><td class="white-text">No reports.</td></tr>
+	{% endfor %}
+</table>
+<br />
 <form method="post">
 	<input type="checkbox" name="approvedmios" checked />
 	<table style="width:100%">

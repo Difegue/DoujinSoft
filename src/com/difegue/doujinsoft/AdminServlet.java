@@ -135,6 +135,26 @@ public class AdminServlet extends HttpServlet {
             output += "Added " + nsfwHashes.length + " hashes to NSFW list.";
         }
 
+        if (req.getParameterMap().containsKey("report_action")) {
+            // Resolve user reports: flag the game as NSFW, or just dismiss; either way the reports are cleared.
+            String hash = req.getParameter("hash");
+            try (Connection connection = DriverManager
+                    .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+                if ("nsfw".equals(req.getParameter("report_action"))) {
+                    PreparedStatement ps = connection.prepareStatement("update Games set isNsfw=1 where hash=?");
+                    ps.setString(1, hash);
+                    ps.executeUpdate();
+                }
+                PreparedStatement ps = connection.prepareStatement("delete from Reports where hash=?");
+                ps.setString(1, hash);
+                ps.executeUpdate();
+                output = "Reports for " + hash + " resolved (" + req.getParameter("report_action") + ").";
+            } catch (SQLException e) {
+                ServletLog.log(Level.SEVERE, e.getMessage());
+                output = e.getMessage();
+            }
+        }
+
         if (req.getParameterMap().containsKey("collection_name")) {
             // New collection
             Collection c = new Collection();
@@ -367,6 +387,27 @@ public class AdminServlet extends HttpServlet {
                 }
             }
         context.put("collections", parsedCollections);
+
+        // Reported games, grouped by hash
+        List<Map<String, Object>> reports = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(
+                    "select r.hash, g.name, g.isNsfw, count(*) as total, group_concat(r.reason, ' | ') as reasons "
+                            + "from Reports r left join Games g on g.hash = r.hash group by r.hash order by total desc");
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("hash", rs.getString("hash"));
+                row.put("name", rs.getString("name"));
+                row.put("isNsfw", rs.getBoolean("isNsfw"));
+                row.put("total", rs.getInt("total"));
+                row.put("reasons", rs.getString("reasons"));
+                reports.add(row);
+            }
+        } catch (SQLException e) {
+            ServletLog.log(Level.SEVERE, e.getMessage());
+        }
+        context.put("reports", reports);
 
         PebbleEngine engine = new PebbleEngine.Builder().build();
         PebbleTemplate compiledTemplate;

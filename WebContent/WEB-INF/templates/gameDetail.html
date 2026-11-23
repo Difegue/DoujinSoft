@@ -88,6 +88,10 @@
         <div class="rating-section" style="margin-top: 10px; height:24px;">
         </div>
       {% endif %}    
+      <a class="tooltipped right" data-position="top" data-tooltip="Report as NSFW" style="cursor:pointer; margin-top:-24px; position:relative"
+        onclick="openReportModal('{{ game.hash }}')">
+        <i class="material-icons amber-text">warning</i>
+      </a>
     </div>
 
     <div class="card-action center">
