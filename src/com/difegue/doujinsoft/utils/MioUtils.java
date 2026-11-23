@@ -58,17 +58,11 @@ public class MioUtils {
 
   /*
    * True if the visitor should get MM/DD/YYYY dates (USA), false for DD/MM/YYYY (Europe and the rest).
-   * The country comes from the geo-IP header set by the reverse proxy (Cloudflare's CF-IPCountry);
-   * without one, we fall back to the region in Accept-Language.
-   * shortcut: no local geo-IP database, so without a proxy header this is a language guess; add a database if that matters.
+   * shortcut: guesses from the region in Accept-Language, no geo-IP lookup; add a geo-IP database if that isn't enough.
    */
   public static boolean prefersUsDates(HttpServletRequest request) {
-    String country = request.getHeader("CF-IPCountry");
-    if (country == null || country.isBlank()) {
-      java.util.Locale locale = request.getLocale();
-      country = locale == null ? "" : locale.getCountry();
-    }
-    return "US".equalsIgnoreCase(country.trim());
+    java.util.Locale locale = request.getLocale();
+    return locale != null && "US".equals(locale.getCountry());
   }
 
   /*
