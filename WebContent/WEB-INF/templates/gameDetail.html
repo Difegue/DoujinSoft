@@ -12,7 +12,7 @@
         {{ game.name }}
       </div>
       <div class="game-metadata black-text">
-        Released {{ game.timestamp }}<br />
+        Released {{ usDates ? game.timestampUS : game.timestamp }}<br />
         MIO-ID: G-{{ game.mioID }}
       </div>
     </div>

@@ -24,6 +24,7 @@ public class BaseMio {
 		creator = m.getCreator();
 		brand = m.getBrand();
 		timestamp = MioUtils.getTimeString(m.getTimestamp());
+		timestampUS = MioUtils.getTimeStringUS(m.getTimestamp());
 
 		int type = m.file.length;
 		switch (type) {
@@ -55,6 +56,7 @@ public class BaseMio {
 
 		// Compute timestamp
 		timestamp = MioUtils.getTimeString(result.getInt("timeStamp"));
+		timestampUS = MioUtils.getTimeStringUS(result.getInt("timeStamp"));
 
 		String desc = result.getString("description");
 		colorLogo = result.getString("colorLogo");
@@ -108,7 +110,7 @@ public class BaseMio {
 		fullStars = (int) Math.floor(averageRating);
 	}
 
-	public String name, timestamp, mioID, hash, brand, creator,
+	public String name, timestamp, timestampUS, mioID, hash, brand, creator,
 			mioDesc1, mioDesc2, colorLogo, colorCart, specialBrand,
 			creatorId, cartridgeId;
 	public int logo, surveyCount, fullStars;

@@ -104,6 +104,7 @@ public class TemplateBuilder {
 
 		this.application = application;
 		this.request = request;
+		context.put("usDates", MioUtils.prefersUsDates(request));
 		dataDir = application.getInitParameter("dataDirectory");
 
 		// create a database connection

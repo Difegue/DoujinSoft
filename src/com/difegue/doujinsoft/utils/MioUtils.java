@@ -12,6 +12,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 
 import com.xperia64.diyedit.editors.GameEdit;
 import com.xperia64.diyedit.editors.MangaEdit;
@@ -28,6 +29,7 @@ public class MioUtils {
   // Constants for timestamp printing
   public static final ZonedDateTime DIY_TIMESTAMP_ORIGIN = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+  private static final DateTimeFormatter formatterUS = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
   // Basic enum to distinguish mio files quickly.
   // Game = 64KB, Manga = 14KB, Record = 8KB.
@@ -45,6 +47,28 @@ public class MioUtils {
   public static String getTimeString(int timestamp) {
     ZonedDateTime dateMio = DIY_TIMESTAMP_ORIGIN.plusDays(timestamp);
     return dateMio.format(formatter);
+  }
+
+  /*
+   * Same as getTimeString, but in the MM/DD/YYYY order used in the USA.
+   */
+  public static String getTimeStringUS(int timestamp) {
+    return DIY_TIMESTAMP_ORIGIN.plusDays(timestamp).format(formatterUS);
+  }
+
+  /*
+   * True if the visitor should get MM/DD/YYYY dates (USA), false for DD/MM/YYYY (Europe and the rest).
+   * The country comes from the geo-IP header set by the reverse proxy (Cloudflare's CF-IPCountry);
+   * without one, we fall back to the region in Accept-Language.
+   * shortcut: no local geo-IP database, so without a proxy header this is a language guess; add a database if that matters.
+   */
+  public static boolean prefersUsDates(HttpServletRequest request) {
+    String country = request.getHeader("CF-IPCountry");
+    if (country == null || country.isBlank()) {
+      java.util.Locale locale = request.getLocale();
+      country = locale == null ? "" : locale.getCountry();
+    }
+    return "US".equalsIgnoreCase(country.trim());
   }
 
   /*

@@ -14,7 +14,7 @@
           {{ item.name }}
         </div>
         <div class="game-metadata black-text">
-          Released {{ item.timestamp }}<br/>
+          Released {{ usDates ? item.timestampUS : item.timestamp }}<br/>
           MIO-ID: M-{{ item.mioID }}
         </div>
     </div>
