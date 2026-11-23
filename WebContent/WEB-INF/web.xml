@@ -8,6 +8,11 @@
     <listener-class>com.difegue.doujinsoft.utils.ServerInit</listener-class>
   </listener>
   
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.html</location>
+  </error-page>
+
   <!-- Change this directory to the one you want to store DoujinSoft data to. -->
   <context-param>
     <param-name>dataDirectory</param-name>
