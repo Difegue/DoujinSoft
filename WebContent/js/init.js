@@ -293,7 +293,7 @@ async function _fetch(url) {
 	return buf
 }
 
-async function playMidi(id) {
+async function playMidi(id, name) {
 	
 	$("#toast-container .toast").remove();
 	$(".playing").removeClass("playing");
@@ -305,7 +305,7 @@ async function playMidi(id) {
 	if (id != currentlyPlayingMidi) {
 	
 		currentlyPlayingMidi=id;
-		popToast("Playing MIDI for id "+id);
+		popToast("Playing " + escapeHtml((name || id).trim()));
 		
 		$("#"+id+"-record").addClass("playing");
 		let mioData = await _fetch('/download?type=record&id='+id);
