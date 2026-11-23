@@ -79,7 +79,7 @@ it. No save export/import needed! <br>
 </div>
 
 <!-- Modal Structure -->
-<div id="regmodal" class="modal">
+<dialog id="regmodal" class="modal">
 	<div class="modal-content black-text">
 		<h4>Register your Wii with DoujinSoft</h4>
 		<p>
@@ -106,7 +106,7 @@ it. No save export/import needed! <br>
 	<div class="modal-footer">
 		<a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
 	</div>
-</div>
+</dialog>
 
 
 <script>
@@ -161,9 +161,8 @@ it. No save export/import needed! <br>
 				'</li>'
 			].join("\n"));
 
-	$('input#recipient').characterCounter();
-	$('#regmodal').modal();
-
+	M.CharacterCounter.init($('input#recipient')[0]);
+	
 	formattedFC = $("#wii-number").html().replace(/(\d{4}\s*)/g, function (match) {
 		//Strip spaces
 		if (match.match(/\s/)) { return match; }
@@ -176,7 +175,7 @@ it. No save export/import needed! <br>
 	if (!localStorage.hasOwnProperty("sawFCDialog")) {
 
 		localStorage.sawFCDialog = true;
-		M.Modal.getInstance($('#regmodal')[0]).open();
+		openModal('#regmodal');
 	}
 
 	// Prefill friendcode if it's in localStorage

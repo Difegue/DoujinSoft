@@ -1,4 +1,4 @@
-<div id="game-modal" class="modal game-player">
+<dialog id="game-modal" class="modal game-player">
     <div class="modal-content" style="position: unset;">
         <h4 id="player-title" style="font-family: warioware" class="black-text">Game Name</h4>
 
@@ -31,9 +31,9 @@
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat"
             style="margin-left: auto; margin-top: 0;">Close</a>
     </div>
-</div>
+</dialog>
 
-<div id="nsfw-modal" class="modal">
+<dialog id="nsfw-modal" class="modal">
     <div class="modal-content">
         <h4 style="font-family: warioware" class="black-text">NSFW Content heads-up</h4>
         <p class="black-text">
@@ -49,7 +49,7 @@
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat"
             style="margin-left: auto; margin-top: 0;">Cancel</a>
     </div>
-</div>
+</dialog>
 
 <!-- TODO move to a js file -->
 <script>
@@ -85,31 +85,24 @@
         musicSamples = await _fetch('./soundfont/ram_slice.bin')
     })();
 
-    $('#game-modal').modal({
-        dismissible: true,
-        onCloseEnd: function () {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            mioPlayer.stop();
+    $('#game-modal').on('close', function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        mioPlayer.stop();
 
-            // Stop all sounds
-            playerSounds.forEach(sound => {
-                sound.pause();
-                sound.currentTime = 0;
-            });
+        // Stop all sounds
+        playerSounds.forEach(sound => {
+            sound.pause();
+            sound.currentTime = 0;
+        });
 
-            if (isPlayingCollection) {
-                isPlayingCollection = false;
-                $("#replay-button").show();
-                $("#truck-player").attr('class', '');
-                $("#animation-overlay").attr('class', '');
-                $("#animation-overlay").hide();
-                score = 0;
+        if (isPlayingCollection) {
+            isPlayingCollection = false;
+            $("#replay-button").show();
+            $("#truck-player").attr('class', '');
+            $("#animation-overlay").attr('class', '');
+            $("#animation-overlay").hide();
+            score = 0;
             }
-        }
-    });
-
-    $('#nsfw-modal').modal({
-        dismissible: true
     });
 
     mioPlayer.scaleCanvas(bestPossibleWindowSize());
@@ -145,14 +138,14 @@
     function createModal(gameHash, isNsfw) {
         if (isNsfw && !localStorage.hasOwnProperty("disabledNsfwCheck")) {
             tempHash = gameHash;
-            $('#nsfw-modal').modal('open');
+            openModal('#nsfw-modal');
         } else {
             startMioPlayer(gameHash);
         }
     }
 
     function bypassNsfwCheck(permanentlyDisable) {
-        $('#nsfw-modal').modal('close');
+        closeModal('#nsfw-modal');
         if (permanentlyDisable) {
             localStorage.disabledNsfwCheck = true;
             $(".game-blur").remove();
@@ -162,7 +155,7 @@
 
     async function startMioPlayer(gameHash) {
         $("#player-title").text("DoujinSoft Micro-Player");
-        $('#game-modal').modal('open');
+        openModal('#game-modal');
         mioData = await _fetch(`./download?type=game&id=${gameHash}`);
         playGame(mioData);
     }
@@ -230,7 +223,7 @@
         $("#score-number").html(score);
         $("#player-title").text("DoujinSoft Micro-Player");
 
-        $('#game-modal').modal('open');
+        openModal('#game-modal');
 
         let nextGame;
         let currentSound;

@@ -1,9 +1,9 @@
 (function($){
   $(function(){
 	 
-	$('.sidenav').sidenav();
-	$('select').formSelect();
-	$('.collapsible').collapsible();
+	M.Sidenav.init(document.querySelectorAll('.sidenav'));
+	M.FormSelect.init(document.querySelectorAll('select'));
+	M.Collapsible.init(document.querySelectorAll('.collapsible'));
 
 	updateTooltips();
 	updateCartCount();
@@ -269,6 +269,32 @@ function drawManga(page1, page2, page3, page4) {
       $('.materialboxed')[0].style.width = "auto";
       $('.materialboxed')[0].style.left = "30%";
 }
+
+// Materialize 2 leaves modals to the native <dialog> element.
+function openModal(selector) {
+	const dialog = document.querySelector(selector);
+	if (dialog && !dialog.open) dialog.showModal();
+}
+
+function closeModal(selector) {
+	const dialog = document.querySelector(selector);
+	if (dialog && dialog.open) dialog.close();
+}
+
+$(document).on('click', '.modal-trigger', function (e) {
+	e.preventDefault();
+	openModal($(this).attr('href'));
+});
+
+$(document).on('click', '.modal-close', function (e) {
+	e.preventDefault();
+	$(this).closest('dialog')[0].close();
+});
+
+// A click on the backdrop lands on the dialog element itself.
+$(document).on('click', 'dialog.modal', function (e) {
+	if (e.target === this) this.close();
+});
 
 function popToast(message) {
 	M.toast({html:message, displayLength: 4000, classes: 'rounded grey lighten-4 black-text'});

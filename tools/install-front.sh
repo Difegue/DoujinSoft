@@ -12,6 +12,7 @@ cp node_modules/@materializecss/materialize/dist/js/materialize.min.js WebConten
 cp -r node_modules/wahdio/ WebContent/js/vendor
 
 cp node_modules/@materializecss/materialize/dist/css/materialize.min.css WebContent/css/vendor
+cp node_modules/@materializecss/materialize/dist/css/materialize.colors.min.css WebContent/css/vendor
 cp node_modules/blueimp-file-upload/css/jquery.fileupload.css WebContent/css/vendor
 cp node_modules/animate.css/animate.min.css WebContent/css/vendor
 

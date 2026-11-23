@@ -13,7 +13,7 @@ Unapproved .mios will be deleted.
 <script>
 
 	async function testGame(id) {
-		$('#game-modal').modal('open');
+		openModal('#game-modal');
 
 		// encode id for url use
 		var encodedId = encodeURIComponent(id);
