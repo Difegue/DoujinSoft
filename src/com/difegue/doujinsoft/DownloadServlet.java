@@ -1,6 +1,7 @@
 package com.difegue.doujinsoft;
 
 import com.difegue.doujinsoft.utils.MioCompress;
+import com.difegue.doujinsoft.utils.MioUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,6 +69,11 @@ public class DownloadServlet extends HttpServlet {
 			String id = request.getParameter("id");
 			String type = request.getParameter("type");
 			boolean isImageOnly = request.getParameterMap().containsKey("preview");
+
+			if (!MioUtils.isValidHash(id)) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				return;
+			}
 
 			boolean isGame = type.equals("game");
 			boolean isRecord = type.equals("record");

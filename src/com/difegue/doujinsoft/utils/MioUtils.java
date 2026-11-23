@@ -48,6 +48,21 @@ public class MioUtils {
   }
 
   /*
+   * Mio hashes are lowercase MD5 hex strings. Anything that ends up in a file path or query must match this.
+   */
+  public static boolean isValidHash(String hash) {
+    return hash != null && hash.matches("[0-9a-f]{32}");
+  }
+
+  /*
+   * True for a plain file name: no directory parts, no "." or "..".
+   */
+  public static boolean isSafeFileName(String name) {
+    return name != null && !name.isEmpty() && !name.equals(".") && !name.equals("..")
+        && !name.contains("/") && !name.contains("\\") && !name.contains("\0");
+  }
+
+  /*
    * Craft ID from .mio metadata.
    */
   public static String computeMioID(Metadata mio) {

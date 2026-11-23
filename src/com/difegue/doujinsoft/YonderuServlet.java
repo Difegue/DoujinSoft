@@ -268,8 +268,9 @@ public class YonderuServlet extends HttpServlet {
 			}
 
 			// Check if the MIO hash exists in the database
-			var statement = connection.createStatement();
-			var result = statement.executeQuery("SELECT * FROM Manga WHERE hash = '" + id + "'");
+			var statement = connection.prepareStatement("SELECT * FROM Manga WHERE hash = ?");
+			statement.setString(1, id);
+			var result = statement.executeQuery();
 			if (result.next()) {
 
 				// This doesn't really make for a "unique" identifier at this point, but should be enough to allow triaging through the database.

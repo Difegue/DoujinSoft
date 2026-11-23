@@ -2,6 +2,8 @@ package com.difegue.doujinsoft;
 
 import java.io.*;
 import java.sql.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +66,10 @@ public class AdminServlet extends HttpServlet {
 
             // Serve file asked for
             String filename = req.getParameter("file");
+            if (!MioUtils.isSafeFileName(filename)) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
             File previewMio = new File(dataDir + "/pending/" + filename);
             if (previewMio.exists()) {
                 res.setContentType("application/octet-stream");
@@ -122,11 +128,12 @@ public class AdminServlet extends HttpServlet {
             // Add to NSFW list
             try (Connection connection = DriverManager
                     .getConnection("jdbc:sqlite:" + dataDir + "/mioDatabase.sqlite")) {
-                Statement statement = connection.createStatement();
+                PreparedStatement statement = connection.prepareStatement("update Games set isNsfw=1 where hash=?");
                 statement.setQueryTimeout(30); // set timeout to 30 sec.
                 for (String hash : nsfwHashes) {
                     output += "Adding " + hash + " to NSFW list... \n";
-                    statement.executeUpdate("update Games set isNsfw=1 where hash='" + hash + "'");
+                    statement.setString(1, hash.trim());
+                    statement.executeUpdate();
                 }
             } catch (SQLException e) {
                 ServletLog.log(Level.SEVERE, e.getMessage());
@@ -147,6 +154,12 @@ public class AdminServlet extends HttpServlet {
             c.background_pic = req.getParameter("background_pic");
             c.mios = new String[0];
 
+            String collectionId = req.getParameter("collection_id");
+            if (collectionId == null || !collectionId.matches("[\\w-]+")) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+
             // Serialize new collection to file
             File collectionFile = new File(dataDir + "/collections/" + req.getParameter("collection_id") + ".json");
             CollectionUtils.SaveCollectionToFile(c, collectionFile.getAbsolutePath());
@@ -164,13 +177,16 @@ public class AdminServlet extends HttpServlet {
                     continue;
 
                 var s = key.replace("approve-", "");
+                if (!MioUtils.isSafeFileName(s))
+                    continue;
                 output += "Looking for approved file " + s + "...\n";
                 File approvedMio = new File(dataDir + "/pending/" + s);
                 if (approvedMio.exists()) {
                     output += "Found! Adding to mio folder.\n";
                     // Add to collection
                     var cKey = "collection-" + s;
-                    if (req.getParameterMap().containsKey(cKey) && !req.getParameter(cKey).isEmpty()) {
+                    if (req.getParameterMap().containsKey(cKey) && !req.getParameter(cKey).isEmpty()
+                            && MioUtils.isSafeFileName(req.getParameter(cKey))) {
 
                         output += "Added to collection " + req.getParameter(cKey) + "\n";
 
@@ -418,11 +434,9 @@ public class AdminServlet extends HttpServlet {
             throw new ServletException("Password not set.");
         }
 
-        if (userpassDecoded.equals(System.getenv("DSOFT_PASS"))) {
-            return true;
-        } else {
-            return false;
-        }
+        // Constant-time comparison so response timing doesn't leak the password.
+        return MessageDigest.isEqual(userpassDecoded.getBytes(StandardCharsets.UTF_8),
+                System.getenv("DSOFT_PASS").getBytes(StandardCharsets.UTF_8));
     }
 
 }
