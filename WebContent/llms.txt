@@ -1,0 +1,9 @@
+# DoujinSoft Store
+
+> A store of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY. Content can be played in the browser and transferred to your own copy of the game.
+
+- [Home](https://diy.tvc-16.science/home): latest news and collections
+- [Games](https://diy.tvc-16.science/games): microgames
+- [Comics](https://diy.tvc-16.science/comics): comics
+- [Records](https://diy.tvc-16.science/records): music
+- [About / FAQ](https://diy.tvc-16.science/about): how to transfer content to a DS or Wii

@@ -8,9 +8,11 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  <meta name="msapplication-TileColor" content="#da532c">
-  <meta name="theme-color" content="#ffffff">
-  <title>DoujinSoft Store</title>
+  <meta name="msapplication-TileColor" content="#a94c4b">
+  <meta name="theme-color" content="#a94c4b">
+  <title>{% block pagetitle %}DoujinSoft Store - WarioWare DIY games, comics and music{% endblock %}</title>
+  <meta name="description"
+    content="Browse, play and download games, comics and music made with WarioWare DIY, and transfer them to your own copy of the game.">
 
   <!-- CSS -->
   <link href="https://fonts.googleapis.com/css?family=Karla|Material+Icons" rel="stylesheet">
@@ -43,21 +45,32 @@
   {% if singleitem == true %}
   {% for item in items %}
   <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:site_name" content="DoujinSoft Store" />
   <meta property="og:title" content="{{ item.name }} by {{ item.creator }} on the DoujinSoft Store" />
   <meta property="og:type" content="website" />
   <meta property="og:description" content="{{ item.mioDesc1 }} {{ item.mioDesc2 }}" />
   <meta property="og:image"
-    content="http://diy.tvc-16.science/download?preview&id={{ item.hash }}&type={% block type %}{% endblock %}" />
+    content="https://diy.tvc-16.science/download?preview&id={{ item.hash }}&type={% block type %}{% endblock %}" />
   <!-- Hardcoding the URL kinda sucks here -->
   {% endfor %}
   {% else %}
   <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:site_name" content="DoujinSoft Store" />
   <meta property="og:title" content="DoujinSoft Store" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://diy.tvc-16.science/" />
   <meta property="og:description"
     content="The DoujinSoft Store presents a selection of games, music and comics created with the 2010 Nintendo DS game WarioWare DIY, available to play with and transfer to your own copies of the game." />
-  <meta property="og:image" content="http://diy.tvc-16.science/meta.jpg" />
-  <!-- Hardcoding the URL kinda sucks here -->
+  <meta property="og:image" content="https://diy.tvc-16.science/meta.jpg" />
+  <meta property="og:image:width" content="1122" />
+  <meta property="og:image:height" content="619" />
+  <meta property="og:image:alt" content="The DoujinSoft Store" />
+  <link rel="canonical" href="https://diy.tvc-16.science/" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"DoujinSoft Store","url":"https://diy.tvc-16.science/",
+   "description":"A store of games, music and comics created with WarioWare DIY, available to play and transfer to your own copy of the game.",
+   "image":"https://diy.tvc-16.science/android-chrome-512x512.png"}
+  </script>
   {% endif %}
 
   {% endblock %}
