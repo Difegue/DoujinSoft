@@ -1,10 +1,10 @@
 {
-    "collection_name": "Games from RiiConnect24",
+    "collection_name": "Games from the old WiiLink",
     "collection_color": "light-blue",
     "collection_icon": "autorenew",
     "background_pic": "./img/bg_rc24.jpg",
-    "collection_desc": "These games have been sent directly from RC24 users!",
-    "collection_desc2": "RiiConnect24 support has been discontinued in favor of WiiLink... But it doesn't mean those games are gone!",
+    "collection_desc": "These games have been sent directly from users of the earlier WiiLink service!",
+    "collection_desc2": "The earlier service has been replaced by the current WiiLink... But it doesn't mean those games are gone!",
     "mios": [
         "40adac3df3ed94e0ff61652e1b182572",
         "4aede17b20938c7d8967b0fa64f84951",

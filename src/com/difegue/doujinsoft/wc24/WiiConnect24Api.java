@@ -49,7 +49,7 @@ public class WiiConnect24Api extends WC24Base {
 
         for (List<MailItem> chunk : chunkedMails) {
             output += sendMailsInternal(chunk);
-            // Sleep between chunks to avoid murdering the RC24 server :|
+            // Sleep between chunks to avoid murdering the WiiLink server :|
             Thread.sleep(1000);
             output += "----------------\n";
         }
