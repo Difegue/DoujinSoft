@@ -48,6 +48,16 @@ public class ServerInit implements javax.servlet.ServletContextListener {
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS Friends "
                 + "(friendcode TEXT, "
                 + "PRIMARY KEY(`friendcode`) )");
+
+        // Hash of a mio's content minus its per-copy header fields, used to reject re-uploaded copies.
+        // SQLite has no ADD COLUMN IF NOT EXISTS: this fails harmlessly once the column is there.
+        for (String table : new String[] { "Games", "Manga", "Records" }) {
+            try {
+                statement.executeUpdate("ALTER TABLE " + table + " ADD COLUMN contentHash TEXT");
+            } catch (SQLException e) {
+                // column already exists
+            }
+        }
     }
 
     @Override
