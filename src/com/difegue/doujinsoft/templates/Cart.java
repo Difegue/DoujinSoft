@@ -1,5 +1,6 @@
 package com.difegue.doujinsoft.templates;
 
+import com.difegue.doujinsoft.utils.MioUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -46,15 +47,27 @@ public class Cart {
         // Get the cart data and deserialize it.
         JsonElement a = JsonParser.parseString(request.getParameter("games"));
         if (a.isJsonArray())
-            games = a.getAsJsonArray();
+            games = onlyValidIds(a.getAsJsonArray());
 
         a = JsonParser.parseString(request.getParameter("manga"));
         if (a.isJsonArray())
-            manga = a.getAsJsonArray();
+            manga = onlyValidIds(a.getAsJsonArray());
 
         a = JsonParser.parseString(request.getParameter("records"));
         if (a.isJsonArray())
-            records = a.getAsJsonArray();
+            records = onlyValidIds(a.getAsJsonArray());
+    }
+
+    // Cart ids end up in file paths, so drop anything that isn't a mio hash.
+    private static JsonArray onlyValidIds(JsonArray items) {
+        JsonArray valid = new JsonArray();
+        for (JsonElement item : items) {
+            if (item.isJsonObject() && item.getAsJsonObject().has("id")
+                    && item.getAsJsonObject().get("id").isJsonPrimitive()
+                    && MioUtils.isValidHash(item.getAsJsonObject().get("id").getAsString()))
+                valid.add(item);
+        }
+        return valid;
     }
 
     public JsonArray getGames() {
