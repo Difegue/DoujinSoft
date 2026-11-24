@@ -134,7 +134,7 @@ public class MailItem {
         PebbleTemplate template = null;
 
         // Note: The Wii normally expects mails to use CRLF for line endings.
-        // Both the RC24 and WL24 mail servers smooth this over, but it's a thing to
+        // Both the RC24 and WiiLink mail servers smooth this over, but it's a thing to
         // consider for future potential backends!
         switch (attachmentType) {
             case 0:
